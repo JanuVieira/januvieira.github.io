@@ -722,10 +722,10 @@
     .speaker__art:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       grid-area: art;
       width: 88px;
-      height: 100%;
-      min-height: 112px;
-      align-self: stretch;
-      aspect-ratio: auto;
+      height: 88px;
+      min-height: 0;
+      align-self: start;
+      aspect-ratio: 1;
       border-radius: var(--radius-tile);
     }
     .speaker__art:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) > span {
@@ -1080,10 +1080,9 @@
       column-gap: var(--space-3);
       padding: var(--space-3);
     }
-    .speaker__art:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) > span,
-    .speaker__art:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) img {
+    .speaker__art:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       width: 76px;
-      min-height: 104px;
+      height: 76px;
     }
   }
 
@@ -3511,8 +3510,7 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
     }
 @media (min-width: 1024px) {
     .speakers--nine:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      grid-template-columns: repeat(3, minmax(0, 360px));
-      justify-content: center;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 .speaker:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
@@ -4306,10 +4304,10 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
     .speaker__art:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       grid-area: art;
       width: 100%;
-      height: 100%;
-      min-height: var(--speaker-art);
-      align-self: stretch;
-      aspect-ratio: auto;
+      height: var(--speaker-art);
+      min-height: 0;
+      align-self: start;
+      aspect-ratio: 1;
       border-radius: var(--radius-tile);
     }
     .speaker__art:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) > span {

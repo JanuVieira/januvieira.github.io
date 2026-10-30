@@ -46,6 +46,13 @@ try:
             layout = page.evaluate("""() => ({doc: document.documentElement.scrollWidth, viewport: innerWidth})""")
             check(layout["doc"] <= layout["viewport"] + 1, f"sem overflow horizontal {width}x{height}", str(layout))
             check(not errors, f"sem exceções JS {width}x{height}", str(errors[:2]))
+            portrait_grid = page.locator('.speaker__art').evaluate_all("""
+              els => els.every((art) => {
+                const r = art.getBoundingClientRect();
+                return r.width > 0 && r.height > 0 && Math.abs(r.width - r.height) <= 1;
+              })
+            """)
+            check(portrait_grid, f"áreas de fotografia quadradas em {width}x{height}")
             page.close()
 
         page = browser.new_page(viewport={"width":390,"height":844}, reduced_motion="reduce")
@@ -227,14 +234,23 @@ try:
         nine_grid = desktop.locator('.speakers').evaluate("""
           (list) => {
             const cards = [...list.children];
-            const lefts = [...new Set(cards.map((card) => Math.round(card.getBoundingClientRect().left)))];
+            const listRect = list.getBoundingClientRect();
+            const rects = cards.map((card) => card.getBoundingClientRect());
+            const lefts = [...new Set(rects.map((rect) => Math.round(rect.left)))];
             return {
               columns: lefts.length,
-              maxWidth: Math.max(...cards.map((card) => card.getBoundingClientRect().width)),
+              leftGap: Math.abs(Math.min(...rects.map((rect) => rect.left)) - listRect.left),
+              rightGap: Math.abs(listRect.right - Math.max(...rects.map((rect) => rect.right))),
             };
           }
         """)
-        check(nine_grid['columns'] == 3 and nine_grid['maxWidth'] <= 361, 'grade de nove palestrantes forma três colunas limitadas no desktop')
+        check(
+            nine_grid['columns'] == 3 and
+            nine_grid['leftGap'] <= 1 and
+            nine_grid['rightGap'] <= 1,
+            'grade de nove palestrantes forma três colunas alinhadas ao container no desktop',
+            str(nine_grid),
+        )
         desktop.close()
 
         tablet_context = browser.new_context(

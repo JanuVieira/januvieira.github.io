@@ -234,7 +234,17 @@
     /* Mais respiro entre os links do menu aberto, inclusive em paisagem. */
 
     /* A biografia deve ocupar uma linha INTEIRA do cartão e crescer naturalmente. */
-  }/* ==========================================================================
+  }
+@media (max-width: 767px) {
+
+    /* A cor do documento acompanha o rodapé durante o overscroll no iOS. */
+
+    /* Mais área azul, sem impor altura fixa que corte títulos ou botões. */
+
+    /* Público-alvo como bloco próprio, com hierarquia e leitura por linhas. */
+  }
+/* Menos altura no celular deitado, sem sacrificar os controles. */
+/* Telefones compactos mantêm controles empilhados e tipografia legível. *//* ==========================================================================
    Patentes para Bioinovadores — estilos
    Ordem das camadas: tokens → reset → base → layout → components → sections → mobile
    Responsive bands: sm ≤480 · md 481–767 · lg 768–1023 · xl ≥1024
@@ -5083,4 +5093,155 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
       display: none;
     }
   }
+
+/* mobile-editorial-20261030:start */
+/* Hero, público-alvo e acabamento inferior. Alterações restritas ao mobile. */
+@media (max-width: 767px) {
+    :root:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      --fs-body: 17px;
+      --fs-small: 15px;
+      --fs-ui: 16px;
+    }
+
+    /* A cor do documento acompanha o rodapé durante o overscroll no iOS. */
+    html:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      background-color: var(--ink);
+    }
+    body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      min-height: 100vh;
+      min-height: 100svh;
+      background: var(--page-bg);
+    }
+    .site-footer:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+    }
+    .site-header.has-menu:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      padding-top: calc(var(--space-2) + env(safe-area-inset-top, 0px));
+    }
+
+    /* Mais área azul, sem impor altura fixa que corte títulos ou botões. */
+    .hero__grid:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      --hero-pad-top: var(--space-10);
+      --hero-pad-bottom: var(--space-12);
+    }
+    .hero__copy:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      padding-top: var(--space-8);
+    }
+    .hero__title-strong:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      font-size: clamp(32px, 10.7vw, 44px);
+      font-size: clamp(32px, 11.5cqi, 44px);
+      line-height: 1.06;
+      letter-spacing: -0.035em;
+    }
+    .hero__title-sub:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      margin-top: var(--space-4);
+      font-size: clamp(18px, 4.7vw, 21px);
+      line-height: 1.42;
+    }
+    .hero__icons:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      margin-top: var(--space-6);
+    }
+    .hero__actions:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      gap: var(--space-5);
+      margin-top: var(--space-10);
+    }
+    .hero__actions:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .pill,
+    .hero__actions:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .hero__link {
+      min-height: 52px;
+      font-size: var(--fs-ui);
+    }
+
+    /* Público-alvo como bloco próprio, com hierarquia e leitura por linhas. */
+    .audience:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      margin-top: var(--space-6);
+      padding: var(--space-6);
+      border-radius: var(--radius-card);
+      background: var(--white);
+    }
+    .audience:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .goals__label {
+      margin-bottom: var(--space-4);
+      font-family: var(--sans);
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+    }
+    .audience:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) ul {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+      margin: 0;
+      border-top: 2px solid var(--blue);
+    }
+    .audience:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr);
+      align-items: center;
+      justify-items: start;
+      gap: var(--space-4);
+      min-height: 76px;
+      padding-top: var(--space-4);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--divider);
+      font-size: clamp(18px, 4.9vw, 20px);
+      font-weight: 600;
+      line-height: 1.3;
+      text-align: left;
+      overflow-wrap: normal;
+    }
+    .audience:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+    .audience:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .icon {
+      width: 44px;
+      height: 44px;
+      padding: 8px;
+      border-radius: 12px;
+      background: var(--paper);
+      stroke-width: 1.6;
+    }
+  }
+/* Menos altura no celular deitado, sem sacrificar os controles. */
+@media (max-width: 767px) and (max-height: 500px) {
+    .hero__grid:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      --hero-pad-top: var(--space-5);
+      --hero-pad-bottom: var(--space-6);
+    }
+    .hero__copy:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      padding-top: var(--space-3);
+    }
+    .hero__title-strong:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      font-size: clamp(28px, 5vw, 34px);
+    }
+    .hero__title-sub:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      margin-top: var(--space-2);
+      font-size: 16px;
+    }
+    .hero__icons:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      display: none;
+    }
+    .hero__actions:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      gap: var(--space-4);
+      margin-top: var(--space-5);
+    }
+  }
+/* Telefones compactos mantêm controles empilhados e tipografia legível. */
+@media (max-width: 359px) {
+    .hero__title-strong:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      font-size: 32px;
+    }
+    .hero__actions:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      gap: var(--space-4);
+    }
+    .audience:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      padding: var(--space-5);
+    }
+    .audience:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li {
+      gap: var(--space-3);
+      font-size: 16px;
+    }
+  }
+/* mobile-editorial-20261030:end */
 

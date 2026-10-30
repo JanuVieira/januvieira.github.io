@@ -57,6 +57,39 @@ try:
 
         page = browser.new_page(viewport={"width":390,"height":844}, reduced_motion="reduce")
         page.goto(url, wait_until="domcontentloaded")
+        # Mudanças editoriais mobile, verificadas na página renderizada.
+        layout_mobile = page.evaluate("""() => {
+          const el = (selector) => document.querySelector(selector);
+          const box = (selector) => el(selector).getBoundingClientRect();
+          const font = (selector) => parseFloat(getComputedStyle(el(selector)).fontSize);
+          const hero = box('.hero__main');
+          const primary = box('.hero__actions .pill');
+          const secondary = box('.hero__actions .hero__link');
+          const audience = el('.audience');
+          const footer = el('.site-footer');
+          return {
+            heroHeight: hero.height,
+            titleSize: font('.hero__title-strong'),
+            subtitleSize: font('.hero__title-sub'),
+            bodySize: font('body'),
+            actionsGap: secondary.top - primary.bottom,
+            audienceBackground: getComputedStyle(audience).backgroundColor,
+            audienceRadius: parseFloat(getComputedStyle(audience).borderTopLeftRadius),
+            audienceItemSize: font('.audience li'),
+            footerBackground: getComputedStyle(footer).backgroundColor,
+            pageBackground: getComputedStyle(document.documentElement).backgroundColor,
+            footerPadding: parseFloat(getComputedStyle(footer).paddingBottom),
+            viewportFit: el('meta[name=viewport]').content.includes('viewport-fit=cover'),
+          };
+        }""")
+        check(layout_mobile['heroHeight'] >= 500, 'hero azul mobile tem altura ampliada', str(round(layout_mobile['heroHeight'])))
+        check(layout_mobile['titleSize'] >= 38 and layout_mobile['subtitleSize'] >= 18 and layout_mobile['bodySize'] >= 17,
+              'tipografia mobile ampliada com hierarquia', repr({key: layout_mobile[key] for key in ('titleSize','subtitleSize','bodySize')}))
+        check(layout_mobile['actionsGap'] >= 16, 'botoes do hero mobile com separacao reforcada', str(round(layout_mobile['actionsGap'])))
+        check(layout_mobile['audienceBackground'] == 'rgb(255, 255, 255)' and layout_mobile['audienceRadius'] >= 12 and layout_mobile['audienceItemSize'] >= 18,
+              'Para quem e possui composicao mobile independente')
+        check(layout_mobile['pageBackground'] == layout_mobile['footerBackground'] and layout_mobile['footerPadding'] >= 24 and layout_mobile['viewportFit'],
+              'fundo inferior acompanha rodape e contempla safe area')
         anchors = page.locator("a[href]")
         unnamed = []
         for i in range(anchors.count()):

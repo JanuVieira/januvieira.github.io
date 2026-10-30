@@ -199,6 +199,8 @@
     /* A short viewport or browser zoom must not strand the final menu link. */
   }
 @media (min-width: 768px) and (max-width: 1023px) {
+    /* The portrait is the strongest visual edge inside each tablet card.
+       Align the section heading with that edge instead of the card shell. */
 
     /* Two compact rows of content per card avoid the 280px empty tablet
        tiles that caused the program section to jump at exactly 768px. */
@@ -4220,6 +4222,13 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
     }
   }
 @media (min-width: 768px) and (max-width: 1023px) {
+    /* The portrait is the strongest visual edge inside each tablet card.
+       Align the section heading with that edge instead of the card shell. */
+    #palestrantes:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .section__head {
+      padding-left: var(--space-4);
+      padding-right: var(--space-4);
+    }
+
     .hero:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       padding-bottom: var(--space-12);
     }

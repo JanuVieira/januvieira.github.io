@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="pt-BR" data-site-version="74fbf4a1e3">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <!-- Consulta um arquivo pequeno sem cache. Se o GitHub Pages já tiver
+         uma publicação nova, recarrega esta página uma única vez usando a
+         versão como parâmetro e preserva a seção que a pessoa estava vendo. -->
+    <script>
+      (() => {
+        const currentVersion = document.documentElement.dataset.siteVersion;
+        const checkForUpdate = async () => {
+          try {
+            const manifestUrl = new URL('version.json', document.baseURI);
+            manifestUrl.searchParams.set('check', Date.now());
+            const response = await fetch(manifestUrl, { cache: 'no-store' });
+            if (!response.ok) return;
+            const { version } = await response.json();
+            if (!version || version === currentVersion) return;
+
+            const nextUrl = new URL(location.href);
+            if (nextUrl.searchParams.get('site-version') === version) return;
+            nextUrl.searchParams.set('site-version', version);
+            location.replace(nextUrl);
+          } catch {
+            /* O site continua funcionando normalmente quando estiver offline. */
+          }
+        };
+
+        checkForUpdate();
+        addEventListener('pageshow', (event) => {
+          if (event.persisted) checkForUpdate();
+        });
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) checkForUpdate();
+        });
+        setInterval(checkForUpdate, 5 * 60 * 1000);
+      })();
+    </script>
+    <!-- Esconde os encontros futuros até o main.js montar o seletor. Se o
+         main.js não carregar, o load libera todos os encontros. -->
+    <script>
+      document.documentElement.classList.add('js');
+      addEventListener('load', () => {
+        document.documentElement.classList.add('schedule-ready');
+        if (!document.documentElement.classList.contains('main-ready')) {
+          document.documentElement.classList.add('main-failed');
+        }
+      });
+    </script>
+    <title>Patentes para Bioinovadores | INPI</title>
+    <meta
+      name="description"
+      content="Curso online com aulas ao vivo sobre patentes de tecnologias da Bioeconomia. 3 a 19 de novembro de 2026, das 14h às 17h. Realização CGDI/INPI."
+    />
+    <meta name="theme-color" content="#f4f5ef" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Patentes para Bioinovadores" />
+    <meta
+      property="og:description"
+      content="Curso online com aulas ao vivo sobre patentes de tecnologias da Bioeconomia, em novembro de 2026."
+    />
+    <link rel="icon" href="assets/img/logo.svg?v=74fbf4a1e3" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap"
+    />
+    <link rel="stylesheet" href="assets/css/main.compat.css?v=74fbf4a1e3" />
+    <script src="assets/js/main.js?v=74fbf4a1e3" defer></script>
+    <script src="assets/js/dna.js?v=74fbf4a1e3" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+    <!-- No celular, com JavaScript, vira uma barra fixa com botão "Menu".
+         Os links marcados com site-nav__extra só aparecem nesse menu. -->
+    <header class="site-header container" id="topo">
+      <a class="site-header__brand" href="#topo" aria-label="Patentes para Bioinovadores">
+        <span>Patentes para Bioinovadores</span>
+        <svg class="site-header__brand-logo" viewBox="0 0 149 54" aria-hidden="true"><path d="M14.2903 0H31.197L16.9068 54H0L14.2903 0Z"/><path d="M43.1269 25.9473L34.5781 54.0004H55.5951L43.1269 25.9473Z"/><path d="M62.5112 28.0636L71.0599 0H50.043L62.5112 28.0636Z"/><path d="M87.0977 0H115.127C121.229 0 125.424 1.43567 127.712 4.30701C129.99 7.17834 130.424 11.2653 129.026 16.5783C127.585 22.0276 124.799 26.2926 120.668 29.3526C116.547 32.423 111.081 33.953 104.28 33.953H95.0426L89.7354 53.9895H72.7969L87.0977 0ZM97.9346 23.0231H102.066C105.318 23.0231 107.744 22.4677 109.365 21.3464C110.975 20.2356 112.013 18.7999 112.479 17.0604C112.924 15.3627 112.733 13.927 111.907 12.7533C111.081 11.5692 109.089 10.9823 105.932 10.9823H101.134L97.9452 23.0231H97.9346Z"/><path d="M132.001 0H148.908L134.618 54H117.711L132.001 0Z"/></svg>
+      </a>
+      <button class="site-header__toggle" type="button" aria-expanded="false" aria-controls="site-nav" hidden>
+        Menu<span class="site-header__toggle-icon" aria-hidden="true"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Navegação principal">
+        <a href="#conteudo-programatico">Conteúdo</a>
+        <a class="site-nav__extra" href="#objetivos">Objetivos</a>
+        <a href="#cronograma">Cronograma</a>
+        <a href="#palestrantes">Palestrantes</a>
+        <a class="site-nav__extra" href="#faq">Dúvidas</a>
+      </nav>
+    </header>
+
+    <main id="conteudo">
+      <!-- Hero -->
+      <section class="hero container" aria-labelledby="hero-title">
+        <div class="hero__grid">
+          <div class="hero__main">
+            <canvas class="hero__dna" aria-hidden="true"></canvas>
+            <div class="hero__brand">
+              <svg class="logo" viewBox="0 0 149 54" width="149" height="54" fill="currentColor" role="img" aria-label="INPI"><path d="M14.2903 0H31.197L16.9068 54H0L14.2903 0Z"/><path d="M43.1269 25.9473L34.5781 54.0004H55.5951L43.1269 25.9473Z"/><path d="M62.5112 28.0636L71.0599 0H50.043L62.5112 28.0636Z"/><path d="M87.0977 0H115.127C121.229 0 125.424 1.43567 127.712 4.30701C129.99 7.17834 130.424 11.2653 129.026 16.5783C127.585 22.0276 124.799 26.2926 120.668 29.3526C116.547 32.423 111.081 33.953 104.28 33.953H95.0426L89.7354 53.9895H72.7969L87.0977 0ZM97.9346 23.0231H102.066C105.318 23.0231 107.744 22.4677 109.365 21.3464C110.975 20.2356 112.013 18.7999 112.479 17.0604C112.924 15.3627 112.733 13.927 111.907 12.7533C111.081 11.5692 109.089 10.9823 105.932 10.9823H101.134L97.9452 23.0231H97.9346Z"/><path d="M132.001 0H148.908L134.618 54H117.711L132.001 0Z"/></svg>
+              <span class="hero__tag">Curso online - Aulas ao vivo</span>
+            </div>
+            <div class="hero__copy">
+              <div class="hero__heading">
+                <h1 class="hero__title" id="hero-title">
+                  <span class="hero__title-strong">Patentes para Bioinovadores:</span>
+                  <span class="hero__title-sub">Detalhes sobre patentes de tecnologias da Bioeconomia</span>
+                </h1>
+                <ul class="hero__icons" aria-hidden="true">
+                  <li>
+                    <svg class="icon" viewBox="5.6 2.1 20.8 27.8" aria-hidden="true">
+                    <path d="M16 29V12" />
+                    <path d="M16 16c0-5.5-3.6-9-9.5-9 0 5.6 3.7 9 9.5 9Z" />
+                    <path d="M16 12c0-5.2 3.4-9 9.5-9 0 5.6-3.8 9-9.5 9Z" />
+                    <path d="M10 29h12" />
+                    </svg>
+                  </li>
+                  <li>
+                    <svg class="icon" viewBox="3.20 2.1 25.61 27.8" aria-hidden="true">
+                    <path d="M15.48 29.00 L16.06 28.92 L16.63 28.84 L17.18 28.75 L17.70 28.65 L18.20 28.54 L18.68 28.42 L19.12 28.30 L19.53 28.16 L19.91 28.00 L20.26 27.84 L20.56 27.66 L20.83 27.47 L21.06 27.26 L21.25 27.04 L21.40 26.81 L21.51 26.56 L21.58 26.29 L21.61 26.01 L21.60 25.72 L21.54 25.41 L21.45 25.08 L21.33 24.75 L21.16 24.40 L20.96 24.04 L20.73 23.66 L20.47 23.27 L20.17 22.88 L19.85 22.47 L19.51 22.06 L19.14 21.63 L18.76 21.20 L18.36 20.77 L17.94 20.33 L17.52 19.88 L17.08 19.43 L16.65 18.99 L16.21 18.54 L15.78 18.09 L15.34 17.64 L14.92 17.20 L14.51 16.76 L14.11 16.32 L13.74 15.89 L13.38 15.47 L13.04 15.06 L12.73 14.66 L12.44 14.26 L12.19 13.88 L11.96 13.51 L11.78 13.15 L11.62 12.81 L11.50 12.47 L11.42 12.15 L11.38 11.85 L11.38 11.56 L11.42 11.28 L11.51 11.02 L11.63 10.78 L11.79 10.55 L11.99 10.33 L12.23 10.13 L12.51 9.94 L12.83 9.77 L13.19 9.60 L13.57 9.46 L14.00 9.32 L14.45 9.19 L14.93 9.08 L15.44 8.97 L15.97 8.88 L16.53 8.79 L17.10 8.71 L17.69 8.63 L18.29 8.56 L18.90 8.49 L19.52 8.43 L20.15 8.37 L20.77 8.30 L21.39 8.24 L22.01 8.17 L22.61 8.11 L23.21 8.03 L23.79 7.95 L24.36 7.87 L24.90 7.78 L25.42 7.68 L25.92 7.57 L26.39 7.45 L26.83 7.32 L27.23 7.18" />
+                    <path d="M10.74 27.27 L10.34 26.84 L9.96 26.41 L9.59 25.99 L9.25 25.58 L8.94 25.17 L8.65 24.78 L8.40 24.39 L8.17 24.02 L7.98 23.66 L7.82 23.31 L7.70 22.98 L7.62 22.66 L7.57 22.35 L7.57 22.06 L7.61 21.78 L7.68 21.52 L7.80 21.28 L7.96 21.04 L8.16 20.83 L8.40 20.62 L8.67 20.43 L8.99 20.26 L9.34 20.10 L9.72 19.95 L10.14 19.81 L10.59 19.68 L11.07 19.57 L11.58 19.46 L12.11 19.36 L12.66 19.27 L13.23 19.19 L13.82 19.12 L14.42 19.05 L15.03 18.98 L15.65 18.91 L16.28 18.85 L16.90 18.79 L17.52 18.72 L18.14 18.66 L18.75 18.59 L19.34 18.52 L19.93 18.44 L20.49 18.35 L21.04 18.26 L21.56 18.16 L22.06 18.06 L22.53 17.94 L22.97 17.81 L23.38 17.67 L23.76 17.51 L24.10 17.35 L24.40 17.17 L24.67 16.97 L24.89 16.77 L25.08 16.54 L25.23 16.31 L25.33 16.06 L25.40 15.79 L25.42 15.51 L25.41 15.21 L25.35 14.90 L25.26 14.58 L25.13 14.24 L24.96 13.89 L24.76 13.53 L24.52 13.15 L24.25 12.76 L23.96 12.36 L23.64 11.96 L23.29 11.54 L22.92 11.12 L22.54 10.69 L22.13 10.25 L21.72 9.81 L21.29 9.36 L20.86 8.92 L20.42 8.47 L19.98 8.02 L19.55 7.57 L19.12 7.12 L18.70 6.68 L18.29 6.24 L17.89 5.81 L17.51 5.38 L17.16 4.96 L16.82 4.55 L16.51 4.14 L16.23 3.75 L15.98 3.37 L15.76 3.00" />
+                    <path d="M17.96 28.60 L9.09 25.37 M21.16 27.15 L7.57 22.21 M21.25 24.57 L9.16 20.17 M11.87 13.33 L23.57 17.59 M11.70 10.66 L25.42 15.65 M14.69 9.14 L24.11 12.56 M25.17 7.73 L16.99 4.75" stroke-opacity="0.6" />
+                    <path d="M4.10 22.77h0 M27.90 20.47h0 M11.77 3.12h0" />
+                    </svg>
+                  </li>
+                  <li>
+                    <svg class="icon" viewBox="4.1 2.1 23.8 27.8" aria-hidden="true">
+                    <path d="M18 27H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7" />
+                    <path d="M9 9h10M9 13.5h7M9 18h4" />
+                    <circle cx="22.5" cy="19.5" r="4.5" />
+                    <path d="m20 23.4-1 5.6 3.5-2 3.5 2-1-5.6" />
+                    </svg>
+                  </li>
+                </ul>
+              </div>
+              <div class="hero__actions">
+                <a class="pill" href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=CPgVWJFgvUesqzDAj-e58jzfPrjp7eNKrmYV1YoTAwpUOThXSllGU1NSU09FWEgwRzc1V1BFQVlDNy4u" target="_blank" rel="noopener noreferrer">Inscreva-se<span class="visually-hidden"> (abre em nova aba)</span></a>
+                <a class="hero__link" href="#cronograma">Cronograma <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="dates">
+            <div class="dates__top">
+              <p>6 encontros</p>
+              <span class="dates__badge">30h</span>
+            </div>
+            <div class="dates__cal">
+              <p class="dates__month">NOV<span>/</span>26</p>
+              <ol class="dates__days" aria-label="Dias de aula em novembro de 2026">
+                <li><b>03</b>TER</li>
+                <li><b>05</b>QUI</li>
+                <li><b>10</b>TER</li>
+                <li><b>12</b>QUI</li>
+                <li><b>17</b>TER</li>
+                <li><b>19</b>QUI</li>
+              </ol>
+            </div>
+            <dl class="dates__facts">
+              <div>
+                <dt>Horário</dt>
+                <dd>14h às 17h</dd>
+              </div>
+              <div>
+                <dt>Dias</dt>
+                <dd>Terças e quintas</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- 01 · Conteúdo programático -->
+      <section class="section section--light program" id="conteudo-programatico" aria-labelledby="program-title">
+        <div class="container">
+          <header class="program__head">
+            <p class="eyebrow">01 / Conteúdo programático</p>
+            <h2 class="section__title" id="program-title">Conteúdo <em>programático.</em></h2>
+          </header>
+          <ol class="program__list">
+            <li><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/fundamentos.svg'); -webkit-mask-image: url('assets/img/icons/fundamentos.svg')"></i></span><span>Fundamentos de propriedade <br />industrial e patentes</span></li>
+            <li><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/planta.svg'); -webkit-mask-image: url('assets/img/icons/planta.svg')"></i></span><span>Legislação de biodiversidade <br />e depósito no INPI</span></li>
+            <li><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/protecao-internacional.svg'); -webkit-mask-image: url('assets/img/icons/protecao-internacional.svg')"></i></span><span>Patentes verdes e <br />proteção internacional</span></li>
+            <li><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/pesquisador.svg'); -webkit-mask-image: url('assets/img/icons/pesquisador.svg')"></i></span><span>Especificidades do setor <br />farmacêutico e químico</span></li>
+            <li><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/dna.svg'); -webkit-mask-image: url('assets/img/icons/dna.svg')"></i></span><span>Patentes aplicadas <br />à biotecnologia</span></li>
+            <li><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/patente.svg'); -webkit-mask-image: url('assets/img/icons/patente.svg')"></i></span><span>Busca de patentes e mapeamento <br />tecnológico em bioeconomia</span></li>
+          </ol>
+          <!-- TODO: confirmar se "Proteção de cultivares" (Encontro 6, 19/11) entra como sétimo eixo do programa. -->
+        </div>
+      </section>
+      <!-- 02 · Objetivos: geral + "Para quem é", depois os específicos em cartões -->
+      <section class="section" id="objetivos" aria-labelledby="goals-title">
+        <div class="container">
+          <div class="goals__intro">
+            <div class="goals__text">
+              <header class="goals__head">
+                <p class="eyebrow">02 / Objetivos</p>
+                <h2 class="section__title" id="goals-title">Por que <em>fazer o curso.</em></h2>
+              </header>
+              <p class="goals__general">
+                O curso prepara pesquisadores, bioinovadores e profissionais da bioeconomia para compreender os requisitos de patenteabilidade, a legislação aplicável à biodiversidade e as possibilidades de proteção de inovações tecnológicas. Também aborda técnicas de busca e redação de patentes e estratégias de depósito no Brasil e no exterior.
+              </p>
+            </div>
+            <section class="audience" aria-labelledby="audience-title">
+              <h3 class="goals__label" id="audience-title">Para quem é</h3>
+              <ul>
+                <li>
+                  <svg class="icon" viewBox="0 0 32 32" aria-hidden="true">
+                        <path d="M12.5 3h7M13.5 3v8.5L6.4 24.6A2.3 2.3 0 0 0 8.4 28h15.2a2.3 2.3 0 0 0 2-3.4L18.5 11.5V3" />
+                        <path d="M9.6 19h12.8" />
+                        <circle cx="14" cy="23.3" r="1" />
+                        <circle cx="18.6" cy="21.8" r="0.7" />
+                  </svg>
+                  <span>Pesquisadores</span>
+                </li>
+                <li>
+                  <svg class="icon" viewBox="0 0 32 32" aria-hidden="true">
+                        <path d="M15.48 29.00 L16.06 28.92 L16.63 28.84 L17.18 28.75 L17.70 28.65 L18.20 28.54 L18.68 28.42 L19.12 28.30 L19.53 28.16 L19.91 28.00 L20.26 27.84 L20.56 27.66 L20.83 27.47 L21.06 27.26 L21.25 27.04 L21.40 26.81 L21.51 26.56 L21.58 26.29 L21.61 26.01 L21.60 25.72 L21.54 25.41 L21.45 25.08 L21.33 24.75 L21.16 24.40 L20.96 24.04 L20.73 23.66 L20.47 23.27 L20.17 22.88 L19.85 22.47 L19.51 22.06 L19.14 21.63 L18.76 21.20 L18.36 20.77 L17.94 20.33 L17.52 19.88 L17.08 19.43 L16.65 18.99 L16.21 18.54 L15.78 18.09 L15.34 17.64 L14.92 17.20 L14.51 16.76 L14.11 16.32 L13.74 15.89 L13.38 15.47 L13.04 15.06 L12.73 14.66 L12.44 14.26 L12.19 13.88 L11.96 13.51 L11.78 13.15 L11.62 12.81 L11.50 12.47 L11.42 12.15 L11.38 11.85 L11.38 11.56 L11.42 11.28 L11.51 11.02 L11.63 10.78 L11.79 10.55 L11.99 10.33 L12.23 10.13 L12.51 9.94 L12.83 9.77 L13.19 9.60 L13.57 9.46 L14.00 9.32 L14.45 9.19 L14.93 9.08 L15.44 8.97 L15.97 8.88 L16.53 8.79 L17.10 8.71 L17.69 8.63 L18.29 8.56 L18.90 8.49 L19.52 8.43 L20.15 8.37 L20.77 8.30 L21.39 8.24 L22.01 8.17 L22.61 8.11 L23.21 8.03 L23.79 7.95 L24.36 7.87 L24.90 7.78 L25.42 7.68 L25.92 7.57 L26.39 7.45 L26.83 7.32 L27.23 7.18" />
+                        <path d="M10.74 27.27 L10.34 26.84 L9.96 26.41 L9.59 25.99 L9.25 25.58 L8.94 25.17 L8.65 24.78 L8.40 24.39 L8.17 24.02 L7.98 23.66 L7.82 23.31 L7.70 22.98 L7.62 22.66 L7.57 22.35 L7.57 22.06 L7.61 21.78 L7.68 21.52 L7.80 21.28 L7.96 21.04 L8.16 20.83 L8.40 20.62 L8.67 20.43 L8.99 20.26 L9.34 20.10 L9.72 19.95 L10.14 19.81 L10.59 19.68 L11.07 19.57 L11.58 19.46 L12.11 19.36 L12.66 19.27 L13.23 19.19 L13.82 19.12 L14.42 19.05 L15.03 18.98 L15.65 18.91 L16.28 18.85 L16.90 18.79 L17.52 18.72 L18.14 18.66 L18.75 18.59 L19.34 18.52 L19.93 18.44 L20.49 18.35 L21.04 18.26 L21.56 18.16 L22.06 18.06 L22.53 17.94 L22.97 17.81 L23.38 17.67 L23.76 17.51 L24.10 17.35 L24.40 17.17 L24.67 16.97 L24.89 16.77 L25.08 16.54 L25.23 16.31 L25.33 16.06 L25.40 15.79 L25.42 15.51 L25.41 15.21 L25.35 14.90 L25.26 14.58 L25.13 14.24 L24.96 13.89 L24.76 13.53 L24.52 13.15 L24.25 12.76 L23.96 12.36 L23.64 11.96 L23.29 11.54 L22.92 11.12 L22.54 10.69 L22.13 10.25 L21.72 9.81 L21.29 9.36 L20.86 8.92 L20.42 8.47 L19.98 8.02 L19.55 7.57 L19.12 7.12 L18.70 6.68 L18.29 6.24 L17.89 5.81 L17.51 5.38 L17.16 4.96 L16.82 4.55 L16.51 4.14 L16.23 3.75 L15.98 3.37 L15.76 3.00" />
+                        <path d="M17.96 28.60 L9.09 25.37 M21.16 27.15 L7.57 22.21 M21.25 24.57 L9.16 20.17 M11.87 13.33 L23.57 17.59 M11.70 10.66 L25.42 15.65 M14.69 9.14 L24.11 12.56 M25.17 7.73 L16.99 4.75" stroke-opacity="0.6" />
+                          <path d="M4.10 22.77h0 M27.90 20.47h0 M11.77 3.12h0" />
+                  </svg>
+                  <span>Bioinovadores</span>
+                </li>
+                <li>
+                  <svg class="icon" viewBox="0 0 32 32" aria-hidden="true">
+                        <path d="M16 29V12" />
+                        <path d="M16 16c0-5.5-3.6-9-9.5-9 0 5.6 3.7 9 9.5 9Z" />
+                        <path d="M16 12c0-5.2 3.4-9 9.5-9 0 5.6-3.8 9-9.5 9Z" />
+                        <path d="M10 29h12" />
+                  </svg>
+                  <span>Profissionais da bioeconomia</span>
+                </li>
+              </ul>
+              <!-- TODO: se confirmado, acrescentar linha sobre pré-requisito (ex.: "Não é preciso conhecimento prévio sobre patentes"). -->
+            </section>
+          </div>
+
+          <h3 class="goals__lead">Ao final do curso, você será capaz de</h3>
+          <!-- TODO: aguardando autorização para corrigir "Tratado de Nagoya" para "Protocolo de Nagoia" no cartão 02. -->
+          <ol class="goal-cards">
+            <li class="goal-card is-open">
+              <details class="goal-card__details" open>
+              <summary><span class="goal-card__num" aria-hidden="true">01</span><h4>Patenteabilidade</h4><span class="goal-card__toggle" aria-hidden="true"></span></summary>
+              <div class="goal-card__more">
+                <p>Compreender a fronteira que distingue simples descobertas científicas de invenções patenteáveis na bioeconomia.</p>
+                <ul class="goal-card__tags" aria-label="Temas">
+                  <li>Descoberta × invenção</li>
+                  <li>Patenteabilidade</li>
+                </ul>
+              </div>
+              </details>
+            </li>
+            <li class="goal-card">
+              <details class="goal-card__details" open>
+              <summary><span class="goal-card__num" aria-hidden="true">02</span><h4>Biodiversidade</h4><span class="goal-card__toggle" aria-hidden="true"></span></summary>
+              <div class="goal-card__more">
+                <p>Navegar pelas exigências legais da biodiversidade, como o cadastramento no SisGen/CGen, a conformidade com o Tratado de Nagoya e o depósito de material genético pelo Tratado de Budapeste.</p>
+                <ul class="goal-card__tags" aria-label="Temas">
+                  <li>SisGen/CGen</li>
+                  <li>Tratado de Nagoya</li>
+                  <li>Tratado de Budapeste</li>
+                </ul>
+              </div>
+              </details>
+            </li>
+            <li class="goal-card">
+              <details class="goal-card__details" open>
+              <summary><span class="goal-card__num" aria-hidden="true">03</span><h4>Reivindicações</h4><span class="goal-card__toggle" aria-hidden="true"></span></summary>
+              <div class="goal-card__more">
+                <p>Aplicar técnicas de redação de quadros reivindicatórios específicos para as áreas de biotecnologia, como microrganismos e listagem de sequências, e para o setor farmacêutico, como fórmulas de Markush e segundo uso médico.</p>
+                <ul class="goal-card__tags" aria-label="Temas">
+                  <li>Microrganismos</li>
+                  <li>Listagem de sequências</li>
+                  <li>Fórmulas de Markush</li>
+                  <li>Segundo uso médico</li>
+                </ul>
+              </div>
+              </details>
+            </li>
+            <li class="goal-card">
+              <details class="goal-card__details" open>
+              <summary><span class="goal-card__num" aria-hidden="true">04</span><h4>Proteção internacional</h4><span class="goal-card__toggle" aria-hidden="true"></span></summary>
+              <div class="goal-card__more">
+                <p>Estruturar estratégias de proteção e divulgação internacional e sustentável, utilizando mecanismos como PCT, CUP, Patentes Verdes e WIPO GREEN.</p>
+                <ul class="goal-card__tags" aria-label="Temas">
+                  <li>PCT</li>
+                  <li>CUP</li>
+                  <li>Patentes Verdes</li>
+                  <li>WIPO GREEN</li>
+                </ul>
+              </div>
+              </details>
+            </li>
+            <li class="goal-card">
+              <details class="goal-card__details" open>
+              <summary><span class="goal-card__num" aria-hidden="true">05</span><h4>Busca tecnológica</h4><span class="goal-card__toggle" aria-hidden="true"></span></summary>
+              <div class="goal-card__more">
+                <p>Executar pesquisas de prospecção e busca tecnológica em bases de dados para mapear patentes na área da bioeconomia.</p>
+                <ul class="goal-card__tags" aria-label="Temas">
+                  <li>Bases de patentes</li>
+                  <li>Mapeamento tecnológico</li>
+                </ul>
+              </div>
+              </details>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 03 · Cronograma
+           Enquanto os links oficiais não estiverem disponíveis, as ações de
+           cada encontro permanecem visíveis e desabilitadas. -->
+      <section class="section section--blue" id="cronograma" aria-labelledby="schedule-title">
+        <div class="container schedule">
+          <!-- Left column: title, day picker and arrows -->
+          <div class="schedule__aside">
+          <header class="section__head">
+            <div>
+            <p class="eyebrow">03 / Cronograma</p>
+              <h2 class="section__title" id="schedule-title">
+                Novembro.<br />Seis encontros,<br /><em>ao vivo.</em>
+              </h2>
+            </div>
+          </header>
+          <div class="day-nav" hidden>
+            <div class="day-nav__tabs" role="group" aria-label="Escolha o encontro">
+              <button type="button" data-day="0" aria-controls="encontro-1" aria-label="Encontro 1 — terça-feira, 3 de novembro" aria-pressed="false">03<small>TER</small></button>
+              <button type="button" data-day="1" aria-controls="encontro-2" aria-label="Encontro 2 — quinta-feira, 5 de novembro" aria-pressed="false">05<small>QUI</small></button>
+              <button type="button" data-day="2" aria-controls="encontro-3" aria-label="Encontro 3 — terça-feira, 10 de novembro" aria-pressed="false">10<small>TER</small></button>
+              <button type="button" data-day="3" aria-controls="encontro-4" aria-label="Encontro 4 — quinta-feira, 12 de novembro" aria-pressed="false">12<small>QUI</small></button>
+              <button type="button" data-day="4" aria-controls="encontro-5" aria-label="Encontro 5 — terça-feira, 17 de novembro" aria-pressed="false">17<small>TER</small></button>
+              <button type="button" data-day="5" aria-controls="encontro-6" aria-label="Encontro 6 — quinta-feira, 19 de novembro" aria-pressed="false">19<small>QUI</small></button>
+            </div>
+            <button class="round-link round-link--lg" type="button" data-step="-1" aria-label="Ver encontro anterior">
+              <svg class="chevron chevron--left" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg>
+            </button>
+            <p class="day-nav__status" role="status" aria-live="polite"></p>
+            <button class="round-link round-link--lg" type="button" data-step="1" aria-label="Ver encontro seguinte">
+              <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg>
+            </button>
+          </div>
+
+          </div>
+
+          <!-- Right column: the selected day's lessons -->
+          <div class="schedule__days">
+          <article class="day" id="encontro-1" data-date="2026-11-03" aria-labelledby="encontro-1-title">
+            <header class="day__label">
+              <svg class="day__icon" xmlns="http://www.w3.org/2000/svg" viewBox="3 2 26 27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="4" y="6" width="24" height="22" rx="3" />
+                <path d="M4 12.5h24M10.5 3v6M21.5 3v6" />
+                <path d="M10 18h.01M16 18h.01M22 18h.01M10 23h.01M16 23h.01" stroke-width="2.6" />
+              </svg>
+              <div>
+                <h3 id="encontro-1-title">Encontro 1</h3>
+                <p>Terça&#8209;feira, 3 de novembro</p>
+              </div>
+            </header>
+            <div class="day__actions" role="group" aria-labelledby="encontro-1-title">
+              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 1 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Em breve</span></span>
+              </button>
+              <button class="btn" type="button" disabled aria-label="Baixar materiais do Encontro 1 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 2.5v8m0 0L4.8 7.3M8 10.5l3.2-3.2M3 13.5h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <span class="btn__label">Baixar materiais<span class="btn__status">Em breve</span></span>
+              </button>
+            </div>
+            <ol class="day__lessons">
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-03T14:00">14h</time> às <time datetime="2026-11-03T16:00">16h</time>
+                </p>
+                <h4 class="lesson__title">Fundamentos de patentes e propriedade industrial</h4>
+                <p class="lesson__speaker">
+                  <strong>Dra. Tatiana Carestiato</strong>
+                  <small>Palestrante · INPI</small>
+                </p>
+                <details class="lesson__topics">
+                  <summary><span class="visually-hidden">Fundamentos de patentes e propriedade industrial: </span><span class="lesson__more">Abrir 8 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <ul>
+                    <li>O papel da propriedade intelectual (PI) na inovação e no desenvolvimento dos países</li>
+                    <li>Patente: definição, tipos e principais características</li>
+                    <li>Biotecnologia, bioinovação e bioeconomia: conceitos integrados</li>
+                    <li>Requisitos e condições de patenteabilidade</li>
+                    <li>Estrutura do pedido de patente e introdução à redação do quadro reivindicatório</li>
+                    <li>Inovação sustentável</li>
+                    <li>Trâmite prioritário no INPI e Patentes Verdes</li>
+                    <li>Integração com a plataforma WIPO GREEN</li>
+                  </ul>
+                </details>
+              </li>
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-03T16:00">16h</time> às <time datetime="2026-11-03T17:00">17h</time>
+                </p>
+                <h4 class="lesson__title">Relato de uma empresa inovadora da bioeconomia</h4>
+                <p class="lesson__speaker">
+                  <strong>Empresa a confirmar</strong>
+                  <small>Empresa convidada</small>
+                </p>
+              </li>
+            </ol>
+          </article>
+
+          <article class="day" id="encontro-2" data-date="2026-11-05" aria-labelledby="encontro-2-title">
+            <header class="day__label">
+              <svg class="day__icon" xmlns="http://www.w3.org/2000/svg" viewBox="3 2 26 27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="4" y="6" width="24" height="22" rx="3" />
+                <path d="M4 12.5h24M10.5 3v6M21.5 3v6" />
+                <path d="M10 18h.01M16 18h.01M22 18h.01M10 23h.01M16 23h.01" stroke-width="2.6" />
+              </svg>
+              <div>
+                <h3 id="encontro-2-title">Encontro 2</h3>
+                <p>Quinta&#8209;feira, 5 de novembro</p>
+              </div>
+            </header>
+            <div class="day__actions" role="group" aria-labelledby="encontro-2-title">
+              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 2 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Em breve</span></span>
+              </button>
+              <button class="btn" type="button" disabled aria-label="Baixar materiais do Encontro 2 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 2.5v8m0 0L4.8 7.3M8 10.5l3.2-3.2M3 13.5h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <span class="btn__label">Baixar materiais<span class="btn__status">Em breve</span></span>
+              </button>
+            </div>
+            <ol class="day__lessons">
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-05T14:00">14h</time> às <time datetime="2026-11-05T15:00">15h</time>
+                </p>
+                <h4 class="lesson__title">Proteção internacional das patentes de tecnologias da bioeconomia</h4>
+                <p class="lesson__speaker">
+                  <strong>Dr. Jeferson Monteiro</strong>
+                  <small>Palestrante · PCT-INPI</small>
+                  <!-- TODO: confirmar significado e grafia de "PCT-INPI". -->
+                </p>
+                <details class="lesson__topics">
+                  <summary><span class="visually-hidden">Proteção internacional das patentes de tecnologias da bioeconomia: </span><span class="lesson__more">Abrir 1 tópico</span><span class="lesson__less">Fechar tópico</span></summary>
+                  <ul>
+                    <li>Internacionalização de patentes: estratégias e vias de depósito no exterior pela Convenção da União de Paris (CUP) e pelo Tratado de Cooperação em Matéria de Patentes (PCT)</li>
+                  </ul>
+                </details>
+              </li>
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-05T15:00">15h</time> às <time datetime="2026-11-05T17:00">17h</time>
+                </p>
+                <h4 class="lesson__title">Limites de patenteabilidade, ativos biológicos e transferência de tecnologia</h4>
+                <p class="lesson__speaker">
+                  <strong>Profa. Dra. Renata Angeli</strong>
+                  <small>Palestrante · UERJ</small>
+                </p>
+                <details class="lesson__topics">
+                  <summary><span class="visually-hidden">Limites de patenteabilidade, ativos biológicos e transferência de tecnologia: </span><span class="lesson__more">Abrir 3 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <ul>
+                    <li>Limites de patenteabilidade: o que pode ser patenteado em biotecnologia, inclusive microrganismos transgênicos</li>
+                    <li>Ativos biológicos: requisitos de acesso a recursos genéticos e tratamento formal da listagem de sequências</li>
+                    <li>Transferência de tecnologia</li>
+                  </ul>
+                </details>
+              </li>
+            </ol>
+          </article>
+
+          <article class="day" id="encontro-3" data-date="2026-11-10" aria-labelledby="encontro-3-title">
+            <header class="day__label">
+              <svg class="day__icon" xmlns="http://www.w3.org/2000/svg" viewBox="3 2 26 27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="4" y="6" width="24" height="22" rx="3" />
+                <path d="M4 12.5h24M10.5 3v6M21.5 3v6" />
+                <path d="M10 18h.01M16 18h.01M22 18h.01M10 23h.01M16 23h.01" stroke-width="2.6" />
+              </svg>
+              <div>
+                <h3 id="encontro-3-title">Encontro 3</h3>
+                <p>Terça&#8209;feira, 10 de novembro</p>
+              </div>
+            </header>
+            <div class="day__actions" role="group" aria-labelledby="encontro-3-title">
+              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 3 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Em breve</span></span>
+              </button>
+              <button class="btn" type="button" disabled aria-label="Baixar materiais do Encontro 3 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 2.5v8m0 0L4.8 7.3M8 10.5l3.2-3.2M3 13.5h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <span class="btn__label">Baixar materiais<span class="btn__status">Em breve</span></span>
+              </button>
+            </div>
+            <ol class="day__lessons">
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-10T14:00">14h</time> às <time datetime="2026-11-10T16:00">16h</time>
+                </p>
+                <h4 class="lesson__title">Legislação de biodiversidade e depósito no INPI</h4>
+                <p class="lesson__speaker">
+                  <strong>Profa. Dra. Cláudia Auler</strong>
+                  <small>Palestrante · UFT</small>
+                </p>
+                <details class="lesson__topics">
+                  <summary><span class="visually-hidden">Legislação de biodiversidade e depósito no INPI: </span><span class="lesson__more">Abrir 3 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <ul>
+                    <li>Acesso e repartição de benefícios: Lei da Biodiversidade, Protocolo de Nagoia, CGen e SisGen</li>
+                    <li>Tratados e depósitos internacionais: normas da OMPI e Tratado de Budapeste para depósito de material genético e microrganismos</li>
+                    <li>Passo a passo do depósito de pedidos de patente no INPI e da submissão da listagem de sequências</li>
+                  </ul>
+                </details>
+              </li>
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-10T16:00">16h</time> às <time datetime="2026-11-10T17:00">17h</time>
+                </p>
+                <h4 class="lesson__title">Relato de uma empresa inovadora da bioeconomia</h4>
+                <p class="lesson__speaker">
+                  <strong>Empresa a confirmar</strong>
+                  <small>Empresa convidada</small>
+                </p>
+              </li>
+            </ol>
+          </article>
+
+          <article class="day" id="encontro-4" data-date="2026-11-12" aria-labelledby="encontro-4-title">
+            <header class="day__label">
+              <svg class="day__icon" xmlns="http://www.w3.org/2000/svg" viewBox="3 2 26 27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="4" y="6" width="24" height="22" rx="3" />
+                <path d="M4 12.5h24M10.5 3v6M21.5 3v6" />
+                <path d="M10 18h.01M16 18h.01M22 18h.01M10 23h.01M16 23h.01" stroke-width="2.6" />
+              </svg>
+              <div>
+                <h3 id="encontro-4-title">Encontro 4</h3>
+                <p>Quinta&#8209;feira, 12 de novembro</p>
+              </div>
+            </header>
+            <div class="day__actions" role="group" aria-labelledby="encontro-4-title">
+              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 4 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Em breve</span></span>
+              </button>
+              <button class="btn" type="button" disabled aria-label="Baixar materiais do Encontro 4 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 2.5v8m0 0L4.8 7.3M8 10.5l3.2-3.2M3 13.5h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <span class="btn__label">Baixar materiais<span class="btn__status">Em breve</span></span>
+              </button>
+            </div>
+            <ol class="day__lessons">
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-12T14:00">14h</time> às <time datetime="2026-11-12T15:30">15h30</time>
+                </p>
+                <h4 class="lesson__title">Patentes do setor de biotecnologia</h4>
+                <p class="lesson__speaker">
+                  <strong>Dr. Rodrigo Ferraro</strong>
+                  <small>Palestrante · INPI</small>
+                </p>
+                <details class="lesson__topics">
+                  <summary><span class="visually-hidden">Patentes do setor de biotecnologia: </span><span class="lesson__more">Abrir 5 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <ul>
+                    <li>Particularidades da proteção em biotecnologia</li>
+                    <li>Exemplos de patentes concedidas</li>
+                    <li>Como identificar a novidade de uma tecnologia</li>
+                    <li>Como avaliar a atividade inventiva de uma tecnologia</li>
+                    <li>O que incluir no relatório descritivo para atender à suficiência descritiva</li>
+                  </ul>
+                </details>
+              </li>
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-12T15:30">15h30</time> às <time datetime="2026-11-12T17:00">17h</time>
+                </p>
+                <h4 class="lesson__title">Quadro reivindicatório em biotecnologias</h4>
+                <p class="lesson__speaker">
+                  <strong>Dr. Fábio Barros</strong>
+                  <small>Palestrante · INPI</small>
+                </p>
+                <details class="lesson__topics">
+                  <summary><span class="visually-hidden">Quadro reivindicatório em biotecnologias: </span><span class="lesson__more">Abrir 1 tópico</span><span class="lesson__less">Fechar tópico</span></summary>
+                  <ul>
+                    <li>Técnicas de redação de reivindicações para proteger invenções biológicas</li>
+                  </ul>
+                </details>
+              </li>
+            </ol>
+          </article>
+
+          <article class="day" id="encontro-5" data-date="2026-11-17" aria-labelledby="encontro-5-title">
+            <header class="day__label">
+              <svg class="day__icon" xmlns="http://www.w3.org/2000/svg" viewBox="3 2 26 27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="4" y="6" width="24" height="22" rx="3" />
+                <path d="M4 12.5h24M10.5 3v6M21.5 3v6" />
+                <path d="M10 18h.01M16 18h.01M22 18h.01M10 23h.01M16 23h.01" stroke-width="2.6" />
+              </svg>
+              <div>
+                <h3 id="encontro-5-title">Encontro 5</h3>
+                <p>Terça&#8209;feira, 17 de novembro</p>
+              </div>
+            </header>
+            <div class="day__actions" role="group" aria-labelledby="encontro-5-title">
+              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 5 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Em breve</span></span>
+              </button>
+              <button class="btn" type="button" disabled aria-label="Baixar materiais do Encontro 5 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 2.5v8m0 0L4.8 7.3M8 10.5l3.2-3.2M3 13.5h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <span class="btn__label">Baixar materiais<span class="btn__status">Em breve</span></span>
+              </button>
+            </div>
+            <ol class="day__lessons">
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-17T14:00">14h</time> às <time datetime="2026-11-17T16:00">16h</time>
+                </p>
+                <h4 class="lesson__title">Patentes do setor farmacêutico e químico</h4>
+                <p class="lesson__speaker">
+                  <strong>Dra. Paula Adamis de Barros</strong>
+                  <small>Palestrante · INPI</small>
+                </p>
+                <details class="lesson__topics">
+                  <summary><span class="visually-hidden">Patentes do setor farmacêutico e químico: </span><span class="lesson__more">Abrir 4 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <ul>
+                    <li>Patentes de compostos químicos: fórmulas de Markush</li>
+                    <li>Formulações e sinergia: proteção de composições (como cosméticos e alimentos) e de combinações com efeito sinérgico</li>
+                    <li>Segundo uso médico e aplicação da fórmula suíça</li>
+                    <li>Prática de redação: quadro reivindicatório na área farmacêutica</li>
+                  </ul>
+                </details>
+              </li>
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-17T16:00">16h</time> às <time datetime="2026-11-17T17:00">17h</time>
+                </p>
+                <h4 class="lesson__title">Relato de uma empresa inovadora da bioeconomia</h4>
+                <p class="lesson__speaker">
+                  <strong>Empresa a confirmar</strong>
+                  <small>Empresa convidada</small>
+                </p>
+              </li>
+            </ol>
+          </article>
+
+          <article class="day" id="encontro-6" data-date="2026-11-19" aria-labelledby="encontro-6-title">
+            <header class="day__label">
+              <svg class="day__icon" xmlns="http://www.w3.org/2000/svg" viewBox="3 2 26 27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="4" y="6" width="24" height="22" rx="3" />
+                <path d="M4 12.5h24M10.5 3v6M21.5 3v6" />
+                <path d="M10 18h.01M16 18h.01M22 18h.01M10 23h.01M16 23h.01" stroke-width="2.6" />
+              </svg>
+              <div>
+                <h3 id="encontro-6-title">Encontro 6</h3>
+                <p>Quinta&#8209;feira, 19 de novembro</p>
+              </div>
+            </header>
+            <div class="day__actions" role="group" aria-labelledby="encontro-6-title">
+              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 6 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Em breve</span></span>
+              </button>
+              <button class="btn" type="button" disabled aria-label="Baixar materiais do Encontro 6 (em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 2.5v8m0 0L4.8 7.3M8 10.5l3.2-3.2M3 13.5h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <span class="btn__label">Baixar materiais<span class="btn__status">Em breve</span></span>
+              </button>
+            </div>
+            <ol class="day__lessons">
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-19T14:00">14h</time> às <time datetime="2026-11-19T15:00">15h</time>
+                </p>
+                <h4 class="lesson__title">Proteção de cultivares</h4>
+                <p class="lesson__speaker">
+                  <strong>Dra. Stefania Palma Araujo</strong>
+                  <small>Palestrante · Ministério da Agricultura e Pecuária (MAPA)</small>
+                </p>
+                <details class="lesson__topics">
+                  <summary><span class="visually-hidden">Proteção de cultivares: </span><span class="lesson__more">Abrir 4 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <ul>
+                    <li>Principais aspectos da proteção de cultivares</li>
+                    <li>Registro: por que, quando e como pedir, e extensão da validade</li>
+                    <li>Da cultivar ao produto comercial</li>
+                    <li>Quando registrar uma cultivar e quando depositar uma patente</li>
+                  </ul>
+                </details>
+              </li>
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-19T15:00">15h</time> às <time datetime="2026-11-19T16:50">16h50</time>
+                </p>
+                <h4 class="lesson__title">Busca de patentes e mapeamento tecnológico em bioeconomia</h4>
+                <p class="lesson__speaker">
+                  <strong>Dra. Cristina D’Urso</strong>
+                  <small>Palestrante · INPI</small>
+                </p>
+                <details class="lesson__topics">
+                  <summary><span class="visually-hidden">Busca de patentes e mapeamento tecnológico em bioeconomia: </span><span class="lesson__more">Abrir 2 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <ul>
+                    <li>Busca de patentes de tecnologias da bioeconomia</li>
+                    <li>Mapeamento tecnológico em bases de dados de patentes</li>
+                  </ul>
+                </details>
+              </li>
+              <li class="lesson">
+                <p class="lesson__time">
+                  <time datetime="2026-11-19T16:50">16h50</time> às <time datetime="2026-11-19T17:00">17h</time>
+                </p>
+                <h4 class="lesson__title">Próximos passos e encerramento</h4>
+                <p class="lesson__speaker">
+                  <strong>Dra. Tatiana Carestiato</strong>
+                  <small>Palestrante · INPI</small>
+                </p>
+              </li>
+            </ol>
+          </article>
+          <p class="schedule-note" id="schedule-access-note" role="note">
+            Links da aula e dos materiais estarão disponíveis em breve.
+          </p>
+          <template id="schedule-card-nav-template">
+            <nav class="schedule-card-nav" aria-label="Navegação entre encontros" hidden>
+              <button type="button" data-card-step="-1">
+                <svg class="chevron chevron--left" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg>
+                <span>Anterior</span>
+              </button>
+              <span class="schedule-card-nav__status" aria-hidden="true"></span>
+              <button type="button" data-card-step="1">
+                <span>Próximo</span>
+                <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg>
+              </button>
+            </nav>
+          </template>
+        </div>
+        </div>
+      </section>
+
+      <!-- 04 · Palestrantes
+           Biografias e fotos adicionais só devem ser exibidas quando houver
+           conteúdo oficial da pessoa correspondente. -->
+      <section class="section" id="palestrantes" aria-labelledby="speakers-title">
+        <div class="container">
+          <header class="section__head">
+            <div>
+              <p class="eyebrow">04 / Palestrantes</p>
+              <h2 class="section__title" id="speakers-title">
+                Quem conduz<br /><em>as aulas.</em>
+              </h2>
+            </div>
+          </header>
+          <ul class="speakers">
+            <li class="speaker">
+              <div class="speaker__art">
+                <span aria-hidden="true">TC</span>
+                <img src="assets/img/palestrantes/tatiana-carestiato.webp" alt="" width="800" height="800" loading="lazy" decoding="async" />
+              </div>
+              <details class="speaker__bio">
+                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Dra. Tatiana Carestiato</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Dra. Tatiana Carestiato</span></span></summary>
+                <div class="speaker__bio-content">
+                  <p>Engenheira Química, doutora em Engenharia de Processos Químicos e Bioquímicos pela UFRJ. Atua há 20 anos como examinadora de patentes no INPI, nas áreas de fármacos, engenharia química, petroquímica e polímeros. Atualmente, é tutora de cursos EAD da WIPO e trabalha na CGDI-INPI, onde é Coordenadora-Substituta da Superintendência Regional Norte do INPI e Chefe de Projetos de Bioeconomia. Atua na articulação e disseminação da Propriedade Intelectual, contribuindo para aproximar conhecimento, inovação e desenvolvimento, especialmente na região amazônica.</p>
+                </div>
+              </details>
+              <p class="speaker__meta"><span>INPI</span><span>03 e 19/11</span></p>
+              <h3>Dra. Tatiana Carestiato</h3>
+              <p class="speaker__topic">Fundamentos de patentes e propriedade industrial</p>
+            </li>
+            <li class="speaker">
+              <div class="speaker__art">
+                <span aria-hidden="true">JM</span>
+                <img src="assets/img/palestrantes/jeferson-monteiro.webp" alt="" width="800" height="800" loading="lazy" decoding="async" />
+              </div>
+              <details class="speaker__bio">
+                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Dr. Jeferson Monteiro</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Dr. Jeferson Monteiro</span></span></summary>
+                <div class="speaker__bio-content">
+                  <p>Engenheiro Químico, doutor em Propriedade Intelectual e Inovação (ACAD INPI). Atua há 20 anos como examinador de patentes no INPI e integra, há 14 anos, a Divisão Internacional do PCT. Na divisão, realiza palestras sobre o sistema PCT e a revisão de qualidade dos exames de pedidos internacionais da Autoridade de Pesquisa Internacional (ISA) brasileira. Também é chefe substituto da unidade.</p>
+                </div>
+              </details>
+              <p class="speaker__meta"><span>PCT-INPI</span><span>05/11</span></p>
+              <h3>Dr. Jeferson Monteiro</h3>
+              <p class="speaker__topic">Proteção internacional das patentes de tecnologias da bioeconomia</p>
+            </li>
+            <li class="speaker">
+              <div class="speaker__art">
+                <span aria-hidden="true">RA</span>
+                <img src="assets/img/palestrantes/renata-angeli.webp" alt="" width="800" height="800" loading="lazy" decoding="async" />
+              </div>
+              <details class="speaker__bio">
+                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Profa. Dra. Renata Angeli</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Profa. Dra. Renata Angeli</span></span></summary>
+                <div class="speaker__bio-content">
+                  <p>Biomédica, doutora em Bioquímica pela UERJ. Desde 2013, é Professora de Propriedade Intelectual e Empreendedorismo da UERJ. É coordenadora da InovaHUPE, onde trabalha no fortalecimento de ambientes de inovação em saúde, apoiando a proteção do conhecimento e a transferência de tecnologia. Orienta trabalhos de graduação, mestrado e doutorado nas áreas de propriedade intelectual, prospecção tecnológica, startups, interação universidade-empresa, saúde e biotecnologia. É coordenadora do FORTEC Sudeste e da REPCTI, integra a Comissão de Bioeconomia e Biodiversidade da ASPI e é assessora de Tecnologia da FAPERJ, atuando na criação e avaliação de projetos para inovação.</p>
+                </div>
+              </details>
+              <p class="speaker__meta"><span>UERJ</span><span>05/11</span></p>
+              <h3>Profa. Dra. Renata Angeli</h3>
+              <p class="speaker__topic">Limites de patenteabilidade, ativos biológicos e transferência de tecnologia</p>
+            </li>
+            <li class="speaker">
+              <div class="speaker__art">
+                <span aria-hidden="true">CA</span>
+                <img src="assets/img/palestrantes/claudia-auler.webp" alt="" width="800" height="800" loading="lazy" decoding="async" />
+              </div>
+              <details class="speaker__bio">
+                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Profa. Dra. Cláudia Auler</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Profa. Dra. Cláudia Auler</span></span></summary>
+                <div class="speaker__bio-content">
+                  <p>Engenheira de Alimentos, doutora em Microbiologia Agrícola pela UFLA. É professora da Universidade Federal do Tocantins (UFT), onde atua na graduação e na pós-graduação. Desenvolve pesquisas em microbiologia aplicada, biotecnologia, bioeconomia e inovação tecnológica, além de estudos voltados à prospecção e valorização de recursos da biodiversidade brasileira, especialmente do Cerrado e da Amazônia. Possui experiência como Diretora de Inovação e Transferência de Tecnologia. É mentora do programa IPMC da Organização Mundial da Propriedade Intelectual (WIPO), vice-diretora do Parque Tecnológico PEQUI, com atuação em FoodTechs, e pesquisadora da EMBRAPII UFT.</p>
+                </div>
+              </details>
+              <p class="speaker__meta"><span>UFT</span><span>10/11</span></p>
+              <h3>Profa. Dra. Cláudia Auler</h3>
+              <p class="speaker__topic">Legislação de biodiversidade e depósito no INPI</p>
+            </li>
+            <li class="speaker">
+              <div class="speaker__art">
+                <span aria-hidden="true">RF</span>
+                <img src="assets/img/palestrantes/rodrigo-ferraro.webp" alt="" width="800" height="800" loading="lazy" decoding="async" />
+              </div>
+              <details class="speaker__bio">
+                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Dr. Rodrigo Ferraro</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Dr. Rodrigo Ferraro</span></span></summary>
+                <div class="speaker__bio-content">
+                  <p>Farmacêutico, doutor em Química Biológica pela UFRJ. É Pesquisador em Propriedade Industrial do INPI, na área de Biotecnologia, desde 2004. Atualmente, atua como Examinador de Patentes na Divisão de Cosméticos e Dentifrícios (DIPAT VIII) e, desde março de 2019, trabalha no Escritório de Difusão Regional de Minas Gerais (EDIR/MG), em Belo Horizonte. Tem experiência em Propriedade Industrial, inovação, bioquímica e biologia molecular e celular, examinando patentes de biotecnologia, farmacêutica e cosmética. Desde 2007, é palestrante em cursos de disseminação do INPI, especialmente na área de Biotecnologia. É tutor de cursos EAD da Organização Mundial da Propriedade Intelectual (WIPO) e instrutor de novos examinadores do INPI.</p>
+                </div>
+              </details>
+              <p class="speaker__meta"><span>INPI</span><span>12/11</span></p>
+              <h3>Dr. Rodrigo Ferraro</h3>
+              <p class="speaker__topic">Patentes do setor de biotecnologia</p>
+            </li>
+            <li class="speaker">
+              <div class="speaker__art">
+                <span aria-hidden="true">FB</span>
+                <img src="assets/img/palestrantes/fabio-barros.webp" alt="" width="800" height="800" loading="lazy" decoding="async" />
+              </div>
+              <details class="speaker__bio">
+                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Dr. Fábio Barros</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Dr. Fábio Barros</span></span></summary>
+                <div class="speaker__bio-content">
+                  <p>Engenheiro de Alimentos pela UFC, doutor em Ciência de Alimentos, com atuação em bioquímica e biotecnologia, pela UNICAMP. É Pesquisador em Propriedade Industrial no Instituto Nacional da Propriedade Industrial (INPI), onde trabalha no exame de patentes. Também atua na CGDI-INPI na articulação, disseminação e mentoria em Propriedade Intelectual. Atualmente, é chefe do Escritório Regional INPI-CE.</p>
+                </div>
+              </details>
+              <p class="speaker__meta"><span>INPI</span><span>12/11</span></p>
+              <h3>Dr. Fábio Barros</h3>
+              <p class="speaker__topic">Quadro reivindicatório em biotecnologias</p>
+            </li>
+            <li class="speaker">
+              <div class="speaker__art">
+                <span aria-hidden="true">PA</span>
+                <img src="assets/img/palestrantes/paula-adamis-de-barros.webp" alt="" width="800" height="800" loading="lazy" decoding="async" />
+              </div>
+              <details class="speaker__bio">
+                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Dra. Paula Adamis de Barros</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Dra. Paula Adamis de Barros</span></span></summary>
+                <div class="speaker__bio-content">
+                  <p>Química Industrial, doutora em Bioquímica pela UFRJ. Atua há 20 anos como examinadora de patentes no INPI, na área de fármacos. Atualmente, é Chefe-Substituta da Divisão de Patentes de Fármacos I do INPI, tutora de novos examinadores de patentes e tutora EAD de cursos da Organização Mundial da Propriedade Intelectual (WIPO).</p>
+                </div>
+              </details>
+              <p class="speaker__meta"><span>INPI</span><span>17/11</span></p>
+              <h3>Dra. Paula Adamis de Barros</h3>
+              <p class="speaker__topic">Patentes do setor farmacêutico e químico</p>
+            </li>
+            <li class="speaker">
+              <div class="speaker__art">
+                <span aria-hidden="true">SA</span>
+              </div>
+              <details class="speaker__bio">
+                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Dra. Stefania Palma Araujo</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Dra. Stefania Palma Araujo</span></span></summary>
+                <div class="speaker__bio-content">
+                  <p>Engenheira Agrônoma pela UnB, mestre em Produção Vegetal pela UENF. Desde 2003, ocupa o cargo de Auditora Fiscal Federal Agropecuária no Ministério da Agricultura e Pecuária e, a partir de 2011, passou a trabalhar no Serviço Nacional de Proteção de Cultivares (SNPC). Realizou dois cursos presenciais sobre proteção de cultivares, promovidos pelo Centro de Formación de la Cooperación Española, em Montevidéu, Uruguai, em 2011, e pela Wageningen University and Research Centre, na Holanda, em 2012. Em 2022, foi designada Coordenadora do SNPC, cargo que ocupa atualmente.</p>
+                </div>
+              </details>
+              <p class="speaker__meta"><span>MAPA</span><span>19/11</span></p>
+              <h3>Dra. Stefania Palma Araujo</h3>
+              <p class="speaker__topic">Proteção de cultivares</p>
+            </li>
+            <li class="speaker">
+              <div class="speaker__art">
+                <span aria-hidden="true">CD</span>
+                <img src="assets/img/palestrantes/cristina-durso.webp" alt="" width="800" height="800" loading="lazy" decoding="async" />
+              </div>
+              <details class="speaker__bio">
+                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Dra. Cristina D’Urso</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Dra. Cristina D’Urso</span></span></summary>
+                <div class="speaker__bio-content">
+                  <p>Engenheira Química, doutora em Tecnologia de Processos Químicos e Bioquímicos pela UFRJ. Atua há 20 anos como pesquisadora em Propriedade Industrial no INPI, onde realiza estudos de mapeamento e prospecção tecnológica. É especialista em bancos de dados, balança comercial, informação tecnológica, patentes e cadeia produtiva. Atualmente, é chefe da Divisão de Observatórios em Propriedade Industrial.</p>
+                </div>
+              </details>
+              <p class="speaker__meta"><span>INPI</span><span>19/11</span></p>
+              <h3>Dra. Cristina D’Urso</h3>
+              <p class="speaker__topic">Busca de patentes e mapeamento tecnológico em bioeconomia</p>
+            </li>
+          </ul>
+          <dialog class="speaker-bio-dialog" data-speaker-bio-dialog aria-labelledby="speaker-bio-dialog-title">
+            <div class="speaker-bio-dialog__surface">
+              <header class="speaker-bio-dialog__header">
+                <div>
+                  <p class="speaker-bio-dialog__meta" data-speaker-bio-meta></p>
+                  <h2 id="speaker-bio-dialog-title" data-speaker-bio-title></h2>
+                </div>
+                <button class="speaker-bio-dialog__close" type="button" data-speaker-bio-close aria-label="Fechar biografia">
+                  <span aria-hidden="true"></span>
+                </button>
+              </header>
+              <div class="speaker-bio-dialog__content" data-speaker-bio-content></div>
+            </div>
+          </dialog>
+          <!-- TODO: confirmar grafia oficial de "Fabio Barros" e "Stefania Palma Araujo" (acentos). -->
+        </div>
+      </section>
+
+      <!-- 05 · Perguntas frequentes -->
+      <section class="section faq" id="faq" aria-labelledby="faq-title">
+        <div class="container faq__grid">
+          <header class="faq__head">
+            <p class="eyebrow">05 / Dúvidas</p>
+            <h2 class="section__title" id="faq-title">
+              Perguntas<br /><em>frequentes.</em>
+            </h2>
+          </header>
+
+          <div class="faq__list">
+            <details class="faq__item">
+              <summary>
+                <span>Como me inscrevo?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </summary>
+              <p>
+                As inscrições são feitas por formulário online.
+                <a class="faq__link" href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=CPgVWJFgvUesqzDAj-e58jzfPrjp7eNKrmYV1YoTAwpUOThXSllGU1NSU09FWEgwRzc1V1BFQVlDNy4u" target="_blank" rel="noopener noreferrer">Inscreva-se no curso<span class="visually-hidden"> (abre em nova aba)</span><svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg></a>
+              </p>
+            </details>
+            <details class="faq__item">
+              <summary>
+                <span>Quem pode participar?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </summary>
+              <p>
+                O curso é destinado a pesquisadores, bioinovadores e profissionais da bioeconomia.
+              </p>
+            </details>
+            <details class="faq__item">
+              <summary>
+                <span>Quando acontecem as aulas?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </summary>
+              <p>
+                As aulas acontecem nos dias 3, 5, 10, 12, 17 e 19 de novembro de 2026, das 14h às 17h.
+              </p>
+            </details>
+            <details class="faq__item">
+              <summary>
+                <span>Como acesso as aulas?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </summary>
+              <p>
+                Os encontros são online e ao vivo. Os links de acesso serão enviados por e-mail e disponibilizados na plataforma de ensino.
+              </p>
+            </details>
+            <details class="faq__item">
+              <summary>
+                <span>Qual é a carga horária?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </summary>
+              <p>
+                A carga horária informada para o curso é de 30 horas.
+              </p>
+            </details>
+            <details class="faq__item">
+              <summary>
+                <span>Como recebo o certificado?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </summary>
+              <p>
+                O certificado será disponibilizado após o término do curso aos participantes que cumprirem, no mínimo, 75% de presença.
+              </p>
+            </details>
+            <!-- TODO: perguntas sugeridas, publicar só com resposta confirmada:
+                 "O curso é gratuito?"
+                 "As aulas ficam gravadas?"
+                 "Preciso ter conhecimento prévio sobre patentes?"
+                 "Com quem falo se tiver outra dúvida?" -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer__inner">
+        <div class="site-footer__brand">
+          <a href="#topo" aria-label="INPI, voltar ao topo">
+            <svg class="logo" viewBox="0 0 149 54" width="149" height="54" fill="currentColor" role="img" aria-label="INPI, voltar ao topo"><path d="M14.2903 0H31.197L16.9068 54H0L14.2903 0Z"/><path d="M43.1269 25.9473L34.5781 54.0004H55.5951L43.1269 25.9473Z"/><path d="M62.5112 28.0636L71.0599 0H50.043L62.5112 28.0636Z"/><path d="M87.0977 0H115.127C121.229 0 125.424 1.43567 127.712 4.30701C129.99 7.17834 130.424 11.2653 129.026 16.5783C127.585 22.0276 124.799 26.2926 120.668 29.3526C116.547 32.423 111.081 33.953 104.28 33.953H95.0426L89.7354 53.9895H72.7969L87.0977 0ZM97.9346 23.0231H102.066C105.318 23.0231 107.744 22.4677 109.365 21.3464C110.975 20.2356 112.013 18.7999 112.479 17.0604C112.924 15.3627 112.733 13.927 111.907 12.7533C111.081 11.5692 109.089 10.9823 105.932 10.9823H101.134L97.9452 23.0231H97.9346Z"/><path d="M132.001 0H148.908L134.618 54H117.711L132.001 0Z"/></svg>
+          </a>
+          <p>
+            <strong>Patentes para Bioinovadores</strong>
+            Curso online, aulas ao vivo<br />3 a 19 de novembro de 2026
+          </p>
+        </div>
+
+        <nav class="site-footer__nav" aria-label="Seções">
+          <p class="label">Nesta página</p>
+          <a href="#conteudo-programatico">Conteúdo programático</a>
+          <a href="#objetivos">Objetivos</a>
+          <a href="#cronograma">Cronograma</a>
+          <a href="#palestrantes">Palestrantes</a>
+          <a href="#faq">Dúvidas</a>
+        </nav>
+
+        <div class="site-footer__org">
+          <p class="label">Realização</p>
+          <p><strong>CGDI</strong> Coordenação-Geral de Desenvolvimento da Propriedade Industrial, Negócios e Inovação</p>
+          <p><strong>INPI</strong> Instituto Nacional da Propriedade Industrial</p>
+        </div>
+
+        <div class="site-footer__bottom">
+          <div class="freefingers-credit">
+            <svg width="48" height="20" viewBox="0 0 48 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M47.9989 8.26715C47.9989 7.26777 47.1598 6.45762 46.1248 6.45762H45.7825C44.4317 2.70355 40.7321 0 36.3894 0C32.3846 0 28.9265 2.2995 27.3532 5.60247C25.248 4.74937 22.771 4.79028 20.6966 5.70886C19.1466 2.34962 15.6578 0 11.6096 0C7.26685 0 3.56827 2.70355 2.2164 6.45762H1.87419C0.839094 6.45762 0 7.26777 0 8.26715C0 9.20311 0.735267 9.97234 1.67925 10.0664C1.93246 15.1442 6.29003 19.2 11.6106 19.2C16.9313 19.2 21.5537 14.8936 21.5537 9.6C21.5537 8.93818 21.4838 8.29272 21.3513 7.66875C22.985 6.85349 25.0054 6.80439 26.6794 7.53986C26.5279 8.20373 26.4463 8.89317 26.4463 9.6C26.4463 14.8936 30.9066 19.2 36.3894 19.2C41.8721 19.2 46.0675 15.1442 46.3208 10.0664C47.2637 9.97234 48 9.20209 48 8.26715H47.9989ZM11.6096 17.1634C7.29016 17.1634 3.77592 13.7704 3.77592 9.6C3.77592 5.4296 7.29016 2.03661 11.6096 2.03661C15.929 2.03661 19.4433 5.4296 19.4433 9.6C19.4433 13.7704 15.929 17.1634 11.6096 17.1634ZM36.3894 17.1634C32.0699 17.1634 28.5557 13.7704 28.5557 9.6C28.5557 5.4296 32.0699 2.03661 36.3894 2.03661C40.7088 2.03661 44.223 5.4296 44.223 9.6C44.223 13.7704 40.7088 17.1634 36.3894 17.1634Z" fill="currentColor"/>
+            </svg>
+            <span>Produzido por</span>
+            <a href="https://www.linkedin.com/in/januvieira" target="_blank" rel="noopener noreferrer">Janu Vieira<span class="visually-hidden"> (abre em nova aba)</span></a>
+          </div>
+          <a href="#topo" data-back-to-top>Voltar ao topo <svg class="chevron chevron--up" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg></a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -5083,8 +5083,13 @@
       min-width: 0;
       height: auto;
       max-height: none;
-      margin: 8px 0 0;
-      padding: 16px;
+      margin: 4px 0 0;
+      /* Só o texto: o painel azul é do desktop, onde a bio cobre a foto. */
+      padding: 0 0 4px;
+      border-radius: 0;
+      background: transparent;
+      color: var(--text-subtle);
+      font-weight: var(--fw-small);
       overflow: visible;
       overflow-wrap: break-word;
       line-height: 1.5;

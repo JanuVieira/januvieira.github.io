@@ -21,7 +21,7 @@ assets/
   css/main.compat.css         CSS compilado e servido aos navegadores
   js/main.js                  Menu do celular, carrossel do cronograma, confirmação de inscrição, cards de objetivos e cursor seguidor
   js/dna.js                   Animação 3D da hélice de DNA no hero (canvas)
-  img/logo.svg                Logo do INPI
+  img/logo.svg                Favicon: logo do INPI em branco sobre quadrado azul (visível em abas claras e escuras)
   img/icons/                  Ícones do conteúdo programático (traço, 32×32)
   img/palestrantes/           Fotos dos palestrantes (quadradas)
 ```

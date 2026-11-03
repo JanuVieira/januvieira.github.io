@@ -1946,11 +1946,9 @@
     overflow: hidden;
     border-top: var(--rule-width-anchor) solid var(--divider-anchor);
     list-style: none;
-    counter-reset: program;
 
     li {
       position: relative;
-      counter-increment: program;
       display: flex;
       min-height: 280px;
       flex-direction: column;
@@ -1969,8 +1967,10 @@
       letter-spacing: -0.02em;
       white-space: nowrap;
 
+      /* The number comes from data-index, not a CSS counter: container-type
+         scopes counters to each item, and Safari then shows "00" on all. */
       &::before {
-        content: counter(program, decimal-leading-zero);
+        content: attr(data-index);
         position: absolute;
         top: var(--card-pad);
         right: var(--card-pad);
@@ -1998,9 +1998,39 @@
           -webkit-mask: center / contain no-repeat;
         }
       }
-      span {
+      /* Title only: the icon circle is a span too and must stay round. */
+      span:not(.program__icon) {
         min-height: 2.4em; /* two lines, so titles share a baseline */
         font-size: min(25px, 100cqi / 16);
+      }
+    }
+    /* A last topic alone on its row becomes a band across the row (icon
+       beside the title, number on the right), so the table never ends in
+       empty cells. Its title keeps the size of the column cards. */
+    @media (min-width: 1024px) {
+      > li:last-child:nth-child(3n + 1) {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: var(--space-6);
+        min-height: 0;
+
+        &::before {
+          top: 50%;
+          line-height: 1;
+          translate: 0 -50%;
+        }
+        .program__icon {
+          flex: none;
+        }
+        br {
+          display: none;
+        }
+      }
+      > li:last-child:nth-child(3n + 1) > span:last-child {
+        min-height: 0;
+        font-size: min(var(--fs-h4), ((100cqi + 2 * var(--card-pad)) / 3 - 2 * var(--card-pad)) / 16);
       }
     }
     /* Columns change where the cards get too narrow for the two-line
@@ -4326,6 +4356,22 @@
     }
     .program__list br {
       display: none;
+    }
+    /* An odd count on two columns: the last topic spans the row as a band. */
+    .program__list > li:last-child:nth-child(2n + 1) {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 0;
+    }
+    .program__list > li:last-child:nth-child(2n + 1)::before {
+      top: 50%;
+      line-height: 1;
+      translate: 0 -50%;
+    }
+    .program__list > li:last-child:nth-child(2n + 1) .program__icon {
+      flex: none;
     }
 
     /* Tablet speaker cards keep the portrait visible but use a horizontal

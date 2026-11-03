@@ -125,6 +125,14 @@ try:
         check(not unnamed, "links visíveis possuem nome acessível", repr(unnamed))
         forms = page.locator('a[href*="forms.cloud.microsoft"]')
         check(forms.count() >= 1 and all(forms.nth(i).inner_text().strip() for i in range(forms.count()) if forms.nth(i).is_visible()) and any(forms.nth(i).is_visible() for i in range(forms.count())), "links de inscrição identificáveis")
+        program_numbers = page.locator('.program__list li').evaluate_all("""
+          els => els.map((el) => el.dataset.index).join(',') === '01,02,03,04,05,06,07' &&
+            els.every((el) => {
+              const content = getComputedStyle(el, '::before').content;
+              return content.includes('attr') || content.replace(/"/g, '') === el.dataset.index;
+            })
+        """)
+        check(program_numbers, 'conteúdo programático numerado de 01 a 07 sem contador CSS (evita "00" no Safari)')
         nav_toggle = page.locator('.site-header__toggle')
         if nav_toggle.is_visible():
             check(not page.locator('.site-header__brand').is_visible(), 'header mobile mantém somente o botão Menu')

@@ -53,6 +53,29 @@ try:
               })
             """)
             check(portrait_grid, f"áreas de fotografia quadradas em {width}x{height}")
+            page.context.route('https://us02web.zoom.us/**', lambda route: route.abort())
+            enrollment_fit = page.evaluate("""() => {
+              const link = document.querySelector('a[data-requires-enrollment]');
+              const dialog = document.querySelector('[data-enrollment-dialog]');
+              if (!link || !dialog) return {open: false};
+              link.click();
+              const rect = dialog.getBoundingClientRect();
+              const surface = dialog.querySelector('.enrollment-dialog__surface');
+              const title = dialog.querySelector('#enrollment-dialog-title');
+              const cards = [...dialog.querySelectorAll('.enrollment-option__card')].map((card) => card.getBoundingClientRect());
+              const sideBySide = Math.abs(cards[0].top - cards[1].top) <= 1;
+              const result = {
+                open: dialog.open,
+                inside: rect.top >= -1 && rect.left >= -1 && rect.bottom <= innerHeight + 1 && rect.right <= innerWidth + 1,
+                noOverflowX: surface.scrollWidth <= surface.clientWidth + 1,
+                titleOneLine: title.getBoundingClientRect().height < parseFloat(getComputedStyle(title).lineHeight) * 1.5,
+                cardsEqual: !sideBySide || Math.abs(cards[0].height - cards[1].height) <= 1,
+              };
+              dialog.close();
+              return result;
+            }""")
+            check(enrollment_fit['open'] and enrollment_fit['inside'] and enrollment_fit['noOverflowX'], f"confirmação de inscrição cabe na tela {width}x{height}", str(enrollment_fit))
+            check(enrollment_fit['titleOneLine'] and enrollment_fit['cardsEqual'], f"confirmação mantém título em uma linha e cards alinhados em {width}x{height}")
             page.close()
 
         page = browser.new_page(viewport={"width":390,"height":844}, reduced_motion="reduce")
@@ -136,15 +159,38 @@ try:
             check(False, 'existe FAQ interativo')
 
         action_statuses = page.locator('.day:not([hidden]) .day__actions .btn__status')
-        check(action_statuses.count() == 2, 'ações do encontro exibem dois estados Em breve')
-        statuses_below = action_statuses.evaluate_all("""
+        check(action_statuses.count() == 1, 'ação do encontro exibe o estado da aula')
+        single_actions = page.locator('.day__actions').evaluate_all("""
+          els => els.length === 6 && els.every((el) => el.querySelectorAll('.btn').length === 1) &&
+            !document.body.textContent.includes('Baixar materiais')
+        """)
+        check(single_actions, 'cada encontro mostra só a ação da aula')
+        action_width = page.locator('.day:not([hidden]) .day__actions').evaluate("""
+          el => Math.abs(el.querySelector('.btn').getBoundingClientRect().width - el.getBoundingClientRect().width) <= 1
+        """)
+        check(action_width, 'botão da aula ocupa a largura do card no mobile')
+        statuses_inline = action_statuses.evaluate_all("""
           els => els.every((el) => {
             const status = el.getBoundingClientRect();
             const label = el.parentElement.getBoundingClientRect();
-            return el.textContent.trim() === 'Em breve' && status.top > label.top + 2;
+            return Math.abs(status.top - label.top) <= 1 && label.height < parseFloat(getComputedStyle(el).fontSize) * 2;
           })
         """)
-        check(statuses_below, 'Em breve fica abaixo do rótulo no mobile')
+        check(statuses_inline, 'rótulo e estado do botão ficam na mesma linha quando há espaço no mobile')
+        pending_statuses = page.locator('.day__actions .btn:disabled .btn__status').evaluate_all(
+            "els => els.length > 0 && els.every((el) => el.textContent.trim() === 'Em breve')"
+        )
+        check(pending_statuses, 'ações pendentes indicam Em breve')
+        lesson_link = page.locator('#encontro-1 .day__actions a.btn--primary').evaluate_all("""
+          els => els.length === 1 && (() => {
+            const link = els[0];
+            const status = link.querySelector('.btn__status');
+            return link.href.startsWith('https://us02web.zoom.us/j/') &&
+              link.target === '_blank' && link.relList.contains('noopener') &&
+              getComputedStyle(status).color === getComputedStyle(link).color;
+          })()
+        """)
+        check(lesson_link, 'aula do Encontro 1 abre o Zoom em nova aba com estado legível')
 
         touch_controls = page.locator(
             '.site-header__toggle, .day-nav__tabs button, '
@@ -175,6 +221,71 @@ try:
           }
         """)
         check(date_spacing, 'datas do cronograma têm 12px de separação para toque')
+
+        page.context.route('https://us02web.zoom.us/**', lambda route: route.abort())
+        page.context.route('https://forms.cloud.microsoft/**', lambda route: route.abort())
+        popups = []
+        page.on('popup', lambda popup: popups.append(popup))
+        page.locator('.day-nav__tabs [data-day="0"]').click()
+        lesson = page.locator('#encontro-1 a[data-requires-enrollment]')
+        enrollment = page.locator('[data-enrollment-dialog]')
+        proceed = enrollment.locator('[data-enrollment-continue]')
+        enrolled_option = enrollment.locator('.enrollment-option', has_text='Sim, já me inscrevi')
+        signup_option = enrollment.locator('.enrollment-option', has_text='Ainda não me inscrevi')
+        lesson.click()
+        page.wait_for_timeout(200)
+        check(enrollment.evaluate('el => el.open') and not popups, 'Assistir aula pergunta sobre a inscrição antes de abrir o Zoom')
+        sheet = enrollment.evaluate("""el => {
+          const rect = el.getBoundingClientRect();
+          const radios = [...el.querySelectorAll('input[name="enrollment-status"]')];
+          const cards = [...el.querySelectorAll('.enrollment-option__card')].map((card) => card.getBoundingClientRect());
+          const proceed = el.querySelector('[data-enrollment-continue]');
+          const close = el.querySelector('[data-enrollment-close]');
+          return {
+            bottom: Math.abs(innerHeight - rect.bottom) <= 1,
+            fullWidth: Math.abs(innerWidth - rect.width) <= 1,
+            stacked: cards.length === 2 && cards[1].top >= cards[0].bottom,
+            targets: [...cards, proceed.getBoundingClientRect(), close.getBoundingClientRect()].every((box) => box.height >= 48),
+            focused: document.activeElement === el.querySelector('#enrollment-dialog-title'),
+            unselected: radios.length === 2 && radios.every((radio) => !radio.checked),
+            waiting: proceed.getAttribute('aria-disabled') === 'true' && !proceed.hasAttribute('href'),
+            meta: el.querySelector('[data-enrollment-meta]').textContent,
+          };
+        }""")
+        check(sheet['bottom'] and sheet['fullWidth'] and sheet['stacked'], 'confirmação abre como painel inferior com opções empilhadas no mobile', str(sheet))
+        check(sheet['targets'] and sheet['focused'], 'opções e Continuar têm 48px e o título recebe o foco')
+        check(sheet['unselected'] and sheet['waiting'] and sheet['meta'] == 'Encontro 1 · 3 de novembro', 'Continuar só é liberado depois da escolha', sheet['meta'])
+        signup_option.click()
+        signup_state = proceed.evaluate("el => ({href: el.href, label: el.textContent.trim(), target: el.target})")
+        with page.expect_popup() as signed:
+            proceed.click()
+        signed.value.close()
+        hint = enrollment.locator('[data-enrollment-hint]').inner_text()
+        check(
+            'forms.cloud.microsoft' in signup_state['href'] and signup_state['label'].startswith('Ir para a inscrição') and
+            signup_state['target'] == '_blank' and enrollment.evaluate('el => el.open') and 'Sim, já me inscrevi' in hint,
+            'Ainda não me inscrevi abre o formulário e mantém a confirmação aberta', str(signup_state),
+        )
+        enrolled_option.click()
+        check(proceed.get_attribute('href') == lesson.get_attribute('href') and proceed.inner_text().startswith('Entrar na aula'), 'Sim, já me inscrevi leva ao link da aula')
+        page.keyboard.press('Escape')
+        check(not enrollment.evaluate('el => el.open') and lesson.evaluate('el => document.activeElement === el'), 'Esc fecha a confirmação e devolve o foco ao botão da aula')
+        lesson.click()
+        reopened_clean = enrollment.evaluate("""el =>
+          [...el.querySelectorAll('input[name="enrollment-status"]')].every((radio) => !radio.checked) &&
+          !el.querySelector('[data-enrollment-hint]').textContent
+        """)
+        check(reopened_clean, 'confirmação reabre sem a escolha anterior')
+        enrolled_option.click()
+        with page.expect_popup() as entered:
+            proceed.click()
+        entered.value.close()
+        page.wait_for_timeout(100)
+        closed_after_enter = not enrollment.evaluate('el => el.open')
+        with page.expect_popup() as direct:
+            lesson.click()
+        direct.value.close()
+        check(closed_after_enter and not enrollment.evaluate('el => el.open'), 'depois de confirmar, as próximas aulas abrem direto')
 
         bios = page.locator('.speaker__bio')
         speaker_count = page.locator('.speaker').count()
@@ -235,6 +346,18 @@ try:
 
         desktop = browser.new_page(viewport={"width":1280,"height":900}, reduced_motion="reduce")
         desktop.goto(url, wait_until="domcontentloaded")
+        desktop_action = desktop.locator('.day:not([hidden])').evaluate("""day => {
+          const button = day.querySelector('.day__actions .btn').getBoundingClientRect();
+          const header = day.querySelector('.day__label').getBoundingClientRect();
+          const inner = day.getBoundingClientRect().right - parseFloat(getComputedStyle(day).paddingRight);
+          const label = day.querySelector('.day__actions .btn__label');
+          return {
+            sameRow: button.top < header.bottom && button.bottom > header.top,
+            rightAligned: Math.abs(button.right - inner) <= 1,
+            oneLine: label.getBoundingClientRect().height < parseFloat(getComputedStyle(label).fontSize) * 2,
+          };
+        }""")
+        check(all(desktop_action.values()), 'botão da aula fica na linha do cabeçalho, à direita, com texto em uma linha no desktop', str(desktop_action))
         first_desktop_speaker = desktop.locator('.speaker').first
         desktop_art = first_desktop_speaker.locator('.speaker__art').bounding_box()
         desktop_bio = first_desktop_speaker.locator('.speaker__bio')
@@ -263,6 +386,31 @@ try:
         check(dialog_box is not None and dialog_box['height'] <= 720 and dialog_box['width'] <= 640, 'diálogo longo respeita os limites da viewport')
         bio_dialog.locator('[data-speaker-bio-close]').click()
         check(bio_dialog.get_attribute('open') is None and desktop.evaluate('(el) => document.activeElement === el', desktop_summary.element_handle()), 'diálogo fecha e devolve o foco ao acionador')
+
+        desktop.context.route('https://us02web.zoom.us/**', lambda route: route.abort())
+        desktop.locator('.day-nav__tabs [data-day="0"]').click()
+        desktop.locator('#encontro-1 a[data-requires-enrollment]').click()
+        desktop_enrollment = desktop.locator('[data-enrollment-dialog]')
+        enrollment_box = desktop_enrollment.evaluate("""el => {
+          const rect = el.getBoundingClientRect();
+          const cards = [...el.querySelectorAll('.enrollment-option__card')].map((card) => card.getBoundingClientRect());
+          const proceed = el.querySelector('[data-enrollment-continue]').getBoundingClientRect();
+          return {
+            open: el.open,
+            width: rect.width,
+            centered: Math.abs(rect.left + rect.width / 2 - innerWidth / 2) <= 1 &&
+              Math.abs(rect.top + rect.height / 2 - innerHeight / 2) <= 1,
+            stacked: cards.length === 2 && cards[1].top >= cards[0].bottom,
+            fullButton: Math.abs(proceed.width - cards[0].width) <= 1,
+          };
+        }""")
+        check(
+            enrollment_box['open'] and enrollment_box['width'] <= 560 and enrollment_box['centered'] and
+            enrollment_box['stacked'] and enrollment_box['fullButton'],
+            'confirmação de inscrição fica centralizada no desktop, com opções empilhadas', str(enrollment_box),
+        )
+        desktop.mouse.click(8, 8)
+        check(not desktop_enrollment.evaluate('el => el.open'), 'clique fora fecha a confirmação')
 
         nine_grid = desktop.locator('.speakers').evaluate("""
           (list) => {

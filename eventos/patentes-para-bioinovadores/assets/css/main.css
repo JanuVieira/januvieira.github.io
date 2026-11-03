@@ -1409,6 +1409,10 @@
     border-color: var(--button);
     color: var(--on-button);
 
+    /* The text colour is white, so the focus ring takes the fill instead. */
+    &:focus-visible {
+      outline-color: var(--button);
+    }
     @media (hover: hover) {
       &:hover:not(:disabled):not([aria-disabled='true']) {
         background: var(--ink);
@@ -2652,6 +2656,10 @@
     @media (max-width: 767px) {
       padding: 0 var(--card-pad) var(--space-4);
     }
+    a {
+      color: var(--blue);
+      font-weight: 600;
+    }
   }
   /* Secondary navigation is useful inside the long card on phones only.
      JavaScript reveals it after the day carousel initializes. */
@@ -2792,6 +2800,14 @@
     &:not([hidden]) ~ &:not([hidden]) {
       margin-top: var(--space-6);
     }
+    /* Tablet and desktop: the lesson action sits at the end of the header
+       row and drops below it only when the card is too narrow for both. */
+    @media (min-width: 768px) {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-5) var(--space-6);
+    }
   }
   /* Day header: app-style icon, encounter number and full date. */
   .day__label {
@@ -2799,6 +2815,15 @@
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
     gap: var(--space-4);
+
+    @media (min-width: 768px) {
+      flex: 1 1 auto;
+    }
+    /* The two-column desktop below 1200px leaves some headers without room
+       for the action; keep it below on every day so it never jumps. */
+    @media (min-width: 1024px) and (max-width: 1199px) {
+      flex-basis: 100%;
+    }
 
     @container (max-width: 479px) {
       grid-template-columns: auto minmax(0, 1fr);
@@ -2811,6 +2836,15 @@
       flex-wrap: wrap;
       align-items: center;
       gap: 0 calc(var(--space-3) - 2px);
+
+      /* A grid, so the header's natural width is the longer of title + badge
+         and date; a wrapping flex row would report all three side by side
+         and push the lesson action off the header row. */
+      @media (min-width: 768px) {
+        display: grid;
+        grid-template-columns: auto auto;
+        justify-content: start;
+      }
     }
     h3 {
       font-size: var(--fs-h3);
@@ -2820,6 +2854,7 @@
     }
     div p {
       flex-basis: 100%;
+      grid-column: 1 / -1;
       margin-top: 2px;
       font-size: var(--fs-body);
       color: var(--text-subtle);
@@ -2865,6 +2900,12 @@
     margin-top: var(--space-8);
     padding: 0;
     list-style: none;
+
+    /* The card's row gap already separates the header. */
+    @media (min-width: 768px) {
+      flex: 1 1 100%;
+      margin-top: var(--space-3);
+    }
   }
   .lesson {
     display: grid;
@@ -2922,22 +2963,24 @@
       color: var(--text-subtle);
     }
   }
-  /* The two essential actions stay visible before their URLs exist. */
+  /* The lesson action stays visible before its URL exists. It sizes to its
+     label on tablet and desktop; phones stretch it to the card width. */
   .day__actions {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-3);
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
     margin-top: var(--space-6);
 
-    @media (max-width: 599px) {
-      grid-template-columns: 1fr;
+    @media (min-width: 768px) {
+      flex: none;
+      margin-top: 0;
     }
 
     .btn {
       min-width: 0;
       min-height: 48px;
       justify-content: center;
-      padding: calc(var(--space-3) - 2px) var(--space-3);
+      padding: calc(var(--space-3) - 2px) var(--space-6);
       border: var(--rule-width) solid var(--divider);
       border-radius: var(--radius-tile);
       background: transparent;
@@ -2965,8 +3008,19 @@
       height: 20px;
       color: var(--blue);
     }
+    /* "Assistir aula (Via Zoom)" stays on one line; the status moves below
+       as a whole only when the button is too narrow for both. */
+    .btn__label {
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      column-gap: 0.3em;
+    }
+    .btn__status {
+      white-space: nowrap;
+    }
     .btn__status::before {
-      content: ' (';
+      content: '(';
     }
     .btn__status::after {
       content: ')';
@@ -3443,8 +3497,10 @@
   }
 
   /* Biografias extensas usam uma superfície de leitura estável no tablet e
-     desktop; o mobile mantém o contexto com a expansão inline do card. */
-  .speaker-bio-dialog {
+     desktop; o mobile mantém o contexto com a expansão inline do card.
+     A confirmação de inscrição reaproveita a mesma superfície. */
+  .speaker-bio-dialog,
+  .enrollment-dialog {
     width: min(640px, calc(100% - 2 * var(--space-6)));
     max-width: none;
     max-height: min(80vh, 760px);
@@ -3458,7 +3514,13 @@
     color: var(--ink);
     box-shadow: 0 28px 80px rgb(16 19 30 / 0.35);
   }
-  .speaker-bio-dialog::backdrop {
+  /* Browsers without <dialog> would render closed dialogs inline. */
+  .speaker-bio-dialog:not([open]),
+  .enrollment-dialog:not([open]) {
+    display: none;
+  }
+  .speaker-bio-dialog::backdrop,
+  .enrollment-dialog::backdrop {
     background: rgb(16 19 30 / 0.64);
     backdrop-filter: blur(3px);
   }
@@ -3475,7 +3537,8 @@
     padding: var(--space-6);
     border-bottom: var(--rule-width) solid var(--divider);
   }
-  .speaker-bio-dialog__meta {
+  .speaker-bio-dialog__meta,
+  .enrollment-dialog__meta {
     margin-bottom: var(--space-2);
     font-family: var(--mono);
     font-size: var(--fs-label);
@@ -3485,7 +3548,8 @@
     color: var(--blue);
     text-transform: uppercase;
   }
-  .speaker-bio-dialog h2 {
+  .speaker-bio-dialog h2,
+  .enrollment-dialog h2 {
     max-width: 18em;
     font-size: var(--fs-h3);
     font-weight: var(--fw-h3);
@@ -3493,7 +3557,8 @@
     letter-spacing: var(--ls-h3);
     text-wrap: balance;
   }
-  .speaker-bio-dialog__close {
+  .speaker-bio-dialog__close,
+  .enrollment-dialog__close {
     position: relative;
     flex: none;
     width: 48px;
@@ -3504,7 +3569,9 @@
     color: var(--ink);
   }
   .speaker-bio-dialog__close span::before,
-  .speaker-bio-dialog__close span::after {
+  .speaker-bio-dialog__close span::after,
+  .enrollment-dialog__close span::before,
+  .enrollment-dialog__close span::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -3516,10 +3583,12 @@
     translate: -50% -50%;
     rotate: 45deg;
   }
-  .speaker-bio-dialog__close span::after {
+  .speaker-bio-dialog__close span::after,
+  .enrollment-dialog__close span::after {
     rotate: -45deg;
   }
-  .speaker-bio-dialog__close:focus-visible {
+  .speaker-bio-dialog__close:focus-visible,
+  .enrollment-dialog__close:focus-visible {
     outline: 3px solid var(--lime);
     outline-offset: 2px;
   }
@@ -3534,8 +3603,235 @@
   .speaker-bio-dialog__content p + p {
     margin-top: var(--space-4);
   }
-  body.has-speaker-dialog {
+  body.has-speaker-dialog,
+  body.has-enrollment-dialog {
     overflow: hidden;
+  }
+
+  /* Confirmação de inscrição: pergunta, duas opções exclusivas e um único
+     "Continuar". Caixa curta no tablet/desktop e painel inferior no celular. */
+  .enrollment-dialog {
+    width: min(560px, calc(100% - 2 * var(--space-6)));
+    max-height: min(90vh, 680px);
+    max-height: min(90dvh, 680px);
+
+    @media (max-width: 767px) {
+      width: 100%;
+      max-height: calc(100vh - var(--space-6));
+      max-height: calc(100dvh - var(--space-6));
+      margin: auto 0 0;
+      border-radius: var(--radius-card) var(--radius-card) 0 0;
+    }
+    /* Short landscape screens: use more width so everything fits in height. */
+    @media (max-height: 500px) and (orientation: landscape) {
+      max-height: calc(100vh - var(--space-4));
+      max-height: calc(100dvh - var(--space-4));
+    }
+    @media (min-width: 768px) and (max-height: 500px) and (orientation: landscape) {
+      width: min(640px, calc(100% - 2 * var(--space-6)));
+    }
+  }
+  .enrollment-dialog__surface {
+    display: grid;
+    gap: var(--space-6);
+    max-height: inherit;
+    padding: var(--space-8);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    @media (max-width: 767px) {
+      gap: var(--space-5);
+      padding: var(--space-5) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+    }
+    @media (max-height: 500px) and (orientation: landscape) {
+      gap: var(--space-3);
+      padding-block: var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+    }
+  }
+  .enrollment-dialog__header {
+    display: grid;
+  }
+  /* Context and close share the top row, so the question gets the full width. */
+  .enrollment-dialog__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-block: calc(-1 * var(--space-2)) var(--space-1);
+
+    .enrollment-dialog__meta {
+      margin-bottom: 0;
+    }
+  }
+  /* One line at every width. The title measures ~13.9 × its font size, so
+     phones scale it with the sheet width (with a small safety margin). */
+  .enrollment-dialog h2 {
+    font-size: 28px;
+
+    @media (max-width: 767px) {
+      font-size: min(24px, calc((100vw - 2 * var(--space-5)) / 14.4));
+    }
+    /* Receives focus on open so no option looks preselected. */
+    &:focus {
+      outline: none;
+    }
+  }
+  .enrollment-dialog__text {
+    margin-top: var(--space-3);
+    color: var(--text-subtle);
+    font-size: var(--fs-small);
+    line-height: var(--lh-small);
+    text-wrap: pretty;
+
+    @media (min-width: 768px) {
+      font-size: var(--fs-body);
+    }
+  }
+
+  /* Each option is a native radio; the card around it carries the state. */
+  .enrollment-dialog__options {
+    display: grid;
+    gap: var(--space-3);
+
+    @media (max-height: 500px) and (orientation: landscape) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  /* Grid so side-by-side cards share the same height. */
+  .enrollment-option {
+    position: relative;
+    display: grid;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .enrollment-option__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+  }
+  .enrollment-option__card {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 72px;
+    padding: var(--space-4) var(--space-5) var(--space-4) var(--space-4);
+    border: var(--rule-width) solid var(--divider);
+    border-radius: var(--radius-tile);
+    background: var(--white);
+    transition:
+      border-color var(--dur-hover) var(--ease-standard),
+      box-shadow var(--dur-hover) var(--ease-standard),
+      background-color var(--dur-hover) var(--ease-standard);
+
+    @media (max-width: 360px) {
+      gap: var(--space-3);
+      padding: var(--space-3);
+    }
+    @media (max-height: 500px) and (orientation: landscape) {
+      min-height: 64px;
+      padding-block: var(--space-3);
+    }
+  }
+  .enrollment-option__mark {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    /* Without color-mix(), the token fallback keeps the ring visible. */
+    border: 2px solid var(--divider);
+    border-color: color-mix(in srgb, var(--navy) 32%, transparent);
+    border-radius: 50%;
+    background: var(--white);
+    transition: border-color var(--dur-hover) var(--ease-standard);
+
+    /* transform, not the scale property: older engines would ignore scale
+       and show every option as selected. */
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--blue);
+      transform: scale(0);
+      transition: transform var(--dur-icon) var(--ease-out);
+    }
+  }
+  .enrollment-option__text {
+    display: grid;
+    gap: 2px;
+
+    strong {
+      color: var(--ink);
+      font-size: var(--fs-ui);
+      font-weight: 700;
+      line-height: 1.3;
+
+      @media (min-width: 768px) {
+        font-size: var(--fs-body);
+      }
+    }
+    span {
+      color: var(--text-muted);
+      font-size: var(--fs-small);
+      line-height: var(--lh-small);
+    }
+  }
+  @media (hover: hover) {
+    .enrollment-option:hover .enrollment-option__card {
+      border-color: color-mix(in srgb, var(--navy) 40%, transparent);
+    }
+  }
+  .enrollment-option__input:checked + .enrollment-option__card {
+    border-color: var(--blue);
+    box-shadow: inset 0 0 0 1px var(--blue);
+    background: color-mix(in srgb, var(--blue) 6%, var(--white));
+
+    .enrollment-option__mark {
+      border-color: var(--blue);
+    }
+    .enrollment-option__mark::after {
+      transform: scale(1);
+    }
+  }
+  .enrollment-option__input:focus-visible + .enrollment-option__card {
+    outline: 3px solid var(--blue);
+    outline-offset: 2px;
+  }
+
+  /* If the content ever scrolls (very short screens, enlarged text), the
+     action stays pinned to the bottom of the panel. */
+  .enrollment-dialog__footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--paper);
+  }
+  .enrollment-dialog__continue {
+    width: 100%;
+    min-height: 52px;
+    justify-content: center;
+    font-size: var(--fs-ui);
+
+    /* Explicit colours instead of opacity: Chromium may skip painting a
+       translucent link inside the dialog's scroll container. */
+    &[aria-disabled='true'] {
+      opacity: 1;
+      border-color: var(--divider);
+      background: var(--hover-light);
+      color: var(--text-muted);
+    }
+  }
+  .enrollment-dialog__hint {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    line-height: var(--lh-small);
+    text-align: center;
+    text-wrap: pretty;
+
+    &:not(:empty) {
+      margin-top: var(--space-3);
+    }
   }
 
   @media (min-width: 768px) {
@@ -4522,31 +4818,15 @@
       white-space: nowrap;
     }
     .day__actions {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-2);
+      justify-items: stretch;
       margin-top: var(--space-5);
     }
     .day__actions .btn {
       min-height: 52px;
-      padding: var(--space-2);
-      font-size: 13px;
+      padding: var(--space-2) var(--space-4);
+      font-size: var(--fs-small);
       line-height: 1.2;
       text-align: center;
-    }
-    .day__actions .btn__label {
-      display: grid;
-      gap: 2px;
-    }
-    .day__actions .btn__status {
-      font-family: var(--mono);
-      font-size: var(--fs-label);
-      font-weight: var(--fw-label);
-      line-height: var(--lh-label);
-      color: var(--text-muted);
-    }
-    .day__actions .btn__status::before,
-    .day__actions .btn__status::after {
-      content: none;
     }
     .schedule-note {
       padding: 0 var(--space-5) var(--space-3);
@@ -4691,16 +4971,6 @@
       order: 2;
       justify-self: center;
       margin-top: var(--space-8);
-    }
-  }
-
-  @media (max-width: 430px) {
-    .day__actions .btn {
-      flex-direction: column;
-      gap: var(--space-1);
-      min-height: 64px;
-      padding: var(--space-2) calc(var(--space-1) + 1px);
-      font-size: var(--fs-label);
     }
   }
 

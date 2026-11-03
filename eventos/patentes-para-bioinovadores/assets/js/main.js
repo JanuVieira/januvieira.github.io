@@ -570,6 +570,129 @@ function initSpeakerBios() {
   document.documentElement.classList.add('bios-ready');
 }
 
+/** Pergunta sobre a inscrição antes de abrir a aula e lembra a resposta no navegador. */
+function initEnrollmentDialog() {
+  const links = [...document.querySelectorAll('a[data-requires-enrollment]')];
+  const dialog = document.querySelector('[data-enrollment-dialog]');
+  const meta = dialog?.querySelector('[data-enrollment-meta]');
+  const title = dialog?.querySelector('[data-enrollment-title]');
+  const options = [...(dialog?.querySelectorAll('input[name="enrollment-status"]') || [])];
+  const enrolled = dialog?.querySelector('[data-enrollment-enrolled]');
+  const proceed = dialog?.querySelector('[data-enrollment-continue]');
+  const proceedLabel = proceed?.querySelector('[data-enrollment-continue-label]');
+  const hint = dialog?.querySelector('[data-enrollment-hint]');
+  const close = dialog?.querySelector('[data-enrollment-close]');
+  // Sem suporte ao elemento <dialog>, o link segue direto para a aula.
+  if (links.length === 0 || !enrolled || !proceedLabel || typeof dialog.showModal !== 'function') return;
+
+  const compact = matchMedia('(max-width: 767px)');
+  const storageKey = 'patentes-bioinovadores:inscricao-confirmada';
+  const proceedLabels = { enrolled: 'Entrar na aula', signup: 'Ir para a inscrição' };
+  let opener = null;
+
+  // O armazenamento pode estar bloqueado (navegação privada ou política do navegador).
+  const isConfirmed = () => {
+    try {
+      return localStorage.getItem(storageKey) === 'sim';
+    } catch {
+      return false;
+    }
+  };
+  const rememberConfirmation = () => {
+    try {
+      localStorage.setItem(storageKey, 'sim');
+    } catch {
+      // Sem armazenamento, a pergunta volta a aparecer no próximo clique.
+    }
+  };
+  const closeDialog = () => {
+    if (dialog.open) dialog.close();
+  };
+  const selectedOption = () => options.find((option) => option.checked);
+
+  // "Continuar" só vira link depois que uma opção é escolhida. Sem href,
+  // target/rel não são válidos e o estado indisponível vem de role + aria.
+  const updateProceed = () => {
+    const selected = selectedOption();
+    if (selected?.dataset.href) {
+      proceed.href = selected.dataset.href;
+      proceed.target = '_blank';
+      proceed.rel = 'noopener noreferrer';
+      proceed.removeAttribute('role');
+      proceed.removeAttribute('aria-disabled');
+    } else {
+      ['href', 'target', 'rel'].forEach((name) => proceed.removeAttribute(name));
+      proceed.setAttribute('role', 'link');
+      proceed.setAttribute('aria-disabled', 'true');
+    }
+    proceedLabel.textContent = proceedLabels[selected?.value] || 'Continuar';
+  };
+
+  options.forEach((option) => option.addEventListener('change', updateProceed));
+  close?.addEventListener('click', closeDialog);
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) closeDialog();
+  });
+  dialog.addEventListener('close', () => {
+    document.body.classList.remove('has-enrollment-dialog');
+    opener?.focus();
+    opener = null;
+  });
+
+  proceed.addEventListener('click', (event) => {
+    const selected = selectedOption();
+    if (!selected) {
+      event.preventDefault();
+      return;
+    }
+    if (selected === enrolled) {
+      rememberConfirmation();
+      // Fecha só depois do clique, para que o navegador abra a aula normalmente.
+      setTimeout(closeDialog);
+      return;
+    }
+    // A inscrição abre em outra aba; o diálogo fica à espera do retorno.
+    if (hint) {
+      hint.textContent =
+        'O formulário abriu em uma nova aba. Depois de enviar, volte aqui e escolha “Sim, já me inscrevi”.';
+    }
+  });
+
+  links.forEach((link) => {
+    link.addEventListener('click', (event) => {
+      // Ctrl/Cmd/Shift + clique mantêm o comportamento nativo do navegador.
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (isConfirmed()) return;
+      event.preventDefault();
+
+      const day = link.closest('.day');
+      if (meta) {
+        // "Terça‑feira, 3 de novembro" vira "3 de novembro" para caber numa linha.
+        const date = day?.querySelector('.day__label p')?.textContent.split(',').pop().trim();
+        meta.textContent = [day?.querySelector('.day__label h3')?.textContent.trim(), date]
+          .filter(Boolean)
+          .join(' · ');
+      }
+      enrolled.dataset.href = link.href;
+      options.forEach((option) => (option.checked = false));
+      if (hint) hint.textContent = '';
+      updateProceed();
+      opener = link;
+      document.body.classList.add('has-enrollment-dialog');
+      dialog.showModal();
+      // O foco vai ao título: assim nenhuma opção parece pré-selecionada.
+      (title || options[0]).focus();
+      runAnimation(
+        dialog,
+        compact.matches
+          ? [{ translate: '0 100%' }, { translate: '0 0' }]
+          : [{ opacity: 0, translate: '0 12px' }, { opacity: 1, translate: '0 0' }],
+        { duration: motion.reveal, easing: motion.out },
+      );
+    });
+  });
+}
+
 const initialize = (name, initializer) => {
   try {
     return initializer();
@@ -594,4 +717,5 @@ initialize('preferência de movimento', () => listenMediaChange(reducedMotion, (
 initialize('imagens dos palestrantes', initSpeakerImages);
 initialize('grade de palestrantes', initSpeakerGrid);
 initialize('biografias dos palestrantes', initSpeakerBios);
+initialize('confirmação de inscrição', initEnrollmentDialog);
 document.documentElement.classList.add('main-ready');

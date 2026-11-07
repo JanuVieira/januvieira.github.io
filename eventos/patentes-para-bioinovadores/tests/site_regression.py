@@ -5,6 +5,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 from urllib.parse import urlparse
+from datetime import datetime
 import json
 import sys
 
@@ -37,8 +38,15 @@ url = f"http://127.0.0.1:{server.server_port}/"
 try:
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=True)
+        # Data fixa antes do curso: os testes não dependem do dia em que rodam
+        # (os encontros passados viram "Aula encerrada" e mudariam o resultado).
+        COURSE_DATE = datetime.fromisoformat('2026-11-02T10:00:00-03:00')
+        def open_page(**options):
+            opened = browser.new_page(**options)
+            opened.clock.set_fixed_time(COURSE_DATE)
+            return opened
         for width, height in SIZES:
-            page = browser.new_page(viewport={"width":width,"height":height}, reduced_motion="reduce")
+            page = open_page(viewport={"width":width,"height":height}, reduced_motion="reduce")
             errors = []
             page.on("pageerror", lambda exc: errors.append(str(exc)))
             page.goto(url, wait_until="domcontentloaded")
@@ -53,6 +61,38 @@ try:
               })
             """)
             check(portrait_grid, f"áreas de fotografia quadradas em {width}x{height}")
+            speaker_rhythm = page.locator('.speaker').evaluate_all("""
+              cards => cards.every((card) => {
+                const box = (selector) => card.querySelector(selector)?.getBoundingClientRect();
+                const meta = box('.speaker__meta');
+                const name = box('h3');
+                const topic = box('.speaker__topic');
+                const near = (value) => Math.abs(value - 8) <= 1;
+                return near(name.top - meta.bottom) && (!topic || near(topic.top - name.bottom));
+              })
+            """)
+            check(speaker_rhythm, f"cards de palestrantes mantêm 8px entre selo, nome e tema em {width}x{height}")
+            two_lines = page.locator('.speaker').evaluate_all("""
+              cards => cards.map((card) => {
+                const lines = (el) => el ? Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)) : 2;
+                return [card.querySelector('h3'), card.querySelector('.speaker__topic')].map(lines);
+              })
+            """)
+            names_ok = all(name == 2 for name, _ in two_lines)
+            # Abaixo de 360px, uma linha longa do tema pode quebrar de novo.
+            topics_ok = all(topic == 2 if width >= 360 else topic <= 3 for _, topic in two_lines)
+            check(names_ok and topics_ok, f"nomes e temas dos palestrantes ficam em duas linhas em {width}x{height}", str(two_lines))
+            footer_balance = page.locator('.speaker').evaluate_all("""
+              cards => cards.every((card) => {
+                if (getComputedStyle(card).display !== 'grid') return true;
+                const summary = card.querySelector('.speaker__bio summary').getBoundingClientRect();
+                const label = card.querySelector('.speaker__bio-more').getBoundingClientRect();
+                const above = label.top - summary.top;
+                const below = card.getBoundingClientRect().bottom - label.bottom;
+                return Math.abs(above - below) <= 2;
+              })
+            """)
+            check(footer_balance, f"Abrir biografia tem o mesmo respiro acima e abaixo em {width}x{height}")
             page.context.route('https://us02web.zoom.us/**', lambda route: route.abort())
             enrollment_fit = page.evaluate("""() => {
               const link = document.querySelector('a[data-requires-enrollment]');
@@ -76,9 +116,34 @@ try:
             }""")
             check(enrollment_fit['open'] and enrollment_fit['inside'] and enrollment_fit['noOverflowX'], f"confirmação de inscrição cabe na tela {width}x{height}", str(enrollment_fit))
             check(enrollment_fit['titleOneLine'] and enrollment_fit['cardsEqual'], f"confirmação mantém título em uma linha e cards alinhados em {width}x{height}")
+            page.locator('.day-nav__tabs [data-day="3"]').click()
+            company_layout = page.locator('#encontro-4').evaluate("""day => {
+              const lessons = [...day.querySelectorAll('.lesson')];
+              const company = day.querySelector('.lesson--company');
+              const box = (root, selector) => root.querySelector(selector).getBoundingClientRect();
+              const lesson = company.getBoundingClientRect();
+              const logo = box(company, '.lesson__logo');
+              const row = box(company, '.lesson__company');
+              const parts = ['.lesson__time', '.lesson__title', '.lesson__speaker', '.lesson__topics summary'].map((s) => box(company, s));
+              const overlaps = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+              const [, title, speaker] = parts;
+              const regularGap = box(lessons[0], '.lesson__speaker').top - box(lessons[0], '.lesson__title').bottom;
+              return {
+                inside: logo.right <= lesson.right + 1 && speaker.left >= lesson.left - 1,
+                noOverlap: parts.every((part) => !overlaps(logo, part)),
+                sameGap: Math.abs((row.top - title.bottom) - regularGap) <= 1,
+                // Nome à esquerda e logo à direita, na mesma linha e centralizados;
+                // abaixo de 360px, o logo desce para a linha de baixo, ainda à direita.
+                placed: Math.abs(logo.right - lesson.right) <= 1 && Math.abs(speaker.left - lesson.left) <= 1 && (innerWidth >= 360
+                  ? logo.left > speaker.right && Math.abs((logo.top + logo.bottom) / 2 - (speaker.top + speaker.bottom) / 2) <= 1
+                  : logo.top >= speaker.bottom),
+                nameLines: Math.round(box(company, '.lesson__speaker strong').height / parseFloat(getComputedStyle(company.querySelector('.lesson__speaker strong')).lineHeight)),
+              };
+            }""")
+            check(all(company_layout.values()), f"logo da Inovafhytos bem posicionado e sem sobreposição em {width}x{height}", str(company_layout))
             page.close()
 
-        page = browser.new_page(viewport={"width":390,"height":844}, reduced_motion="reduce")
+        page = open_page(viewport={"width":390,"height":844}, reduced_motion="reduce")
         page.goto(url, wait_until="domcontentloaded")
         # Mudanças editoriais mobile, verificadas na página renderizada.
         layout_mobile = page.evaluate("""() => {
@@ -303,7 +368,7 @@ try:
             return rect.width > 0 && rect.height > 0;
           }).length
         """)
-        check(speaker_count == 9 and bios.count() == speaker_count and visible_bios == speaker_count, 'as nove biografias ficam acessíveis no mobile')
+        check(speaker_count == 10 and bios.count() == speaker_count and visible_bios == speaker_count, 'as dez biografias ficam acessíveis no mobile')
         check(page.locator('.speaker > .speaker__bio').count() == speaker_count and page.locator('.speaker__art .speaker__bio').count() == 0, 'biografias ficam fora da área da foto')
         if bios.count():
             first_bio = bios.first
@@ -347,13 +412,76 @@ try:
         back_to_top.click()
         check(scroll_before > 0 and page.evaluate('scrollY') == 0, 'Voltar ao topo chega ao início da página')
 
+        # Cronograma conforme o convite novo (horário de início, fim e palestrante).
+        expected_schedule = {
+            'encontro-1': [('14:00', '16:00', 'Dra. Tatiana Carestiato'), ('16:00', '17:00', 'Dra. Tatiana Carestiato')],
+            'encontro-2': [('14:00', '15:00', 'Dr. Jeferson Monteiro'), ('15:00', '17:00', 'Profa. Dra. Renata Angeli')],
+            'encontro-3': [('14:00', '16:00', 'Profa. Dra. Cláudia Auler'), ('16:00', '17:00', 'Empresa a confirmar')],
+            'encontro-4': [('14:00', '16:00', 'Dr. Rodrigo Ferraro'), ('16:00', '17:00', 'Profa. Dra. Jaqueline Cibene')],
+            'encontro-5': [('14:00', '15:00', 'Dr. Fábio Barros'), ('15:00', '17:00', 'Dra. Paula Adamis de Barros')],
+            'encontro-6': [('14:00', '15:00', 'Dra. Stefania Palma Araujo'), ('15:00', '16:50', 'Dra. Cristina D’Urso'), ('16:50', '17:00', 'Dra. Tatiana Carestiato')],
+        }
+        rendered_schedule = page.evaluate("""() => Object.fromEntries([...document.querySelectorAll('.day')].map((day) => [
+          day.id,
+          [...day.querySelectorAll('.lesson')].map((lesson) => [
+            ...[...lesson.querySelectorAll('.lesson__time time')].map((time) => time.dateTime.slice(11, 16)),
+            lesson.querySelector('.lesson__speaker strong').textContent.trim(),
+          ]),
+        ]))""")
+        rendered_schedule = {day: [tuple(row) for row in rows] for day, rows in rendered_schedule.items()}
+        check(rendered_schedule == expected_schedule, 'cronograma segue horários e palestrantes do convite', str(rendered_schedule))
+        cards_vs_schedule = page.evaluate("""() => {
+          const days = {};
+          document.querySelectorAll('.day').forEach((day) => {
+            const dd = day.dataset.date.slice(8, 10);
+            day.querySelectorAll('.lesson__speaker strong').forEach((speaker) => {
+              const name = speaker.textContent.trim();
+              days[name] = [...new Set([...(days[name] || []), dd])];
+            });
+          });
+          return [...document.querySelectorAll('.speaker')].map((card) => {
+            const name = card.querySelector('h3').textContent.trim();
+            const meta = card.querySelector('.speaker__meta span:last-child').textContent.trim();
+            return {name, card: meta.replace(/\\/\\d{2}$/, '').match(/\\d{2}/g) || [], schedule: days[name] || []};
+          });
+        }""")
+        dates_match = all(item['card'] == item['schedule'] and item['card'] for item in cards_vs_schedule)
+        firsts = [item['card'][0] for item in cards_vs_schedule if item['card']]
+        check(dates_match and firsts == sorted(firsts), 'datas dos cards de palestrantes batem com o cronograma e seguem a ordem dos dias', str(cards_vs_schedule))
+        company = page.locator('#encontro-4 .lesson--company')
+        logo_ok = company.locator('.lesson__logo').evaluate("img => img.complete || img.loading === 'lazy'") and company.locator('.lesson__logo').get_attribute('alt')
+        instagram = page.locator('#encontro-4 .lesson__about a[href*="instagram.com/inovafhytos_cerrado"]')
+        check(company.count() == 1 and bool(logo_ok) and instagram.count() == 1 and instagram.get_attribute('rel') == 'noopener noreferrer',
+              'aula da Inovafhytos mostra logo, apresentação e Instagram')
+
         manifest = page.evaluate("async () => await (await fetch('version.json', {cache: 'no-store'})).json()")
         embedded_version = page.locator('html').get_attribute('data-site-version')
         check(manifest.get('version') == embedded_version, 'version.json corresponde à versão embutida no HTML')
         page.close()
 
-        desktop = browser.new_page(viewport={"width":1280,"height":900}, reduced_motion="reduce")
+        desktop = open_page(viewport={"width":1280,"height":900}, reduced_motion="reduce")
         desktop.goto(url, wait_until="domcontentloaded")
+        hero_space = desktop.evaluate("""() => {
+          const header = document.querySelector('.site-header').getBoundingClientRect();
+          const hero = document.querySelector('.hero__grid').getBoundingClientRect();
+          const next = document.querySelector('#conteudo-programatico .eyebrow').getBoundingClientRect();
+          return {above: Math.round(hero.top - header.bottom), below: Math.round(next.top - hero.bottom), fits: hero.bottom <= innerHeight};
+        }""")
+        check(hero_space['above'] >= 32 and hero_space['below'] <= 160 and hero_space['fits'],
+              'hero tem respiro abaixo do menu e não acumula espaço antes da seção seguinte', str(hero_space))
+        fold_issues = []
+        for fold_w, fold_h in ((1024, 600), (1280, 720), (1366, 768), (1440, 900)):
+            desktop.set_viewport_size({"width": fold_w, "height": fold_h})
+            desktop.wait_for_timeout(60)
+            bottom = desktop.evaluate("document.querySelector('.hero__actions .pill').getBoundingClientRect().bottom")
+            if bottom > fold_h: fold_issues.append((fold_w, fold_h, round(bottom)))
+        desktop.set_viewport_size({"width": 1280, "height": 900})
+        check(not fold_issues, 'botão Inscreva-se fica visível sem rolar em telas de desktop baixas', str(fold_issues))
+        credit = desktop.locator('.freefingers-credit a').evaluate("""el => {
+          const s = getComputedStyle(el);
+          return s.textDecorationLine.includes('underline') && s.textDecorationColor !== 'rgba(0, 0, 0, 0)';
+        }""")
+        check(credit, 'link Janu Vieira fica sublinhado para indicar que é clicável')
         desktop_action = desktop.locator('.day:not([hidden])').evaluate("""day => {
           const button = day.querySelector('.day__actions .btn').getBoundingClientRect();
           const header = day.querySelector('.day__label').getBoundingClientRect();
@@ -420,27 +548,104 @@ try:
         desktop.mouse.click(8, 8)
         check(not desktop_enrollment.evaluate('el => el.open'), 'clique fora fecha a confirmação')
 
-        nine_grid = desktop.locator('.speakers').evaluate("""
+        speaker_grid_js = """
           (list) => {
             const cards = [...list.children];
             const listRect = list.getBoundingClientRect();
             const rects = cards.map((card) => card.getBoundingClientRect());
             const lefts = [...new Set(rects.map((rect) => Math.round(rect.left)))];
+            const tops = [...new Set(rects.map((rect) => Math.round(rect.top)))];
+            const lastRow = rects.filter((rect) => Math.round(rect.top) === Math.max(...tops));
             return {
               columns: lefts.length,
+              rows: tops.length,
               leftGap: Math.abs(Math.min(...rects.map((rect) => rect.left)) - listRect.left),
               rightGap: Math.abs(listRect.right - Math.max(...rects.map((rect) => rect.right))),
+              lastRowCount: lastRow.length,
+              lastRowCentered: Math.abs(
+                (Math.min(...lastRow.map((rect) => rect.left)) - listRect.left) -
+                (listRect.right - Math.max(...lastRow.map((rect) => rect.right)))
+              ) <= 1,
             };
           }
-        """)
+        """
+        ten_grid = desktop.locator('.speakers').evaluate(speaker_grid_js)
         check(
-            nine_grid['columns'] == 3 and
-            nine_grid['leftGap'] <= 1 and
-            nine_grid['rightGap'] <= 1,
-            'grade de nove palestrantes forma três colunas alinhadas ao container no desktop',
-            str(nine_grid),
+            ten_grid['columns'] == 5 and ten_grid['rows'] == 2 and
+            ten_grid['leftGap'] <= 1 and ten_grid['rightGap'] <= 1,
+            'grade de dez palestrantes forma duas linhas de cinco alinhadas ao container no desktop',
+            str(ten_grid),
+        )
+        desktop.set_viewport_size({"width": 1100, "height": 900})
+        narrow_grid = desktop.locator('.speakers').evaluate(speaker_grid_js)
+        check(
+            narrow_grid['rows'] == 3 and narrow_grid['lastRowCount'] == 2 and narrow_grid['lastRowCentered'] and
+            narrow_grid['leftGap'] <= 1 and narrow_grid['rightGap'] <= 1,
+            'entre 1024 e 1199px, a grade usa quatro colunas e centraliza a última dupla',
+            str(narrow_grid),
         )
         desktop.close()
+
+        # Limites das faixas responsivas (um pixel antes e depois de cada corte).
+        boundary = open_page(viewport={"width": 1024, "height": 900}, reduced_motion="reduce")
+        boundary.goto(url, wait_until="load")
+        boundary.locator('.day-nav__tabs [data-day="3"]').click()  # Encontro 4, com a aula da Inovafhytos
+        boundary_issues = []
+        for width in (359, 360, 361, 430, 431, 480, 481, 599, 600, 767, 768, 1023, 1024, 1199, 1200, 2560):
+            boundary.set_viewport_size({"width": width, "height": 900})
+            boundary.wait_for_timeout(80)
+            state = boundary.evaluate("""() => {
+              const strong = document.querySelector('.hero__title-strong');
+              const range = document.createRange(); range.selectNodeContents(strong);
+              const right = Math.max(...[...range.getClientRects()].map((line) => line.right));
+              const heading = document.querySelector('.hero__heading').getBoundingClientRect();
+              const lines = (el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight));
+              const company = document.querySelector('#encontro-4 .lesson--company');
+              const companyBox = company.getBoundingClientRect();
+              const logo = company.querySelector('.lesson__logo').getBoundingClientRect();
+              const speaker = company.querySelector('.lesson__speaker').getBoundingClientRect();
+              return {
+                // Logo sempre à direita; até 359px desce para baixo do nome.
+                logo: Math.abs(logo.right - companyBox.right) <= 1 &&
+                  (innerWidth < 360 ? logo.top >= speaker.bottom - 1 : logo.left > speaker.right),
+                overflow: document.documentElement.scrollWidth - innerWidth,
+                titleFits: right <= heading.right + 1,
+                names: [...document.querySelectorAll('.speaker h3')].every((el) => lines(el) === 2),
+                topics: [...document.querySelectorAll('.speaker__topic')].every((el) => lines(el) === 2),
+              };
+            }""")
+            if state['overflow'] > 1 or not state['logo'] or not state['titleFits'] or not state['names'] or (width >= 360 and not state['topics']):
+                boundary_issues.append((width, state))
+        boundary.close()
+        check(not boundary_issues, 'limites dos breakpoints sem overflow, com título do hero na coluna e cards em duas linhas', str(boundary_issues))
+
+        # Encontros de dias anteriores viram "Aula encerrada" (datas simuladas).
+        ended_cases = {
+            '2026-11-07T12:00:00-03:00': (['encontro-1', 'encontro-2'], 'encontro-3'),  # sábado entre encontros
+            '2026-11-05T15:00:00-03:00': (['encontro-1'], 'encontro-2'),  # durante a aula do Encontro 2
+        }
+        ended_issues = []
+        for moment, (expected_ended, current_day) in ended_cases.items():
+            when = browser.new_page(viewport={"width": 390, "height": 844}, reduced_motion="reduce")
+            when_errors = []
+            when.on("pageerror", lambda exc: when_errors.append(str(exc)))
+            when.clock.set_fixed_time(datetime.fromisoformat(moment))
+            when.goto(url, wait_until="load")
+            state = when.evaluate("""() => [...document.querySelectorAll('.day')].map((day) => {
+              const btn = day.querySelector('.day__actions .btn');
+              return {id: day.id, ended: btn.classList.contains('btn--ended'), disabled: btn.disabled === true,
+                      link: btn.tagName === 'A', label: btn.textContent.trim(), aria: btn.getAttribute('aria-label') || ''};
+            })""")
+            ended = [item['id'] for item in state if item['ended']]
+            ok = (
+                ended == expected_ended and not when_errors and
+                all(item['disabled'] and not item['link'] and item['label'] == 'Aula encerrada' and 'encerrada' in item['aria']
+                    for item in state if item['ended']) and
+                not next(item for item in state if item['id'] == current_day)['ended']
+            )
+            if not ok: ended_issues.append((moment, ended, when_errors))
+            when.close()
+        check(not ended_issues, 'encontros de dias anteriores mostram Aula encerrada, desativado, e o do dia continua ativo', str(ended_issues))
 
         tablet_context = browser.new_context(
             viewport={"width":820,"height":1180},
@@ -448,6 +653,7 @@ try:
             has_touch=True,
             reduced_motion="reduce",
         )
+        tablet_context.clock.set_fixed_time(COURSE_DATE)
         tablet = tablet_context.new_page()
         tablet.goto(url, wait_until="domcontentloaded")
         tablet_bios = tablet.locator('.speaker__bio')

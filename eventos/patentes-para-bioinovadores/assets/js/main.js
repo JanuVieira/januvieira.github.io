@@ -378,8 +378,9 @@ function initDisclosures() {
   document.querySelectorAll('.faq__item').forEach((details) => {
     animateDisclosure(details, { content: details.querySelector(':scope > p') });
   });
+  // Tópicos usam <ul>; a apresentação de empresa convidada, .lesson__about.
   document.querySelectorAll('.lesson__topics').forEach((details) => {
-    animateDisclosure(details, { content: details.querySelector(':scope > ul') });
+    animateDisclosure(details, { content: details.querySelector(':scope > ul, :scope > .lesson__about') });
   });
 }
 
@@ -449,6 +450,30 @@ function initCursorFollower() {
   };
 }
 
+/**
+ * Encontros de dias anteriores: o botão da aula vira "Aula encerrada",
+ * desativado, para não levar a uma sala que já fechou nem dizer "Em breve".
+ * Roda antes da confirmação de inscrição, que assim ignora esses links.
+ */
+function initPastMeetings() {
+  const today = new Date().toLocaleDateString('sv');
+  document.querySelectorAll('.day[data-date]').forEach((day) => {
+    if (day.dataset.date >= today) return;
+    const action = day.querySelector('.day__actions .btn');
+    if (!action) return;
+    const title = day.querySelector('.day__label h3')?.textContent.trim() || 'Encontro';
+    const ended = document.createElement('button');
+    ended.type = 'button';
+    ended.className = `${action.className} btn--ended`;
+    ended.disabled = true;
+    ended.setAttribute('aria-label', `Aula do ${title} encerrada`);
+    ended.innerHTML =
+      '<span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>' +
+      '<span class="btn__label">Aula encerrada</span>';
+    action.replaceWith(ended);
+  });
+}
+
 /** Revela fotos carregadas suavemente, mantendo as iniciais como reserva. */
 function initSpeakerImages() {
   document.querySelectorAll('.speaker__art img').forEach((image) => {
@@ -459,11 +484,13 @@ function initSpeakerImages() {
   document.documentElement.classList.add('photos-ready');
 }
 
-/** Prepara a composição equilibrada quando o nono palestrante for incluído. */
+/** Escolhe a composição equilibrada da grade conforme o número de palestrantes. */
 function initSpeakerGrid() {
   const list = document.querySelector('.speakers');
   if (!list) return;
-  list.classList.toggle('speakers--nine', list.children.length === 9);
+  const count = list.children.length;
+  list.classList.toggle('speakers--nine', count === 9);
+  list.classList.toggle('speakers--ten', count === 10);
 }
 
 /** Bio inline no celular e diálogo de leitura no tablet/desktop. */
@@ -705,6 +732,7 @@ const initialize = (name, initializer) => {
 initialize('menu', initSiteMenu);
 initialize('voltar ao topo', initBackToTop);
 initialize('cronograma', initDayCarousel);
+initialize('encontros encerrados', initPastMeetings);
 initialize('objetivos', initGoalCards);
 initialize('acordeões', initDisclosures);
 let stopCursor = initialize('cursor', initCursorFollower) || (() => {});

@@ -111,7 +111,9 @@
     --ls-h2: -0.035em;
     --fw-h2: 700;
     --fs-display: clamp(34px, 5vw, 72px);
-    --fs-title: var(--fs-display);
+    /* H1 do hero no desktop. “PATENTES PARA BIOINOVADORES:” não quebra e mede
+       cerca de 16,8em: sem cqi, 3vw cabe na coluna do título em 1024–1920px. */
+    --fs-title: clamp(30px, 3vw, 46px);
     --lh-display: 1.02;
     --ls-display: -0.03em;
     --fw-display: 700;
@@ -212,6 +214,9 @@
   @supports (font-size: 1cqi) {
     :root {
       --fs-display: min(6.15cqi, 72px);
+      /* 100 / 16,8em ≈ 5,95cqi: com 5,9cqi a linha forte do H1 termina dentro
+         da coluna, alinhada ao selo “Curso online”. */
+      --fs-title: min(5.9cqi, 72px);
       --fs-day: clamp(20px, 6cqi, 30px);
       --fs-month: 28.65cqi;
     }
@@ -240,8 +245,10 @@
       margin-bottom: var(--space-8);
     }
 
-    /* Hero: protect every nested grid/flex item from its min-content width. */
+    /* Hero: protect every nested grid/flex item from its min-content width.
+       No celular, o hero ocupa a largura toda logo abaixo da barra fixa. */
     .hero {
+      padding-top: 0;
       padding-bottom: 0;
     }
     .hero.container {
@@ -469,7 +476,9 @@
         'art topic'
         'art bio';
       align-items: start;
-      gap: var(--space-1) var(--space-4);
+      /* Espaço vertical por margem, não por row-gap: assim um card sem tema
+         não ganha o espaço de uma linha vazia. */
+      gap: 0 var(--space-4);
       padding: var(--space-4);
       overflow: hidden;
       border: 0;
@@ -507,7 +516,7 @@
     .speaker h3 {
       grid-area: name;
       align-self: start;
-      margin: 0;
+      margin: var(--speaker-gap) 0 0;
       font-size: var(--fs-h4);
       line-height: var(--lh-h4);
       letter-spacing: var(--ls-h4);
@@ -516,11 +525,10 @@
     }
     .speaker__topic {
       grid-area: topic;
-      display: flex;
+      display: block;
       align-self: start;
-      align-items: center;
       min-height: 0;
-      margin-top: var(--space-1);
+      margin-top: var(--speaker-gap);
       padding: 0;
       line-height: 1.4;
     }
@@ -530,7 +538,7 @@
       align-self: start;
       width: 100%;
       aspect-ratio: auto;
-      margin-top: var(--space-1);
+      margin-top: var(--speaker-block);
       pointer-events: auto;
 
       summary {
@@ -834,6 +842,11 @@
     .site-header__brand-logo {
       display: block;
     }
+  }
+  /* Card compacto dos palestrantes até 374px: com foto de 88px e respiro
+     de 16px, a coluna de texto cairia para 179px entre 361 e 373px, e a
+     linha mais longa dos temas (“Limites de patenteabilidade”, 190px) quebraria. */
+  @media (max-width: 374px) {
     .speaker {
       grid-template-columns: 76px minmax(0, 1fr);
       column-gap: var(--space-3);
@@ -1472,8 +1485,17 @@
    -------------------------------------------------------------------------- */
 @layer sections {
   /* Hero ------------------------------------------------------------------ */
+  /* Respiro abaixo do menu e, embaixo, só o suficiente para não somar um
+     espaço de seção inteiro antes de "01 / Conteúdo programático". */
   .hero {
-    padding-bottom: var(--section-space);
+    padding-top: var(--space-10);
+    padding-bottom: var(--space-10);
+
+    /* Em telas baixas (ex.: 1024×600), o respiro diminui para o botão
+       “Inscreva-se” continuar visível sem rolar. */
+    @media (min-width: 1024px) and (max-height: 680px) {
+      padding-top: var(--space-4);
+    }
   }
   /* Shared grid for both panels: same side/top/bottom padding, same top-row
      height and same gap below it. This lines up the brand row with
@@ -2993,6 +3015,79 @@
       color: var(--text-subtle);
     }
   }
+  /* Empresa convidada: palestrante à esquerda e logo à direita, na mesma
+     linha em todas as telas. O logo fica numa moldura discreta, alinhado à
+     borda direita da aula (a mesma do botão da apresentação) e centralizado
+     na altura do nome. O bloco mantém a distância do título que o
+     palestrante tem nas outras aulas. */
+  .lesson__company {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3) var(--space-4);
+    margin-top: var(--space-3);
+
+    .lesson__speaker {
+      flex: 1 1 auto;
+      min-width: 0;
+      margin-top: 0;
+    }
+    /* Quando o nome quebra, “Profa. Dra. / Jaqueline Cibene”. */
+    .lesson__speaker strong {
+      text-wrap: balance;
+    }
+    @media (max-width: 430px) {
+      column-gap: var(--space-3);
+    }
+    /* Abaixo de 360px, o nome cairia para três linhas ao lado do logo: o
+       logo passa para a linha de baixo, ainda à direita. */
+    @media (max-width: 359px) {
+      flex-direction: column;
+      align-items: stretch;
+
+      .lesson__logo {
+        align-self: flex-end;
+      }
+    }
+  }
+  .lesson__logo {
+    box-sizing: content-box;
+    flex: none;
+    width: 88px;
+    height: auto;
+    margin-left: auto;
+    padding: var(--space-1) var(--space-2);
+    border: var(--rule-width) solid var(--divider);
+    border-radius: var(--radius-tile);
+    background: var(--white);
+
+    @media (min-width: 768px) {
+      width: 104px;
+    }
+    @media (max-width: 430px) {
+      width: 72px;
+    }
+  }
+  /* Apresentação da empresa, no mesmo lugar e ritmo da lista de tópicos. */
+  .lesson__about {
+    display: flow-root;
+    max-width: 620px;
+    margin-top: calc(var(--space-4) - 2px);
+    line-height: 1.6;
+    color: var(--text-subtle);
+
+    p + p {
+      margin-top: var(--space-3);
+    }
+    a {
+      color: var(--blue);
+      font-weight: 600;
+    }
+  }
+  .lesson__about-lead {
+    font-weight: 600;
+    color: var(--ink);
+  }
   /* The lesson action stays visible before its URL exists. It sizes to its
      label on tablet and desktop; phones stretch it to the card width. */
   .day__actions {
@@ -3318,8 +3413,19 @@
       flex: none;
       transition: color var(--dur-hover) var(--ease-standard);
     }
+    /* Único link do rodapé que não leva a uma seção da página: o sublinhado
+       fica sempre visível para indicar que é clicável. */
     a {
       font-weight: 700;
+      text-decoration-line: underline;
+      text-decoration-color: currentColor;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+    @media (hover: hover) {
+      a:hover {
+        color: var(--lime);
+      }
     }
     &:focus-within svg {
       color: var(--lime);
@@ -3333,6 +3439,10 @@
 
   /* 04 · Palestrantes ----------------------------------------------------- */
   .speakers {
+    /* Ritmo padrão dos cards em todas as telas: --speaker-gap separa selo,
+       nome e tema; --speaker-block separa foto, texto e biografia. */
+    --speaker-gap: var(--space-2);
+    --speaker-block: var(--space-4);
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--space-14) var(--col-gap);
@@ -3350,6 +3460,25 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
+  /* Dez palestrantes: duas linhas de cinco. Entre 1024 e 1199px, cinco
+     colunas apertariam os nomes; ficam quatro colunas (oito trilhas de
+     meia coluna) com a última dupla centralizada. */
+  @media (min-width: 1200px) {
+    .speakers--ten {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) and (max-width: 1199px) {
+    .speakers--ten {
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+    }
+    .speakers--ten > .speaker {
+      grid-column: span 2;
+    }
+    .speakers--ten > .speaker:nth-child(9) {
+      grid-column: 3 / span 2;
+    }
+  }
   .speaker {
     position: relative;
     display: flex;
@@ -3357,7 +3486,7 @@
     flex-direction: column;
   }
   .speaker h3 {
-    margin-top: var(--space-3);
+    margin-top: var(--speaker-gap);
     font-size: var(--fs-h4);
     line-height: 1.2;
     letter-spacing: -0.02em;
@@ -3368,9 +3497,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 29px;
+    min-height: 24px;
     gap: calc(var(--space-3) - 2px);
-    margin-top: var(--space-4);
+    margin-top: var(--speaker-block);
     font-family: var(--mono);
     font-size: var(--fs-label);
     font-weight: 500;
@@ -3392,15 +3521,25 @@
       line-height: 1.2;
       letter-spacing: 0.02em;
     }
+    /* Mesma altura do selo (24px), para que a linha não acrescente espaço
+       extra antes do nome. */
     span:last-child {
       flex: none;
       padding-block: calc(var(--space-1) + 1px);
+      line-height: 1.2;
       white-space: nowrap;
     }
 
   }
+  /* Nome e tema sempre em duas linhas, em todas as telas: cada <span> é uma
+     linha. Os cortes foram medidos para caber a partir de 360px; abaixo
+     disso, uma linha longa pode quebrar de novo. */
+  .speaker h3 > span,
+  .speaker__topic > span {
+    display: block;
+  }
   .speaker__topic {
-    margin-top: var(--space-2);
+    margin-top: var(--speaker-gap);
     font-size: var(--fs-small);
     font-weight: var(--fw-small);
     line-height: var(--lh-small);
@@ -4314,7 +4453,8 @@
     }
 
     .hero {
-      padding-bottom: var(--space-12);
+      padding-top: var(--space-8);
+      padding-bottom: var(--space-6);
     }
     .hero__copy {
       padding-top: var(--space-6);
@@ -4396,7 +4536,7 @@
         'bio bio';
       grid-template-rows: auto auto 1fr auto;
       align-items: start;
-      gap: var(--space-1) var(--space-4);
+      gap: 0 var(--space-4);
       min-height: calc(var(--speaker-art) + 2 * var(--space-4));
       padding: var(--space-4);
       overflow: hidden;
@@ -4434,16 +4574,18 @@
     .speaker h3 {
       grid-area: name;
       min-width: 0;
-      margin-top: 0;
+      margin-top: var(--speaker-gap);
       text-align: left;
       text-wrap: pretty;
     }
     .speaker__topic {
       grid-area: topic;
       min-width: 0;
-      margin-top: var(--space-1);
+      margin-top: var(--speaker-gap);
       line-height: 1.4;
     }
+    /* A linha do tema (1fr) absorve a diferença de altura entre cards da
+       mesma fileira, e a biografia fica sempre alinhada na base. */
     .speaker__bio,
     .speaker__bio--pending {
       display: block;
@@ -4452,7 +4594,7 @@
       align-self: start;
       width: 100%;
       aspect-ratio: auto;
-      margin-top: var(--space-3);
+      margin-top: var(--speaker-block);
       pointer-events: auto;
     }
     .speaker__bio summary {
@@ -4461,7 +4603,7 @@
       width: 100%;
       min-height: 52px;
       margin: 0;
-      padding: var(--space-2) 0 0;
+      padding: 0;
       border: 0;
       border-top: var(--rule-width) solid var(--divider);
       border-radius: 0;
@@ -4525,7 +4667,9 @@
     .site-nav {
       gap: var(--space-5);
     }
+    /* Em paisagem baixa, cada pixel de altura vale: o hero fica colado ao menu. */
     .hero {
+      padding-top: 0;
       padding-bottom: var(--space-6);
     }
     .hero.container {
@@ -4974,7 +5118,7 @@
       grid-area: bio;
       grid-column: 1 / -1;
       width: 100%;
-      margin-top: var(--space-3);
+      margin-top: var(--speaker-block);
     }
     .speaker__bio summary {
       font-family: var(--mono);
@@ -5089,10 +5233,13 @@
       }
     }
 
-    /* A biografia deve ocupar uma linha INTEIRA do cartão e crescer naturalmente. */
+    /* A biografia deve ocupar uma linha INTEIRA do cartão e crescer naturalmente.
+       Quando o texto é mais baixo que a foto, a linha do tema (1fr) absorve a
+       sobra, e selo, nome e tema mantêm o --speaker-gap. */
     .speaker {
       min-width: 0;
       grid-template-areas: "art meta" "art name" "art topic" "bio bio";
+      grid-template-rows: auto auto 1fr auto;
     }
     .speaker__bio,
     .speaker__bio--pending {
@@ -5104,7 +5251,7 @@
       max-width: 100%;
       height: auto;
       aspect-ratio: auto;
-      margin-top: 12px;
+      margin-top: var(--speaker-block);
       overflow: visible;
       pointer-events: auto;
     }
@@ -5142,6 +5289,18 @@
     }
     .speaker__bio:not([open]) > .speaker__bio-content {
       display: none;
+    }
+  }
+
+  /* Rodapé dos cards em tablet e celular: o botão "Abrir biografia" (52px)
+     já dá o respiro inferior, com o mesmo espaço acima e abaixo do rótulo.
+     Aberta, a biografia recupera o --speaker-block antes da borda. */
+  @media (max-width: 1023px) {
+    .speaker {
+      padding-bottom: 0;
+    }
+    .speaker__bio[open] {
+      padding-bottom: var(--speaker-block);
     }
   }
 }
@@ -5683,7 +5842,7 @@
         'art name'
         'art topic'
         'art bio';
-      gap: 4px 16px;
+      gap: 8px 16px;
       padding: 16px;
       overflow: hidden;
       border: 0;
@@ -5720,7 +5879,7 @@
     .speaker__topic {
       grid-area: topic;
       min-height: 0;
-      margin-top: 4px;
+      margin-top: 0;
       padding: 0;
     }
     .site-footer {
@@ -5831,7 +5990,7 @@
     }
     .speaker {
       grid-template-columns: 76px minmax(0, 1fr);
-      gap: 4px 12px;
+      gap: 8px 12px;
       padding: 12px;
     }
     .speaker__art {

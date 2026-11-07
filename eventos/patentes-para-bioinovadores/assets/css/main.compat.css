@@ -151,14 +151,10 @@
      activities receive a divider; the rest is grouped by spacing. */
 /* Speaker: a thin blue rule on the left, name over
      "Palestrante · instituição" */
-/* Empresa convidada: palestrante à esquerda e logo à direita, na mesma
-     linha em todas as telas. O logo fica numa moldura discreta, alinhado à
-     borda direita da aula (a mesma do botão da apresentação) e centralizado
-     na altura do nome. O bloco mantém a distância do título que o
-     palestrante tem nas outras aulas. */
-/* Quando o nome quebra, “Profa. Dra. / Jaqueline Cibene”. */
-/* Abaixo de 360px, o nome cairia para três linhas ao lado do logo: o
-       logo passa para a linha de baixo, ainda à direita. */
+/* Empresa convidada: a aula segue o formato das outras. O logo abre a
+     apresentação em “Conhecer a startup”, acima do texto e alinhado a ele,
+     sem moldura (o fundo da arte é branco, como o card). A arte vem recortada
+     rente ao desenho; a largura define a altura. */
 /* Apresentação da empresa, no mesmo lugar e ritmo da lista de tópicos. */
 /* The lesson action stays visible before its URL exists. It sizes to its
      label on tablet and desktop; phones stretch it to the card width. */
@@ -3346,63 +3342,19 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
       line-height: 1.35;
       color: var(--text-subtle);
     }
-/* Empresa convidada: palestrante à esquerda e logo à direita, na mesma
-     linha em todas as telas. O logo fica numa moldura discreta, alinhado à
-     borda direita da aula (a mesma do botão da apresentação) e centralizado
-     na altura do nome. O bloco mantém a distância do título que o
-     palestrante tem nas outras aulas. */
-.lesson__company:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3) var(--space-4);
-    margin-top: var(--space-3);
-  }
-.lesson__company:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .lesson__speaker {
-      flex: 1 1 auto;
-      min-width: 0;
-      margin-top: 0;
-    }
-/* Quando o nome quebra, “Profa. Dra. / Jaqueline Cibene”. */
-.lesson__company:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .lesson__speaker strong {
-      text-wrap: balance;
-    }
-@media (max-width: 430px) {
-  .lesson__company:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      column-gap: var(--space-3);
-  }
-    }
-/* Abaixo de 360px, o nome cairia para três linhas ao lado do logo: o
-       logo passa para a linha de baixo, ainda à direita. */
-@media (max-width: 359px) {
-  .lesson__company:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      flex-direction: column;
-      align-items: stretch;
-  }
-
-      .lesson__company:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .lesson__logo {
-        align-self: flex-end;
-      }
-    }
+/* Empresa convidada: a aula segue o formato das outras. O logo abre a
+     apresentação em “Conhecer a startup”, acima do texto e alinhado a ele,
+     sem moldura (o fundo da arte é branco, como o card). A arte vem recortada
+     rente ao desenho; a largura define a altura. */
 .lesson__logo:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-    box-sizing: content-box;
-    flex: none;
-    width: 88px;
+    display: block;
+    width: 120px;
     height: auto;
-    margin-left: auto;
-    padding: var(--space-1) var(--space-2);
-    border: var(--rule-width) solid var(--divider);
-    border-radius: var(--radius-tile);
-    background: var(--white);
+    margin-bottom: var(--space-4);
   }
 @media (min-width: 768px) {
   .lesson__logo:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      width: 104px;
-  }
-    }
-@media (max-width: 430px) {
-  .lesson__logo:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      width: 72px;
+      width: 144px;
   }
     }
 /* Apresentação da empresa, no mesmo lugar e ritmo da lista de tópicos. */

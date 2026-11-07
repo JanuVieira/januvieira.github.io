@@ -120,27 +120,31 @@ try:
             company_layout = page.locator('#encontro-4').evaluate("""day => {
               const lessons = [...day.querySelectorAll('.lesson')];
               const company = day.querySelector('.lesson--company');
+              const details = company.querySelector('.lesson__topics');
+              const img = company.querySelector('.lesson__logo');
               const box = (root, selector) => root.querySelector(selector).getBoundingClientRect();
-              const lesson = company.getBoundingClientRect();
-              const logo = box(company, '.lesson__logo');
-              const row = box(company, '.lesson__company');
-              const parts = ['.lesson__time', '.lesson__title', '.lesson__speaker', '.lesson__topics summary'].map((s) => box(company, s));
-              const overlaps = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
-              const [, title, speaker] = parts;
-              const regularGap = box(lessons[0], '.lesson__speaker').top - box(lessons[0], '.lesson__title').bottom;
-              return {
-                inside: logo.right <= lesson.right + 1 && speaker.left >= lesson.left - 1,
-                noOverlap: parts.every((part) => !overlaps(logo, part)),
-                sameGap: Math.abs((row.top - title.bottom) - regularGap) <= 1,
-                // Nome à esquerda e logo à direita, na mesma linha e centralizados;
-                // abaixo de 360px, o logo desce para a linha de baixo, ainda à direita.
-                placed: Math.abs(logo.right - lesson.right) <= 1 && Math.abs(speaker.left - lesson.left) <= 1 && (innerWidth >= 360
-                  ? logo.left > speaker.right && Math.abs((logo.top + logo.bottom) / 2 - (speaker.top + speaker.bottom) / 2) <= 1
-                  : logo.top >= speaker.bottom),
-                nameLines: Math.round(box(company, '.lesson__speaker strong').height / parseFloat(getComputedStyle(company.querySelector('.lesson__speaker strong')).lineHeight)),
+              const gap = (root) => box(root, '.lesson__speaker').top - box(root, '.lesson__title').bottom;
+              // Fechada, a aula segue o formato das outras e o logo não aparece.
+              const closed = {
+                hidden: !details.open && !img.checkVisibility(),
+                sameGap: Math.abs(gap(company) - gap(lessons[0])) <= 1,
               };
+              // Aberta, o logo vem acima do texto da empresa, alinhado a ele.
+              details.open = true;
+              const lesson = company.getBoundingClientRect();
+              const logo = img.getBoundingClientRect();
+              const summary = box(company, '.lesson__topics summary');
+              const lead = box(company, '.lesson__about-lead');
+              const opened = {
+                visible: img.checkVisibility() && logo.width > 0,
+                aboveText: logo.top >= summary.bottom && logo.bottom <= lead.top,
+                alignedWithText: Math.abs(logo.left - lead.left) <= 1,
+                inside: logo.left >= lesson.left - 1 && logo.right <= lesson.right + 1,
+              };
+              details.open = false;
+              return {...closed, ...opened};
             }""")
-            check(all(company_layout.values()), f"logo da Inovafhytos bem posicionado e sem sobreposição em {width}x{height}", str(company_layout))
+            check(all(company_layout.values()), f"logo da Inovafhytos só aparece ao abrir a apresentação, acima do texto, em {width}x{height}", str(company_layout))
             page.close()
 
         page = open_page(viewport={"width":390,"height":844}, reduced_motion="reduce")
@@ -600,14 +604,10 @@ try:
               const right = Math.max(...[...range.getClientRects()].map((line) => line.right));
               const heading = document.querySelector('.hero__heading').getBoundingClientRect();
               const lines = (el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight));
-              const company = document.querySelector('#encontro-4 .lesson--company');
-              const companyBox = company.getBoundingClientRect();
-              const logo = company.querySelector('.lesson__logo').getBoundingClientRect();
-              const speaker = company.querySelector('.lesson__speaker').getBoundingClientRect();
+              const logo = document.querySelector('#encontro-4 .lesson--company .lesson__about .lesson__logo');
               return {
-                // Logo sempre à direita; até 359px desce para baixo do nome.
-                logo: Math.abs(logo.right - companyBox.right) <= 1 &&
-                  (innerWidth < 360 ? logo.top >= speaker.bottom - 1 : logo.left > speaker.right),
+                // O logo fica dentro da apresentação e não aparece com ela fechada.
+                logo: Boolean(logo) && !logo.checkVisibility(),
                 overflow: document.documentElement.scrollWidth - innerWidth,
                 titleFits: right <= heading.right + 1,
                 names: [...document.querySelectorAll('.speaker h3')].every((el) => lines(el) === 2),

@@ -299,12 +299,24 @@ function initHeaderCta() {
   if (!header || !cta || !heroCta || !('IntersectionObserver' in window)) return;
   if (document.documentElement.classList.contains('course-ended')) return;
 
-  const observer = new IntersectionObserver(([entry]) => {
-    const passed = !entry.isIntersecting && entry.boundingClientRect.top < header.offsetHeight;
-    cta.hidden = !passed;
-    header.classList.toggle('has-cta', passed);
-  }, { rootMargin: `-${header.offsetHeight}px 0px 0px 0px` });
-  observer.observe(heroCta);
+  // A margem do observador é a altura do cabeçalho, que muda entre faixas
+  // de tela (84px, 56px); ao mudar, o observador é recriado.
+  let observer = null;
+  let observedHeight = -1;
+  const observe = () => {
+    const height = header.offsetHeight;
+    if (height === observedHeight) return;
+    observedHeight = height;
+    observer?.disconnect();
+    observer = new IntersectionObserver(([entry]) => {
+      const passed = !entry.isIntersecting && entry.boundingClientRect.top < header.offsetHeight;
+      cta.hidden = !passed;
+      header.classList.toggle('has-cta', passed);
+    }, { rootMargin: `-${height}px 0px 0px 0px` });
+    observer.observe(heroCta);
+  };
+  observe();
+  if ('ResizeObserver' in window) new ResizeObserver(observe).observe(header);
 }
 
 /** Garante a volta ao início mesmo quando #topo já está na URL. */
@@ -478,7 +490,8 @@ function initPastMeetings() {
   document.querySelectorAll('.day[data-date]').forEach((day) => {
     if (day.dataset.date >= today) return;
     const action = day.querySelector('.day__actions .btn');
-    if (!action) return;
+    // Encontros já encerrados no próprio HTML (sem link no código) ficam como estão.
+    if (!action || action.classList.contains('btn--ended')) return;
     const title = day.querySelector('.day__label h3')?.textContent.trim() || 'Encontro';
     const ended = document.createElement('button');
     ended.type = 'button';
@@ -633,6 +646,15 @@ function initEnrollmentDialog() {
   const compact = matchMedia('(max-width: 767px)');
   const storageKey = 'patentes-bioinovadores:inscricao-confirmada';
   const proceedLabels = { enrolled: 'Entrar na aula', signup: 'Ir para a inscrição' };
+  // Só endereços https viram destino do "Continuar" (nunca javascript:, data: etc.).
+  const safeHref = (value) => {
+    try {
+      const url = new URL(value, document.baseURI);
+      return url.protocol === 'https:' ? url.href : '';
+    } catch {
+      return '';
+    }
+  };
   let opener = null;
 
   // O armazenamento pode estar bloqueado (navegação privada ou política do navegador).
@@ -659,8 +681,9 @@ function initEnrollmentDialog() {
   // target/rel não são válidos e o estado indisponível vem de role + aria.
   const updateProceed = () => {
     const selected = selectedOption();
-    if (selected?.dataset.href) {
-      proceed.href = selected.dataset.href;
+    const href = safeHref(selected?.dataset.href || '');
+    if (href) {
+      proceed.href = href;
       proceed.target = '_blank';
       proceed.rel = 'noopener noreferrer';
       proceed.removeAttribute('role');

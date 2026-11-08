@@ -2126,8 +2126,9 @@
         letter-spacing: 0;
         color: var(--text-faint);
       }
-      /* Icon files drawn in the site blue through a mask (set inline on the
-         <i>, so the URL resolves against the page, not this stylesheet) */
+      /* Icon files drawn in the site blue through a mask. Cada eixo tem uma
+         classe com o arquivo (caminho relativo a este CSS), sem estilo
+         embutido no HTML, por causa da política de segurança (CSP). */
       .program__icon {
         display: grid;
         place-items: center;
@@ -2142,6 +2143,30 @@
           background: var(--blue);
           mask: center / contain no-repeat;
           -webkit-mask: center / contain no-repeat;
+        }
+        .icon-fundamentos {
+          -webkit-mask-image: url('../img/icons/fundamentos.svg');
+          mask-image: url('../img/icons/fundamentos.svg');
+        }
+        .icon-planta {
+          -webkit-mask-image: url('../img/icons/planta.svg');
+          mask-image: url('../img/icons/planta.svg');
+        }
+        .icon-protecao-internacional {
+          -webkit-mask-image: url('../img/icons/protecao-internacional.svg');
+          mask-image: url('../img/icons/protecao-internacional.svg');
+        }
+        .icon-pesquisador {
+          -webkit-mask-image: url('../img/icons/pesquisador.svg');
+          mask-image: url('../img/icons/pesquisador.svg');
+        }
+        .icon-dna {
+          -webkit-mask-image: url('../img/icons/dna.svg');
+          mask-image: url('../img/icons/dna.svg');
+        }
+        .icon-patente {
+          -webkit-mask-image: url('../img/icons/patente.svg');
+          mask-image: url('../img/icons/patente.svg');
         }
       }
       /* Title only: the icon circle is a span too and must stay round. */

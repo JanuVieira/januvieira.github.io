@@ -1,67 +1,18 @@
 <!doctype html>
-<html lang="pt-BR" data-course-end="2026-11-19" data-site-version="3457ab89e0">
+<html lang="pt-BR" data-course-end="2026-11-19" data-site-version="1b6a1d1cbb">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- Política de segurança: só scripts, estilos e consultas do próprio site
+         (fontes do Google Fonts; imagens do site e data: do CSS). Os scripts
+         do <head> ficam em assets/js/head.js, sem nada embutido. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-src 'none'" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <!-- Consulta um arquivo pequeno sem cache. Se o GitHub Pages já tiver
-         uma publicação nova, recarrega esta página uma única vez usando a
-         versão como parâmetro e preserva a seção que a pessoa estava vendo. -->
-    <script>
-      (() => {
-        const currentVersion = document.documentElement.dataset.siteVersion;
-        const checkForUpdate = async () => {
-          try {
-            const manifestUrl = new URL('version.json', document.baseURI);
-            manifestUrl.searchParams.set('check', Date.now());
-            const response = await fetch(manifestUrl, { cache: 'no-store' });
-            if (!response.ok) return;
-            const { version } = await response.json();
-            if (!version || version === currentVersion) return;
-
-            const nextUrl = new URL(location.href);
-            if (nextUrl.searchParams.get('site-version') === version) return;
-            nextUrl.searchParams.set('site-version', version);
-            location.replace(nextUrl);
-          } catch {
-            /* O site continua funcionando normalmente quando estiver offline. */
-          }
-        };
-
-        checkForUpdate();
-        addEventListener('pageshow', (event) => {
-          if (event.persisted) checkForUpdate();
-        });
-        document.addEventListener('visibilitychange', () => {
-          if (!document.hidden) checkForUpdate();
-        });
-        setInterval(checkForUpdate, 5 * 60 * 1000);
-      })();
-    </script>
-    <!-- Esconde os encontros futuros até o main.js montar o seletor. Se o
-         main.js não carregar, o load libera todos os encontros. -->
-    <script>
-      document.documentElement.classList.add('js');
-      addEventListener('load', () => {
-        document.documentElement.classList.add('schedule-ready');
-        if (!document.documentElement.classList.contains('main-ready')) {
-          document.documentElement.classList.add('main-failed');
-        }
-      });
-    </script>
-    <!-- Depois do último encontro (a partir do dia seguinte, como “Aula
-         encerrada”), a página entra no estado “curso encerrado”: o CSS
-         troca os elementos marcados com data-when="open" pelos de
-         data-when="ended". Roda antes da pintura para não piscar. -->
-    <script>
-      (function () {
-        var root = document.documentElement;
-        var end = root.getAttribute('data-course-end');
-        if (end && new Date().toLocaleDateString('sv') > end) root.classList.add('course-ended');
-      })();
-    </script>
+    <!-- Checagem de versão nova, classe js e estado de curso encerrado
+         (antes da pintura). -->
+    <script src="assets/js/head.js?v=1b6a1d1cbb"></script>
     <title>Patentes para Bioinovadores | INPI</title>
     <meta
       name="description"
@@ -76,7 +27,7 @@
     />
     <meta property="og:url" content="https://januvieira.tech/eventos/patentes-para-bioinovadores/" />
     <meta property="og:locale" content="pt_BR" />
-    <meta property="og:image" content="https://januvieira.tech/eventos/patentes-para-bioinovadores/assets/img/og-image.png?v=3457ab89e0" />
+    <meta property="og:image" content="https://januvieira.tech/eventos/patentes-para-bioinovadores/assets/img/og-image.png?v=1b6a1d1cbb" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Patentes para Bioinovadores: curso online do INPI com seis encontros ao vivo em novembro de 2026, terças e quintas, das 14h às 17h." />
@@ -114,18 +65,18 @@
       }
     }
     </script>
-    <link rel="icon" href="assets/img/favicon-32.png?v=3457ab89e0" sizes="32x32" type="image/png" />
-    <link rel="icon" href="assets/img/logo.svg?v=3457ab89e0" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png?v=3457ab89e0" />
+    <link rel="icon" href="assets/img/favicon-32.png?v=1b6a1d1cbb" sizes="32x32" type="image/png" />
+    <link rel="icon" href="assets/img/logo.svg?v=1b6a1d1cbb" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png?v=1b6a1d1cbb" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap"
     />
-    <link rel="stylesheet" href="assets/css/main.compat.css?v=3457ab89e0" />
-    <script src="assets/js/main.js?v=3457ab89e0" defer></script>
-    <script src="assets/js/dna.js?v=3457ab89e0" defer></script>
+    <link rel="stylesheet" href="assets/css/main.compat.css?v=1b6a1d1cbb" />
+    <script src="assets/js/main.js?v=1b6a1d1cbb" defer></script>
+    <script src="assets/js/dna.js?v=1b6a1d1cbb" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -268,12 +219,12 @@
             <h2 class="section__title" id="program-title">O que você<br /><em>vai aprender.</em></h2>
           </header>
           <ol class="program__list">
-            <li data-index="01"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/fundamentos.svg'); -webkit-mask-image: url('assets/img/icons/fundamentos.svg')"></i></span><span>Fundamentos de propriedade <br />industrial e patentes</span></li>
-            <li data-index="02"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/planta.svg'); -webkit-mask-image: url('assets/img/icons/planta.svg')"></i></span><span>Legislação de biodiversidade <br />e depósito no INPI</span></li>
-            <li data-index="03"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/protecao-internacional.svg'); -webkit-mask-image: url('assets/img/icons/protecao-internacional.svg')"></i></span><span>Patentes verdes e <br />proteção internacional</span></li>
-            <li data-index="04"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/pesquisador.svg'); -webkit-mask-image: url('assets/img/icons/pesquisador.svg')"></i></span><span>Especificidades do setor <br />farmacêutico e químico</span></li>
-            <li data-index="05"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/dna.svg'); -webkit-mask-image: url('assets/img/icons/dna.svg')"></i></span><span>Patentes aplicadas <br />à biotecnologia</span></li>
-            <li data-index="06"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/patente.svg'); -webkit-mask-image: url('assets/img/icons/patente.svg')"></i></span><span>Busca de patentes e mapeamento <br />tecnológico em bioeconomia</span></li>
+            <li data-index="01"><span class="program__icon" aria-hidden="true"><i class="icon-fundamentos"></i></span><span>Fundamentos de propriedade <br />industrial e patentes</span></li>
+            <li data-index="02"><span class="program__icon" aria-hidden="true"><i class="icon-planta"></i></span><span>Legislação de biodiversidade <br />e depósito no INPI</span></li>
+            <li data-index="03"><span class="program__icon" aria-hidden="true"><i class="icon-protecao-internacional"></i></span><span>Patentes verdes e <br />proteção internacional</span></li>
+            <li data-index="04"><span class="program__icon" aria-hidden="true"><i class="icon-pesquisador"></i></span><span>Especificidades do setor <br />farmacêutico e químico</span></li>
+            <li data-index="05"><span class="program__icon" aria-hidden="true"><i class="icon-dna"></i></span><span>Patentes aplicadas <br />à biotecnologia</span></li>
+            <li data-index="06"><span class="program__icon" aria-hidden="true"><i class="icon-patente"></i></span><span>Busca de patentes e mapeamento <br />tecnológico em bioeconomia</span></li>
           </ol>
         </div>
       </section>
@@ -445,10 +396,11 @@
               </div>
             </header>
             <div class="day__actions" role="group" aria-labelledby="encontro-1-title">
-              <a class="btn btn--primary" href="https://us02web.zoom.us/j/81541632580?pwd=7VEbyswG6iMS9L3NsQiYbyMAhBrc2k.1" target="_blank" rel="noopener noreferrer" data-requires-enrollment aria-label="Assistir aula do Encontro 1 no Zoom (abre em nova aba)" aria-describedby="schedule-access-note">
-                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
-                <span class="btn__label">Assistir aula<span class="btn__status">Via Zoom</span></span>
-              </a>
+              <!-- Encontro encerrado: sem link no código da página. -->
+              <button class="btn btn--primary btn--ended" type="button" disabled aria-label="Aula do Encontro 1 encerrada; a gravação chega por e-mail aos inscritos">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <span class="btn__label">Aula encerrada<span class="btn__status">Gravação por e-mail</span></span>
+              </button>
             </div>
             <ol class="day__lessons">
               <li class="lesson">
@@ -505,9 +457,10 @@
               </div>
             </header>
             <div class="day__actions" role="group" aria-labelledby="encontro-2-title">
-              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 2 (link em breve)" aria-describedby="schedule-access-note">
-                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
-                <span class="btn__label">Assistir aula<span class="btn__status">Link em breve</span></span>
+              <!-- Encontro encerrado: sem link no código da página. -->
+              <button class="btn btn--primary btn--ended" type="button" disabled aria-label="Aula do Encontro 2 encerrada; a gravação chega por e-mail aos inscritos">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+                <span class="btn__label">Aula encerrada<span class="btn__status">Gravação por e-mail</span></span>
               </button>
             </div>
             <ol class="day__lessons">

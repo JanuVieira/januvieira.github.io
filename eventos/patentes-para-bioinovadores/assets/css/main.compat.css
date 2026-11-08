@@ -77,8 +77,9 @@
 /* 01 · Conteúdo programático: a table of square cells. Rules on top,
      bottom and between columns; the outer side edges are left open (each
      cell's right rule overhangs by one rule and the last column is clipped). */
-/* Icon files drawn in the site blue through a mask (set inline on the
-         <i>, so the URL resolves against the page, not this stylesheet) */
+/* Icon files drawn in the site blue through a mask. Cada eixo tem uma
+         classe com o arquivo (caminho relativo a este CSS), sem estilo
+         embutido no HTML, por causa da política de segurança (CSP). */
 /* Title only: the icon circle is a span too and must stay round. */
 /* A last topic alone on its row becomes a band across the row (icon
        beside the title, number on the right), so the table never ends in
@@ -2470,8 +2471,9 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
         letter-spacing: 0;
         color: var(--text-faint);
       }
-/* Icon files drawn in the site blue through a mask (set inline on the
-         <i>, so the URL resolves against the page, not this stylesheet) */
+/* Icon files drawn in the site blue through a mask. Cada eixo tem uma
+         classe com o arquivo (caminho relativo a este CSS), sem estilo
+         embutido no HTML, por causa da política de segurança (CSP). */
 .program__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li .program__icon {
         display: grid;
         place-items: center;
@@ -2486,6 +2488,30 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
           background: var(--blue);
           mask: center / contain no-repeat;
           -webkit-mask: center / contain no-repeat;
+        }
+.program__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li .program__icon .icon-fundamentos {
+          -webkit-mask-image: url('../img/icons/fundamentos.svg');
+          mask-image: url('../img/icons/fundamentos.svg');
+        }
+.program__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li .program__icon .icon-planta {
+          -webkit-mask-image: url('../img/icons/planta.svg');
+          mask-image: url('../img/icons/planta.svg');
+        }
+.program__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li .program__icon .icon-protecao-internacional {
+          -webkit-mask-image: url('../img/icons/protecao-internacional.svg');
+          mask-image: url('../img/icons/protecao-internacional.svg');
+        }
+.program__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li .program__icon .icon-pesquisador {
+          -webkit-mask-image: url('../img/icons/pesquisador.svg');
+          mask-image: url('../img/icons/pesquisador.svg');
+        }
+.program__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li .program__icon .icon-dna {
+          -webkit-mask-image: url('../img/icons/dna.svg');
+          mask-image: url('../img/icons/dna.svg');
+        }
+.program__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li .program__icon .icon-patente {
+          -webkit-mask-image: url('../img/icons/patente.svg');
+          mask-image: url('../img/icons/patente.svg');
         }
 /* Title only: the icon circle is a span too and must stay round. */
 .program__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li span:not(.program__icon) {

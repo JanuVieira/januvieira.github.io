@@ -7,6 +7,7 @@ from threading import Thread
 from urllib.parse import urlparse
 from datetime import datetime
 import json
+import re
 import sys
 
 try:
@@ -24,6 +25,32 @@ LONG_BIO = [
 issues = []
 results = []
 
+# Os testes simulam datas antes e durante o curso. A página publicada já traz
+# os encontros passados como "Aula encerrada" e sem link do Zoom no código;
+# aqui o HTML volta ao estado de antes do curso, com um link de teste.
+PRECOURSE_ACTIONS = {
+    1: """<a class="btn btn--primary" href="https://us02web.zoom.us/j/00000000000?pwd=teste" target="_blank" rel="noopener noreferrer" data-requires-enrollment aria-label="Assistir aula do Encontro 1 no Zoom (abre em nova aba)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Via Zoom</span></span>
+              </a>""",
+    2: """<button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 2 (link em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Link em breve</span></span>
+              </button>""",
+}
+
+def precourse_html(html):
+    for number, markup in PRECOURSE_ACTIONS.items():
+        pattern = r'(<article class="day" id="encontro-%d".*?<div class="day__actions"[^>]*>).*?(</div>)' % number
+        html = re.sub(pattern, lambda m: m.group(1) + '\n              ' + markup + '\n            ' + m.group(2), html, count=1, flags=re.S)
+    return html
+
+def use_precourse(target):
+    def handle(route):
+        response = route.fetch()
+        route.fulfill(response=response, body=precourse_html(response.text()))
+    target.route(lambda address: urlparse(address).path in ('/', '/index.html'), handle)
+
 def check(ok, title, detail=""):
     results.append({"test": title, "passed": bool(ok), "detail": detail})
     print(("PASS" if ok else "FAIL") + " " + title + (" | " + detail if detail else ""))
@@ -32,7 +59,13 @@ def check(ok, title, detail=""):
 class QuietHandler(SimpleHTTPRequestHandler):
     def log_message(self, *args): pass
 
-server = ThreadingHTTPServer(("127.0.0.1", 0), partial(QuietHandler, directory=str(ROOT)))
+class QuietServer(ThreadingHTTPServer):
+    # Uma página de teste que fecha no meio de um download não é erro do site.
+    def handle_error(self, request, client_address):
+        if isinstance(sys.exc_info()[1], (BrokenPipeError, ConnectionResetError)): return
+        super().handle_error(request, client_address)
+
+server = QuietServer(("127.0.0.1", 0), partial(QuietHandler, directory=str(ROOT)))
 Thread(target=server.serve_forever, daemon=True).start()
 url = f"http://127.0.0.1:{server.server_port}/"
 try:
@@ -44,6 +77,7 @@ try:
         def open_page(**options):
             opened = browser.new_page(**options)
             opened.clock.set_fixed_time(COURSE_DATE)
+            use_precourse(opened)
             return opened
         for width, height in SIZES:
             page = open_page(viewport={"width":width,"height":height}, reduced_motion="reduce")
@@ -698,10 +732,72 @@ try:
                   f'cabeçalho fixo mostra Inscreva-se só depois do hero, com Dúvidas no menu e âncoras visíveis, em {vw}px', str((at_top, faq_visible, scrolled, anchor_ok)))
             nav_page.close()
 
+        # Robustez: endereço limpo após atualização, CTA recalculado ao mudar de
+        # tamanho e diálogo de inscrição que só aceita destinos https.
+        robust = open_page(viewport={"width": 1280, "height": 800}, reduced_motion="reduce")
+        robust.goto(url + '?site-version=antiga&x=1#faq', wait_until="load")
+        robust.wait_for_timeout(200)
+        clean = robust.evaluate("() => ({search: location.search, hash: location.hash})")
+        check(clean == {'search': '?x=1', 'hash': '#faq'}, 'endereço perde ?site-version= depois de carregar e mantém a seção e os outros parâmetros', str(clean))
+        robust.evaluate("() => window.scrollTo(0, document.querySelector('#objetivos').offsetTop)")
+        robust.wait_for_timeout(250)
+        robust.set_viewport_size({"width": 390, "height": 844})
+        robust.wait_for_timeout(400)
+        robust.evaluate("() => window.scrollTo(0, document.querySelector('#objetivos').offsetTop)")
+        robust.wait_for_timeout(400)
+        after_resize = robust.evaluate("() => !document.querySelector('[data-header-cta]').hidden")
+        robust.evaluate("() => window.scrollTo(0, 0)")
+        robust.wait_for_timeout(400)
+        at_top_after_resize = robust.evaluate("() => document.querySelector('[data-header-cta]').hidden")
+        check(after_resize and at_top_after_resize, 'Inscreva-se do cabeçalho continua certo depois de mudar o tamanho da tela', str((after_resize, at_top_after_resize)))
+        robust.close()
+        unsafe = open_page(viewport={"width": 1280, "height": 800}, reduced_motion="reduce")
+        unsafe.goto(url, wait_until="load")
+        unsafe.route('https://us02web.zoom.us/**', lambda route: route.abort())
+        unsafe.locator('a[data-requires-enrollment]').first.click()
+        unsafe_href = unsafe.evaluate("""() => {
+          const enrolled = document.querySelector('[data-enrollment-enrolled]');
+          enrolled.dataset.href = 'javascript:alert(1)';
+          enrolled.checked = true;
+          enrolled.dispatchEvent(new Event('change', {bubbles: true}));
+          return document.querySelector('[data-enrollment-continue]').getAttribute('href');
+        }""")
+        check(unsafe_href is None, 'diálogo de inscrição não aceita destino javascript:', str(unsafe_href))
+        unsafe.close()
+
+        # Página publicada (sem a cópia de antes do curso): encontros passados
+        # sem link do Zoom no código e política de segurança sem violações.
+        published = (ROOT / 'index.html').read_text(encoding='utf-8')
+        past_actions = [re.search(r'<article class="day" id="encontro-%d".*?<div class="day__actions"[^>]*>(.*?)</div>' % n, published, re.S).group(1) for n in (1, 2)]
+        check('zoom.us' not in published and all('btn--ended' in a and 'href=' not in a for a in past_actions),
+              'encontros que já passaram ficam encerrados no HTML, sem link do Zoom no código da página')
+        check('<script>' not in published and 'style="' not in published and 'http-equiv="Content-Security-Policy"' in published,
+              'HTML sem script nem estilo embutidos, com política de segurança (CSP)')
+        csp_violations = []
+        for vw, vh, precourse in ((1280, 800, True), (390, 844, True), (1280, 800, False)):
+            csp_page = browser.new_page(viewport={"width": vw, "height": vh}, reduced_motion="reduce")
+            csp_page.clock.set_fixed_time(COURSE_DATE)
+            if precourse: use_precourse(csp_page)
+            csp_page.route('https://us02web.zoom.us/**', lambda route: route.abort())
+            csp_page.add_init_script("document.addEventListener('securitypolicyviolation', (e) => (window.__csp = window.__csp || []).push(e.violatedDirective + ' ' + e.blockedURI))")
+            csp_page.goto(url, wait_until="load")
+            csp_page.evaluate("async () => { for (let y = 0; y < document.body.scrollHeight; y += 700) { scrollTo(0, y); await new Promise((r) => setTimeout(r, 40)); } }")
+            csp_page.locator('.faq__item summary').first.click()
+            csp_page.locator('.speaker summary').first.click()
+            csp_page.keyboard.press('Escape')
+            if precourse and csp_page.locator('a[data-requires-enrollment]').count():
+                csp_page.locator('a[data-requires-enrollment]').first.click()
+                csp_page.keyboard.press('Escape')
+            ready = csp_page.evaluate("() => ['js', 'schedule-ready', 'main-ready'].every((name) => document.documentElement.classList.contains(name))")
+            csp_violations += csp_page.evaluate("() => window.__csp || []") + ([] if ready else ['head.js ou main.js não rodou'])
+            csp_page.close()
+        check(not csp_violations, 'nenhuma violação da política de segurança ao usar a página', str(csp_violations[:4]))
+
         # Depois de 19/11, a página entra no estado de curso encerrado.
         for moment, ended_expected in (('2026-11-19T15:00:00-03:00', False), ('2026-11-20T09:00:00-03:00', True)):
             for vw, vh in ((1280, 800), (390, 844)):
                 state_page = browser.new_page(viewport={"width": vw, "height": vh}, reduced_motion="reduce")
+                use_precourse(state_page)
                 state_page.clock.set_fixed_time(datetime.fromisoformat(moment))
                 state_page.goto(url, wait_until="load")
                 state_page.evaluate("() => window.scrollTo(0, document.querySelector('#objetivos').offsetTop)")
@@ -782,6 +878,7 @@ try:
         ended_issues = []
         for moment, (expected_ended, current_day) in ended_cases.items():
             when = browser.new_page(viewport={"width": 390, "height": 844}, reduced_motion="reduce")
+            use_precourse(when)
             when_errors = []
             when.on("pageerror", lambda exc: when_errors.append(str(exc)))
             when.clock.set_fixed_time(datetime.fromisoformat(moment))
@@ -810,6 +907,7 @@ try:
             reduced_motion="reduce",
         )
         tablet_context.clock.set_fixed_time(COURSE_DATE)
+        use_precourse(tablet_context)
         tablet = tablet_context.new_page()
         tablet.goto(url, wait_until="domcontentloaded")
         tablet_bios = tablet.locator('.speaker__bio')

@@ -28,7 +28,7 @@ mv "$output_tmp" assets/css/main.compat.css
 # HTML, CSS, JavaScript e imagens, mas continua idempotente entre dois builds.
 sed -E \
   -e 's/data-site-version="[^"]+"/data-site-version="SITE_VERSION"/' \
-  -e 's#(assets/(css/main\.compat\.css|js/main\.js|js/dna\.js|img/[a-z0-9-]+\.(svg|png))\?v=)[^"]+#\1SITE_VERSION#g' \
+  -e 's#(assets/(css/main\.compat\.css|js/head\.js|js/main\.js|js/dna\.js|img/[a-z0-9-]+\.(svg|png))\?v=)[^"]+#\1SITE_VERSION#g' \
   index.html > "$normalized_index_tmp"
 
 find assets -type f -print | LC_ALL=C sort | while IFS= read -r asset_file; do
@@ -41,7 +41,7 @@ site_hash="$(shasum -a 256 "$hashes_tmp" | cut -c1-10)"
 # As expressões são compatíveis com o sed do macOS e não acumulam parâmetros.
 sed -E \
   -e "s/data-site-version=\"[^\"]+\"/data-site-version=\"${site_hash}\"/" \
-  -e "s#(assets/(css/main\.compat\.css|js/main\.js|js/dna\.js|img/[a-z0-9-]+\.(svg|png))\?v=)[^\"]+#\1${site_hash}#g" \
+  -e "s#(assets/(css/main\.compat\.css|js/head\.js|js/main\.js|js/dna\.js|img/[a-z0-9-]+\.(svg|png))\?v=)[^\"]+#\1${site_hash}#g" \
   index.html > "$index_tmp"
 chmod 644 "$index_tmp"
 mv "$index_tmp" index.html

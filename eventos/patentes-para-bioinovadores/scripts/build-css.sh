@@ -14,9 +14,7 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-# O fallback manual serve apenas ao main.css aberto diretamente. No artefato
-# compilado ele seria redundante e poderia sobrescrever a composição completa.
-sed '/^\/\* compat-fallback:start \*\/$/,$d' assets/css/main.css |
+cat assets/css/main.css |
   BROWSERSLIST='Safari >= 13.1, iOS >= 13.4, Chrome >= 80, Firefox >= 78' \
     npx --yes \
       --package postcss-cli@11.0.1 \

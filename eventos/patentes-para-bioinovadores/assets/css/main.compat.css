@@ -2,11 +2,19 @@
 
   /* Container-relative type is progressive enhancement. Browsers without
      cqi keep the vw/px values declared above instead of invalidating type. */
+/* Estado do curso (script no <head>): até o último encontro valem os
+     elementos data-when="open"; a partir do dia seguinte, os "ended". */
 /* Highlight section (cronograma), same blue as the hero panel */
 /* One title style for every section: system font, bold, tight */
 /* Header */
 /* Brand, "Menu" button and the extra links exist only in the phone
      menu below; the desktop header shows the three section links. */
+/* Tablet e desktop: o cabeçalho fica no topo ao rolar, como a barra do
+     celular. O fundo cobre toda a largura (border-image, sem criar rolagem
+     lateral) e ganha uma linha quando a página já rolou. */
+/* Celular sem JavaScript (sem .has-menu): os links ficam em linha e
+     quebram para uma segunda linha em vez de passar da tela. */
+/* "Inscreva-se" do cabeçalho: aparece quando o botão do hero sai da tela. */
 /* Phones with JavaScript (.has-menu, set by assets/js/main.js): a
      compact bar that stays on top while scrolling, with the course name
      and a "Menu" button opening every section as large touch rows.
@@ -14,6 +22,7 @@
 @media (max-width: 767px) {
       /* Wraps onto two balanced lines on the narrowest phones instead of
          being cut with an ellipsis */
+      /* Com o "Inscreva-se" visível, ele ocupa o lugar do nome do curso. */
       /* The menu panel drops over the page, so opening it never pushes
          the content down. */
   }
@@ -41,8 +50,6 @@
      size container on the panel itself would break the subgrid. */
 /* Above the blue scrim (they sit inside .hero__copy, display: contents). */
 /* Sizes are fluid against the blue panel width (container query units). */
-/* Small support text under the H1, sentence case so it never competes
-     with the uppercase title */
 /* Outline icons under the H1 (plant, DNA, patent certificate), each
      centred on a round tile. Each SVG's viewBox is cropped to its ink, so
      all three render at the same ink height inside equal circles. */
@@ -57,6 +64,10 @@
      and one between every two dates; each date is centred in its cell. */
 /* Calendar and facts are the size containers for the cqi-based sizes
      (NOV/26, day numbers, facts), so the panel itself can be a subgrid. */
+/* Curso encerrado: o selo perde o ponto de "ao vivo" e o lugar do botão
+     de inscrição explica gravações e certificado. */
+/* O curso em resumo: faixa logo abaixo do hero, no padrão de Horário/Dias
+     do painel lima (rótulo mono, valor em negrito, nota curta). */
 /* 01–02 · Conteúdo programático, Objetivos ------------------------ */
 /* Apple-style: left-aligned heads in the system font, generous space,
      soft rounded cards without borders, alternating paper / white grounds. */
@@ -132,7 +143,9 @@
 /* Desktop: card top lines up with the title, not the eyebrow */
 /* Hide future encounters before deferred JavaScript runs. Without
      JavaScript, every encounter remains available in the document. */
-/* Access note as a quiet footer of the selected day's card. */
+/* Aviso de acesso no rodapé do card do dia: separado do cronograma por
+     uma linha, com ícone de atenção (lima, a cor de destaque) e a primeira
+     frase em negrito. */
 /* Secondary navigation is useful inside the long card on phones only.
      JavaScript reveals it after the day carousel initializes. */
 /* Day picker: dates grid, then "Dia N de 6" with the arrows on the right */
@@ -170,14 +183,15 @@
 /* Único link do rodapé que não leva a uma seção da página: o sublinhado
        fica sempre visível para indicar que é clicável. */
 /* 04 · Palestrantes ----------------------------------------------------- */
-/* Dez palestrantes: duas linhas de cinco. Entre 1024 e 1199px, cinco
-     colunas apertariam os nomes; ficam quatro colunas (oito trilhas de
-     meia coluna) com a última dupla centralizada. */
+/* Nove palestrantes (quem conduz as aulas): 3 × 3 em todo o desktop. */
+/* Startups convidadas, abaixo da grade. No desktop, formam uma quarta linha
+     nas mesmas três colunas: o título na primeira e os dois cards nas outras
+     duas, com a largura dos cards de cima (mesmo --col-gap). No tablet e no
+     celular, o título fica acima dos cards. */
+/* Título do grupo no padrão dos títulos de seção ("Quem conduz / as
+     aulas."): segunda linha na cor de destaque, e uma frase de apoio. */
 /* Mesma altura do selo (24px), para que a linha não acrescente espaço
        extra antes do nome. */
-/* Nome e tema sempre em duas linhas, em todas as telas: cada <span> é uma
-     linha. Os cortes foram medidos para caber a partir de 360px; abaixo
-     disso, uma linha longa pode quebrar de novo. */
 /* Photo slot. Until there is a photo, the initials stand in on a tint. */
 /* Fade-in only once main.js has taken over the photos; if it never
      runs, photos show normally. */
@@ -420,6 +434,8 @@
     --fs-month: clamp(72px, 9vw, 112px);
 
     /* Spacing scale: base 4/8, shared by every margin, padding and gap. */
+    /* Micro: entre linhas de um mesmo bloco (nome e cargo, por exemplo). */
+    --space-half: 2px;
     --space-1: 4px;
     --space-2: 8px;
     --space-3: 12px;
@@ -473,8 +489,12 @@
        --radius-card / --radius-tile → things you touch or expand
        --pill / 50% → buttons, tags, badges, icon circles */
     --pill: 40px;
-    --radius-card: 20px;
-    --radius-tile: 12px;
+    --radius-card: 16px;
+    --radius-tile: 8px;
+    /* Canto de um elemento encostado no canto de outro (foto dentro do card
+       branco do palestrante). O contêiner usa --radius-inner + o espaço entre
+       os dois, para os cantos serem concêntricos. */
+    --radius-inner: 4px;
   }
 @media (max-width: 1023px) {
   :root {
@@ -483,8 +503,7 @@
       --head-gap: var(--space-12);
       --block-gap: var(--space-16);
       --subhead-gap: var(--space-6);
-      --column-gap: calc(var(--space-12) - var(--space-1));
-      --card-pad: calc(var(--space-8) - var(--space-1));
+      --column-gap: var(--space-12);
   }
     }
 @media (max-width: 767px) {
@@ -641,10 +660,6 @@
       color: var(--on-dark);
       text-wrap: pretty;
     }
-    .hero__lead:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      margin-top: var(--space-4);
-      font-size: var(--fs-body);
-    }
     .hero__icons:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       --tile: var(--space-12);
       gap: var(--space-3);
@@ -762,7 +777,7 @@
       padding-bottom: var(--space-5);
     }
     .schedule-note:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      padding: var(--space-3) var(--space-5);
+      padding: var(--space-4) var(--space-5) var(--space-5);
     }
 
     /* Speakers: a true media card instead of disconnected horizontal rows. */
@@ -784,10 +799,12 @@
       /* Espaço vertical por margem, não por row-gap: assim um card sem tema
          não ganha o espaço de uma linha vazia. */
       gap: 0 var(--space-4);
-      padding: var(--space-4);
+      /* Cantos concêntricos: card = canto da foto + espaço interno. */
+      --speaker-pad: var(--space-4);
+      padding: var(--speaker-pad);
       overflow: hidden;
       border: 0;
-      border-radius: var(--radius-card);
+      border-radius: calc(var(--radius-inner) + var(--speaker-pad));
       background: var(--white);
     }
 
@@ -801,7 +818,7 @@
       min-height: 0;
       align-self: start;
       aspect-ratio: 1;
-      border-radius: var(--radius-tile);
+      border-radius: var(--radius-inner);
     }
     .speaker__art:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) > span {
       top: 0;
@@ -821,7 +838,7 @@
       gap: var(--space-2);
       margin: 0;
     }
-    .speaker:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) h3 {
+    .speaker__name:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       grid-area: name;
       align-self: start;
       margin: var(--speaker-gap) 0 0;
@@ -1157,7 +1174,8 @@
     .speaker:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       grid-template-columns: 76px minmax(0, 1fr);
       column-gap: var(--space-3);
-      padding: var(--space-3);
+      --speaker-pad: var(--space-3);
+      padding: var(--speaker-pad);
     }
     .speaker__art:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       width: 76px;
@@ -1212,16 +1230,23 @@ button:not(#\#):not(#\#) {
    -------------------------------------------------------------------------- */
 html:not(#\#):not(#\#):not(#\#):not(#\#) {
     scroll-behavior: smooth;
-    scroll-padding-top: 28px;
+    /* Tablet e desktop: o cabeçalho fixo (84px) mais um respiro. */
+    scroll-padding-top: calc(84px + var(--space-6));
 
     /* Phones: anchored sections start right under the 56px sticky bar
        (more would show a strip of the previous section) */
   }
-@media (max-width: 767px) {
+@media (max-width: 767px), (max-width: 1023px) and (max-height: 500px) and (orientation: landscape) {
   html:not(#\#):not(#\#):not(#\#):not(#\#) {
       scroll-padding-top: 56px;
   }
     }
+/* Estado do curso (script no <head>): até o último encontro valem os
+     elementos data-when="open"; a partir do dia seguinte, os "ended". */
+html:not(.course-ended):not(#\#):not(#\#):not(#\#) [data-when='ended'],
+  .course-ended:not(#\#):not(#\#):not(#\#) [data-when='open'] {
+    display: none !important;
+  }
 body:not(#\#):not(#\#):not(#\#):not(#\#) {
     background: var(--page-bg);
     color: var(--ink);
@@ -1406,6 +1431,66 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
       font-size: var(--fs-label);
   }
     }
+/* Tablet e desktop: o cabeçalho fica no topo ao rolar, como a barra do
+     celular. O fundo cobre toda a largura (border-image, sem criar rolagem
+     lateral) e ganha uma linha quando a página já rolou. */
+@media (min-width: 768px) {
+    .site-header:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-image: linear-gradient(var(--page-bg) 0, var(--page-bg) 0) fill 0 / 0 / 0 100vmax;
+    }
+
+@supports (background: linear-gradient(red 0%, red 0% 1%, red 2%)) {
+.site-header:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      border-image: linear-gradient(var(--page-bg) 0 0) fill 0 / 0 / 0 100vmax;
+    }
+}
+
+      .site-header.is-scrolled:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+        border-image: linear-gradient(to top, var(--divider) 0 var(--rule-width), var(--page-bg) var(--rule-width)) fill 0 / 0 / 0 100vmax;
+      }
+    .site-nav:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      order: 1;
+    }
+    .site-header__cta:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      order: 2;
+    }
+  }
+/* Celular sem JavaScript (sem .has-menu): os links ficam em linha e
+     quebram para uma segunda linha em vez de passar da tela. */
+@media (max-width: 767px) {
+    .site-header:not(.has-menu):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .site-nav {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      row-gap: var(--space-2);
+    }
+  }
+/* "Inscreva-se" do cabeçalho: aparece quando o botão do hero sai da tela. */
+.site-header__cta:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--pill);
+    background: var(--blue);
+    color: var(--white);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    line-height: 1;
+    -webkit-text-decoration: none;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color var(--dur-hover) var(--ease-standard);
+  }
+@media (hover: hover) {
+      .site-header__cta:hover:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+        background: var(--navy);
+      }
+    }
 /* Phones with JavaScript (.has-menu, set by assets/js/main.js): a
      compact bar that stays on top while scrolling, with the course name
      and a "Menu" button opening every section as large touch rows.
@@ -1448,6 +1533,10 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
       }
       .site-header.has-menu:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .site-header__toggle {
         display: inline-flex;
+      }
+      /* Com o "Inscreva-se" visível, ele ocupa o lugar do nome do curso. */
+      .site-header.has-menu.has-cta:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .site-header__brand {
+        display: none;
       }
       /* The menu panel drops over the page, so opening it never pushes
          the content down. */
@@ -1933,12 +2022,6 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
       .hero__heading:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .hero__icons {
         grid-row: 3;
       }
-      .hero__heading:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .hero__lead {
-        grid-row: 3;
-        grid-column: 2;
-        max-width: 26em;
-        margin-top: var(--space-8);
-      }
     }
 /* Above the blue scrim (they sit inside .hero__copy, display: contents). */
 .hero__heading:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#),
@@ -1958,21 +2041,6 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
     text-wrap: pretty;
 
   }
-/* Small support text under the H1, sentence case so it never competes
-     with the uppercase title */
-.hero__lead:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-    max-width: 34em;
-    margin-top: var(--space-5);
-    font-size: var(--fs-body);
-    font-weight: 400;
-    line-height: 1.45;
-    color: var(--on-dark);
-    text-wrap: balance;
-  }
-.hero__lead:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) strong {
-      font-weight: 600;
-      color: var(--on-dark-strong);
-    }
 /* Outline icons under the H1 (plant, DNA, patent certificate), each
      centred on a round tile. Each SVG's viewBox is cropped to its ink, so
      all three render at the same ink height inside equal circles. */
@@ -2083,8 +2151,9 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
 .dates:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
     display: flex;
     flex-direction: column;
-    container: dates-panel / inline-size;
-    /* NOV/26 scales from the calendar column rather than the viewport. */
+    /* Sem container aqui: o painel é subgrid de .hero__grid no desktop, e um
+       container de tamanho desligaria o subgrid. NOV/26, os dias e os fatos
+       escalam pelos próprios containers (.dates__cal e .dates__facts). */
     font-family: var(--sans);
     /* Side by side: tighter on the left (next to the blue panel), full
        breathing room on the right edge. Stacked on mobile: symmetric, so it
@@ -2219,14 +2288,26 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
     padding-top: var(--space-5);
     border-top: var(--rule-width-strong) solid var(--ink);
 
-    /* Side by side: same row as the hero buttons, bottoms aligned. */
+    /* Desktop: mesmo padrão do celular, "Horário" à esquerda e "Dias" à
+       direita. A coluna do horário tem a largura do texto (não quebra); o
+       valor acompanha a largura do painel (7cqi, entre 16px e --fs-h4) e,
+       se ainda faltar espaço (perto de 1024px), "Terças e quintas" quebra
+       em duas linhas em vez de empilhar o bloco. Mesma linha dos botões do
+       hero, com as bases alinhadas. */
   }
 @media (min-width: 1024px) {
   .dates__facts:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       grid-row: 3;
+      grid-template-columns: -webkit-max-content minmax(0, 1fr);
+      grid-template-columns: max-content minmax(0, 1fr);
+      justify-content: stretch;
       align-self: end;
       margin-top: var(--hero-row-gap);
   }
+
+      .dates__facts:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#)  > div:last-child {
+        text-align: right;
+      }
     }
 .dates__facts:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) dt {
       font-family: var(--mono);
@@ -2237,24 +2318,91 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
     }
 .dates__facts:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) dd {
       margin-top: calc(var(--space-2) - 2px);
-      /* Capped by the panel width so both values fit on one row. */
-      font-size: min(var(--fs-lead), 7cqi);
+      font-size: var(--fs-h4);
       white-space: nowrap;
       font-weight: 700;
       line-height: 1.1;
       letter-spacing: -0.04em;
-    }
-@container dates-panel (max-width: 299px) {
-    .dates__facts:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      grid-template-columns: 1fr;
-      justify-content: stretch;
-      gap: var(--space-4);
-    }
 
-      .dates__facts:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) dd {
+      /* Desktop (ver o comentário acima): o valor acompanha a largura do
+         painel. Sem suporte a cqi, fica em --fs-h4 e quebra linha. */
+    }
+@media (min-width: 1024px) {
+    .dates__facts:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) dd {
+        font-size: clamp(16px, 7cqi, var(--fs-h4));
         white-space: normal;
+        text-wrap: balance;
+    }
       }
+/* Curso encerrado: o selo perde o ponto de "ao vivo" e o lugar do botão
+     de inscrição explica gravações e certificado. */
+.hero__tag--ended:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#)::after {
+    display: none;
   }
+.hero__ended:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+    max-width: 30em;
+    margin: 0;
+    font-size: var(--fs-body);
+    line-height: 1.45;
+    color: var(--on-dark);
+    text-wrap: pretty;
+  }
+/* O curso em resumo: faixa logo abaixo do hero, no padrão de Horário/Dias
+     do painel lima (rótulo mono, valor em negrito, nota curta). */
+.facts:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+    padding-bottom: var(--space-10);
+  }
+@media (max-width: 1023px) {
+  .facts:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      padding-bottom: var(--space-8);
+  }
+    }
+@media (max-width: 767px) {
+  .facts:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      padding-top: var(--space-8);
+  }
+    }
+.facts__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-6);
+    margin: 0;
+  }
+@media (max-width: 1023px) {
+  .facts__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: var(--space-6);
+  }
+    }
+.facts__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#)  > div {
+      padding-top: var(--space-4);
+      border-top: var(--rule-width-strong) solid var(--ink);
+    }
+.facts__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) dt {
+      font-family: var(--mono);
+      font-size: var(--fs-label);
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+.facts__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) dd {
+      margin: calc(var(--space-2) - 2px) 0 0;
+      font-size: var(--fs-h4);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      text-wrap: balance;
+    }
+.facts__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .facts__note {
+      margin-top: var(--space-1);
+      font-size: var(--fs-small);
+      font-weight: 400;
+      line-height: var(--lh-small);
+      letter-spacing: var(--ls-small);
+      color: var(--text-subtle);
+      text-wrap: pretty;
+    }
 /* 01–02 · Conteúdo programático, Objetivos ------------------------ */
 /* Apple-style: left-aligned heads in the system font, generous space,
      soft rounded cards without borders, alternating paper / white grounds. */
@@ -2893,7 +3041,8 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
       display: flow-root;
       max-width: 34em;
       padding: 0 var(--space-14) calc(var(--space-8) - var(--space-1)) 0;
-      font-size: var(--fs-h4);
+      /* Texto corrido, um nível abaixo da pergunta (--fs-h4). */
+      font-size: var(--fs-body);
       line-height: 1.55;
       color: var(--text-subtle);
     }
@@ -2909,7 +3058,6 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
       }
       .faq__item:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#)  > p {
         padding-right: 0;
-        font-size: var(--fs-body);
       }
     }
 /* "+" in a round button */
@@ -3009,27 +3157,54 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
 .js:not(.schedule-ready):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .schedule__days > .day:not(:first-child) {
     display: none;
   }
-/* Access note as a quiet footer of the selected day's card. */
+/* Aviso de acesso no rodapé do card do dia: separado do cronograma por
+     uma linha, com ícone de atenção (lima, a cor de destaque) e a primeira
+     frase em negrito. */
 .schedule-note:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-    display: block;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
     width: 100%;
-    padding: 0 var(--card-pad) var(--space-4);
+    margin: 0;
+    padding: var(--space-5) var(--card-pad) var(--space-6);
+    border-top: var(--rule-width) solid var(--divider);
     background: var(--white);
-    color: var(--text-muted);
+    color: var(--text-subtle);
     font-size: var(--fs-small);
     font-weight: var(--fw-small);
     line-height: var(--lh-small);
     letter-spacing: var(--ls-small);
   }
-@media (max-width: 767px) {
-  .schedule-note:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      padding: 0 var(--card-pad) var(--space-4);
-  }
+.schedule-note:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) strong {
+      font-weight: 600;
+      color: var(--ink);
     }
 .schedule-note:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) a {
       color: var(--blue);
       font-weight: 600;
     }
+.schedule-note__icon:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+    flex: none;
+    display: block;
+    width: var(--space-6);
+    height: var(--space-6);
+    color: var(--lime);
+  }
+.schedule-note__icon:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+.schedule-note__icon:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .schedule-note__mark {
+      stroke: var(--ink);
+    }
+.schedule-note__icon:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .schedule-note__dot {
+      fill: var(--ink);
+    }
+.schedule-note__text:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+    /* Alinha a primeira linha ao centro do ícone. */
+    padding-top: calc((var(--space-6) - 1em * var(--lh-small)) / 2);
+  }
 /* Secondary navigation is useful inside the long card on phones only.
      JavaScript reveals it after the day carousel initializes. */
 .schedule-card-nav:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
@@ -3229,7 +3404,7 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
 .day__label:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) div p {
       flex-basis: 100%;
       grid-column: 1 / -1;
-      margin-top: 2px;
+      margin-top: var(--space-half);
       font-size: var(--fs-body);
       color: var(--text-subtle);
     }
@@ -3311,23 +3486,19 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
 .lesson__title:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
     max-width: 580px;
     margin-top: var(--space-2);
-    font-size: var(--fs-h3);
+    /* --fs-h4, um nível abaixo do título do dia ("Encontro N", --fs-h3). */
+    font-size: var(--fs-h4);
     font-weight: 600;
     line-height: 1.22;
     letter-spacing: -0.4px;
     text-wrap: balance;
     color: var(--blue);
   }
-@media (max-width: 430px) {
-  .lesson__title:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      font-size: var(--fs-h4);
-  }
-    }
 /* Speaker: a thin blue rule on the left, name over
      "Palestrante · instituição" */
 .lesson__speaker:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
     display: grid;
-    gap: 2px;
+    gap: var(--space-half);
     margin-top: var(--space-3);
     padding-left: var(--space-3);
     border-left: 2px solid var(--blue);
@@ -3545,6 +3716,7 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
 /* Scoped to the grid, not the section, so the section's eyebrow and title
      keep the same fonts as every other section */
 .speakers:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#),
+  .speakers__guests:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#),
   .site-footer:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
     --fs-label: 12px;
     --fs-ui: 15px;
@@ -3557,6 +3729,7 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
   }
 @media (max-width: 1023px) {
   .speakers:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#),
+  .speakers__guests:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#),
   .site-footer:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       --col-gap: 20px;
   }
@@ -3573,7 +3746,7 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
     padding: 0;
     list-style: none;
   }
-.speaker:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) h3 {
+.speaker__name:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
     font-weight: 600;
   }
 .speaker__bio:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) summary {
@@ -3588,7 +3761,7 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
     }
 /* Footer: navy band; course, sections and Realização in columns */
 .site-footer:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-    padding-top: calc(var(--space-20) - var(--space-2));
+    padding-top: var(--space-20);
     padding-bottom: var(--space-8);
     background: var(--ink);
     color: var(--white);
@@ -3742,28 +3915,64 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
   }
     }
+/* Nove palestrantes (quem conduz as aulas): 3 × 3 em todo o desktop. */
 @media (min-width: 1024px) {
     .speakers--nine:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
-/* Dez palestrantes: duas linhas de cinco. Entre 1024 e 1199px, cinco
-     colunas apertariam os nomes; ficam quatro colunas (oito trilhas de
-     meia coluna) com a última dupla centralizada. */
-@media (min-width: 1200px) {
-    .speakers--ten:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-    }
+/* Startups convidadas, abaixo da grade. No desktop, formam uma quarta linha
+     nas mesmas três colunas: o título na primeira e os dois cards nas outras
+     duas, com a largura dos cards de cima (mesmo --col-gap). No tablet e no
+     celular, o título fica acima dos cards. */
+.speakers__guests:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+    margin-top: var(--head-gap);
   }
-@media (min-width: 1024px) and (max-width: 1199px) {
-    .speakers--ten:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      grid-template-columns: repeat(8, minmax(0, 1fr));
+@media (min-width: 1024px) {
+  .speakers__guests:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      /* Mesmo espaço entre as linhas da grade de cima. */
+      margin-top: var(--space-14);
+  }
     }
-    .speakers--ten:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) > .speaker {
-      grid-column: span 2;
+/* Título do grupo no padrão dos títulos de seção ("Quem conduz / as
+     aulas."): segunda linha na cor de destaque, e uma frase de apoio. */
+.speakers__group-head:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+    max-width: 24em;
+    margin-bottom: var(--subhead-gap);
+  }
+@media (min-width: 1024px) {
+  .speakers__group-head:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      align-self: start;
+      margin: 0;
+      padding-right: var(--space-6);
+  }
     }
-    .speakers--ten:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) > .speaker:nth-child(9) {
-      grid-column: 3 / span 2;
+.speakers__group:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+    margin: 0;
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+.speakers__group:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) em {
+      font-style: normal;
+      color: var(--accent);
+    }
+.speakers__group-lead:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+    max-width: 24em;
+    margin-top: var(--space-3);
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    color: var(--text-subtle);
+    text-wrap: pretty;
+  }
+@media (min-width: 1024px) {
+    .speakers--guests:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      grid-column: 2 / -1;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 .speaker:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
@@ -3772,7 +3981,7 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
     min-width: 0;
     flex-direction: column;
   }
-.speaker:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) h3 {
+.speaker__name:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
     margin-top: var(--speaker-gap);
     font-size: var(--fs-h4);
     line-height: 1.2;
@@ -3819,15 +4028,9 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
       line-height: 1.2;
       white-space: nowrap;
     }
-/* Nome e tema sempre em duas linhas, em todas as telas: cada <span> é uma
-     linha. Os cortes foram medidos para caber a partir de 360px; abaixo
-     disso, uma linha longa pode quebrar de novo. */
-.speaker:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) h3 > span,
-  .speaker__topic:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) > span {
-    display: block;
-  }
 .speaker__topic:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
     margin-top: var(--speaker-gap);
+    text-wrap: pretty;
     font-size: var(--fs-small);
     font-weight: var(--fw-small);
     line-height: var(--lh-small);
@@ -4239,7 +4442,7 @@ body.has-speaker-dialog:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):no
     }
 .enrollment-option__text:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
     display: grid;
-    gap: 2px;
+    gap: var(--space-half);
   }
 .enrollment-option__text:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) strong {
       color: var(--ink);
@@ -4362,8 +4565,7 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
     height: 16px;
     fill: currentColor;
   }
-.program__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) > li > span:last-child,
-  .dates__facts:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) dd {
+.program__list:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) > li > span:last-child {
     font-size: var(--fs-h4);
   }
 @media (min-width: 1024px) {
@@ -4831,9 +5033,11 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
       align-items: start;
       gap: 0 var(--space-4);
       min-height: calc(var(--speaker-art) + 2 * var(--space-4));
-      padding: var(--space-4);
+      /* Cantos concêntricos: card = canto da foto + espaço interno. */
+      --speaker-pad: var(--space-4);
+      padding: var(--speaker-pad);
       overflow: hidden;
-      border-radius: var(--radius-card);
+      border-radius: calc(var(--radius-inner) + var(--speaker-pad));
       background: var(--white);
     }
     .speaker__art:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
@@ -4843,7 +5047,7 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
       min-height: 0;
       align-self: start;
       aspect-ratio: 1;
-      border-radius: var(--radius-tile);
+      border-radius: var(--radius-inner);
     }
     .speaker__art:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) > span {
       top: 0;
@@ -4867,7 +5071,7 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .speaker:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) h3 {
+    .speaker__name:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       grid-area: name;
       min-width: 0;
       margin-top: var(--speaker-gap);
@@ -5109,7 +5313,8 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
     }
     .speaker:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       min-height: calc(var(--speaker-art) + 2 * var(--space-3));
-      padding: var(--space-3);
+      --speaker-pad: var(--space-3);
+      padding: var(--speaker-pad);
       column-gap: var(--space-3);
     }
   }
@@ -5301,7 +5506,7 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
       order: initial;
       justify-self: end;
       margin: 0;
-      padding: 2px 6px;
+      padding: var(--space-half) calc(var(--space-2) - var(--space-half));
       font-size: var(--fs-label);
       line-height: 1.2;
       white-space: nowrap;
@@ -5318,7 +5523,7 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
       text-align: center;
     }
     .schedule-note:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      padding: 0 var(--space-5) var(--space-3);
+      padding: var(--space-4) var(--space-5);
     }
     .schedule-card-nav:not([hidden]):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       display: grid;
@@ -5488,7 +5693,7 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
       letter-spacing: 0.04em;
     }
     .day__badge:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
-      padding: 2px 4px;
+      padding: var(--space-half) var(--space-1);
       font-size: var(--fs-label);
     }
   }
@@ -5530,7 +5735,7 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
       padding-left: var(--space-4);
       padding-right: var(--space-4);
       border-bottom: 0;
-      border-radius: 8px;
+      border-radius: 6px;
       line-height: 1.35;
       font-weight: 600;
     }
@@ -5574,7 +5779,7 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
       width: 100%;
       min-width: 0;
       min-height: 52px;
-      padding: 12px 4px 12px 0;
+      padding: var(--space-3) var(--space-1) var(--space-3) 0;
       line-height: 1.4;
       overflow-wrap: break-word;
     }
@@ -5590,9 +5795,9 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
       min-width: 0;
       height: auto;
       max-height: none;
-      margin: 4px 0 0;
+      margin: var(--space-1) 0 0;
       /* Só o texto: o painel azul é do desktop, onde a bio cobre a foto. */
-      padding: 0 0 4px;
+      padding: 0 0 var(--space-1);
       border-radius: 0;
       background: transparent;
       color: var(--text-subtle);
@@ -5720,8 +5925,8 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
     .audience:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .icon {
       width: 44px;
       height: 44px;
-      padding: 8px;
-      border-radius: 12px;
+      padding: var(--space-2);
+      border-radius: var(--radius-tile);
       background: var(--paper);
       stroke-width: 1.6;
     }
@@ -5767,4 +5972,3 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
     }
   }
 /* mobile-editorial-20261030:end */
-

@@ -289,6 +289,24 @@ function initSiteMenu() {
   onScroll();
 }
 
+/** "Inscreva-se" no cabeçalho fixo: aparece quando o botão do hero sai da
+ *  tela por cima e some quando ele volta. Depois do fim do curso, o CSS
+ *  esconde o botão (data-when="open"). */
+function initHeaderCta() {
+  const header = document.querySelector('.site-header');
+  const cta = document.querySelector('[data-header-cta]');
+  const heroCta = document.querySelector('.hero__actions .pill');
+  if (!header || !cta || !heroCta || !('IntersectionObserver' in window)) return;
+  if (document.documentElement.classList.contains('course-ended')) return;
+
+  const observer = new IntersectionObserver(([entry]) => {
+    const passed = !entry.isIntersecting && entry.boundingClientRect.top < header.offsetHeight;
+    cta.hidden = !passed;
+    header.classList.toggle('has-cta', passed);
+  }, { rootMargin: `-${header.offsetHeight}px 0px 0px 0px` });
+  observer.observe(heroCta);
+}
+
 /** Garante a volta ao início mesmo quando #topo já está na URL. */
 function initBackToTop() {
   const control = document.querySelector('[data-back-to-top]');
@@ -452,7 +470,7 @@ function initCursorFollower() {
 
 /**
  * Encontros de dias anteriores: o botão da aula vira "Aula encerrada",
- * desativado, para não levar a uma sala que já fechou nem dizer "Em breve".
+ * desativado, para não levar a uma sala que já fechou nem dizer "Link em breve".
  * Roda antes da confirmação de inscrição, que assim ignora esses links.
  */
 function initPastMeetings() {
@@ -466,10 +484,10 @@ function initPastMeetings() {
     ended.type = 'button';
     ended.className = `${action.className} btn--ended`;
     ended.disabled = true;
-    ended.setAttribute('aria-label', `Aula do ${title} encerrada`);
+    ended.setAttribute('aria-label', `Aula do ${title} encerrada; a gravação chega por e-mail aos inscritos`);
     ended.innerHTML =
       '<span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>' +
-      '<span class="btn__label">Aula encerrada</span>';
+      '<span class="btn__label">Aula encerrada<span class="btn__status">Gravação por e-mail</span></span>';
     action.replaceWith(ended);
   });
 }
@@ -484,13 +502,13 @@ function initSpeakerImages() {
   document.documentElement.classList.add('photos-ready');
 }
 
-/** Escolhe a composição equilibrada da grade conforme o número de palestrantes. */
+/** Grade 3 × 3 (speakers--nine) quando a lista principal tem nove cards. O
+ *  grupo das startups convidadas (.speakers--guests) segue as colunas dela
+ *  pelo CSS e fica de fora. */
 function initSpeakerGrid() {
-  const list = document.querySelector('.speakers');
-  if (!list) return;
-  const count = list.children.length;
-  list.classList.toggle('speakers--nine', count === 9);
-  list.classList.toggle('speakers--ten', count === 10);
+  document.querySelectorAll('.speakers:not(.speakers--guests)').forEach((list) => {
+    list.classList.toggle('speakers--nine', list.children.length === 9);
+  });
 }
 
 /** Bio inline no celular e diálogo de leitura no tablet/desktop. */
@@ -521,7 +539,7 @@ function initSpeakerBios() {
 
   const openDialog = (details, summary, content) => {
     const speaker = details.closest('.speaker');
-    const name = speaker?.querySelector('h3')?.textContent.trim() || 'Biografia';
+    const name = speaker?.querySelector('.speaker__name')?.textContent.trim() || 'Biografia';
     const meta = [...(speaker?.querySelectorAll('.speaker__meta span') || [])]
       .map((item) => item.textContent.trim())
       .filter(Boolean)
@@ -731,6 +749,7 @@ const initialize = (name, initializer) => {
 
 initialize('menu', initSiteMenu);
 initialize('voltar ao topo', initBackToTop);
+initialize('inscrição no cabeçalho', initHeaderCta);
 initialize('cronograma', initDayCarousel);
 initialize('encontros encerrados', initPastMeetings);
 initialize('objetivos', initGoalCards);

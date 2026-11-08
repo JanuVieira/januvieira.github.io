@@ -121,6 +121,8 @@
     --fs-month: clamp(72px, 9vw, 112px);
 
     /* Spacing scale: base 4/8, shared by every margin, padding and gap. */
+    /* Micro: entre linhas de um mesmo bloco (nome e cargo, por exemplo). */
+    --space-half: 2px;
     --space-1: 4px;
     --space-2: 8px;
     --space-3: 12px;
@@ -174,8 +176,12 @@
        --radius-card / --radius-tile → things you touch or expand
        --pill / 50% → buttons, tags, badges, icon circles */
     --pill: 40px;
-    --radius-card: 20px;
-    --radius-tile: 12px;
+    --radius-card: 16px;
+    --radius-tile: 8px;
+    /* Canto de um elemento encostado no canto de outro (foto dentro do card
+       branco do palestrante). O contêiner usa --radius-inner + o espaço entre
+       os dois, para os cantos serem concêntricos. */
+    --radius-inner: 4px;
 
     @media (max-width: 1023px) {
       --gutter: var(--space-8);
@@ -183,8 +189,7 @@
       --head-gap: var(--space-12);
       --block-gap: var(--space-16);
       --subhead-gap: var(--space-6);
-      --column-gap: calc(var(--space-12) - var(--space-1));
-      --card-pad: calc(var(--space-8) - var(--space-1));
+      --column-gap: var(--space-12);
     }
     @media (max-width: 767px) {
       --gutter: var(--space-6);
@@ -339,10 +344,6 @@
       color: var(--on-dark);
       text-wrap: pretty;
     }
-    .hero__lead {
-      margin-top: var(--space-4);
-      font-size: var(--fs-body);
-    }
     .hero__icons {
       --tile: var(--space-12);
       gap: var(--space-3);
@@ -457,7 +458,7 @@
       padding-block: var(--space-5);
     }
     .schedule-note {
-      padding: var(--space-3) var(--space-5);
+      padding: var(--space-4) var(--space-5) var(--space-5);
     }
 
     /* Speakers: a true media card instead of disconnected horizontal rows. */
@@ -479,10 +480,12 @@
       /* Espaço vertical por margem, não por row-gap: assim um card sem tema
          não ganha o espaço de uma linha vazia. */
       gap: 0 var(--space-4);
-      padding: var(--space-4);
+      /* Cantos concêntricos: card = canto da foto + espaço interno. */
+      --speaker-pad: var(--space-4);
+      padding: var(--speaker-pad);
       overflow: hidden;
       border: 0;
-      border-radius: var(--radius-card);
+      border-radius: calc(var(--radius-inner) + var(--speaker-pad));
       background: var(--white);
 
       &:last-child {
@@ -496,7 +499,7 @@
       min-height: 0;
       align-self: start;
       aspect-ratio: 1;
-      border-radius: var(--radius-tile);
+      border-radius: var(--radius-inner);
     }
     .speaker__art > span {
       inset: 0;
@@ -513,7 +516,7 @@
       gap: var(--space-2);
       margin: 0;
     }
-    .speaker h3 {
+    .speaker__name {
       grid-area: name;
       align-self: start;
       margin: var(--speaker-gap) 0 0;
@@ -850,7 +853,8 @@
     .speaker {
       grid-template-columns: 76px minmax(0, 1fr);
       column-gap: var(--space-3);
-      padding: var(--space-3);
+      --speaker-pad: var(--space-3);
+      padding: var(--speaker-pad);
     }
     .speaker__art {
       width: 76px;
@@ -909,13 +913,20 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 28px;
+    /* Tablet e desktop: o cabeçalho fixo (84px) mais um respiro. */
+    scroll-padding-top: calc(84px + var(--space-6));
 
     /* Phones: anchored sections start right under the 56px sticky bar
        (more would show a strip of the previous section) */
-    @media (max-width: 767px) {
+    @media (max-width: 767px), (max-width: 1023px) and (max-height: 500px) and (orientation: landscape) {
       scroll-padding-top: 56px;
     }
+  }
+  /* Estado do curso (script no <head>): até o último encontro valem os
+     elementos data-when="open"; a partir do dia seguinte, os "ended". */
+  html:not(.course-ended) [data-when='ended'],
+  .course-ended [data-when='open'] {
+    display: none !important;
   }
   body {
     background: var(--page-bg);
@@ -1084,6 +1095,61 @@
     }
   }
 
+  /* Tablet e desktop: o cabeçalho fica no topo ao rolar, como a barra do
+     celular. O fundo cobre toda a largura (border-image, sem criar rolagem
+     lateral) e ganha uma linha quando a página já rolou. */
+  @media (min-width: 768px) {
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-image: linear-gradient(var(--page-bg) 0 0) fill 0 / 0 / 0 100vmax;
+
+      &.is-scrolled {
+        border-image: linear-gradient(to top, var(--divider) 0 var(--rule-width), var(--page-bg) var(--rule-width)) fill 0 / 0 / 0 100vmax;
+      }
+    }
+    .site-nav {
+      order: 1;
+    }
+    .site-header__cta {
+      order: 2;
+    }
+  }
+  /* Celular sem JavaScript (sem .has-menu): os links ficam em linha e
+     quebram para uma segunda linha em vez de passar da tela. */
+  @media (max-width: 767px) {
+    .site-header:not(.has-menu) .site-nav {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      row-gap: var(--space-2);
+    }
+  }
+  /* "Inscreva-se" do cabeçalho: aparece quando o botão do hero sai da tela. */
+  .site-header__cta {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--pill);
+    background: var(--blue);
+    color: var(--white);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color var(--dur-hover) var(--ease-standard);
+
+    @media (hover: hover) {
+      &:hover {
+        background: var(--navy);
+      }
+    }
+  }
+
   /* Phones with JavaScript (.has-menu, set by assets/js/main.js): a
      compact bar that stays on top while scrolling, with the course name
      and a "Menu" button opening every section as large touch rows.
@@ -1123,6 +1189,10 @@
       }
       .site-header__toggle {
         display: inline-flex;
+      }
+      /* Com o "Inscreva-se" visível, ele ocupa o lugar do nome do curso. */
+      &.has-cta .site-header__brand {
+        display: none;
       }
       /* The menu panel drops over the page, so opening it never pushes
          the content down. */
@@ -1612,12 +1682,6 @@
       .hero__icons {
         grid-row: 3;
       }
-      .hero__lead {
-        grid-row: 3;
-        grid-column: 2;
-        max-width: 26em;
-        margin-top: var(--space-8);
-      }
     }
   }
   /* Above the blue scrim (they sit inside .hero__copy, display: contents). */
@@ -1637,22 +1701,6 @@
     text-transform: uppercase;
     text-wrap: pretty;
 
-  }
-  /* Small support text under the H1, sentence case so it never competes
-     with the uppercase title */
-  .hero__lead {
-    max-width: 34em;
-    margin-top: var(--space-5);
-    font-size: var(--fs-body);
-    font-weight: 400;
-    line-height: 1.45;
-    color: var(--on-dark);
-    text-wrap: balance;
-
-    strong {
-      font-weight: 600;
-      color: var(--on-dark-strong);
-    }
   }
   /* Outline icons under the H1 (plant, DNA, patent certificate), each
      centred on a round tile. Each SVG's viewBox is cropped to its ink, so
@@ -1763,8 +1811,9 @@
   .dates {
     display: flex;
     flex-direction: column;
-    container: dates-panel / inline-size;
-    /* NOV/26 scales from the calendar column rather than the viewport. */
+    /* Sem container aqui: o painel é subgrid de .hero__grid no desktop, e um
+       container de tamanho desligaria o subgrid. NOV/26, os dias e os fatos
+       escalam pelos próprios containers (.dates__cal e .dates__facts). */
     font-family: var(--sans);
     /* Side by side: tighter on the left (next to the blue panel), full
        breathing room on the right edge. Stacked on mobile: symmetric, so it
@@ -1902,11 +1951,22 @@
     padding-top: var(--space-5);
     border-top: var(--rule-width-strong) solid var(--ink);
 
-    /* Side by side: same row as the hero buttons, bottoms aligned. */
+    /* Desktop: mesmo padrão do celular, "Horário" à esquerda e "Dias" à
+       direita. A coluna do horário tem a largura do texto (não quebra); o
+       valor acompanha a largura do painel (7cqi, entre 16px e --fs-h4) e,
+       se ainda faltar espaço (perto de 1024px), "Terças e quintas" quebra
+       em duas linhas em vez de empilhar o bloco. Mesma linha dos botões do
+       hero, com as bases alinhadas. */
     @media (min-width: 1024px) {
       grid-row: 3;
+      grid-template-columns: max-content minmax(0, 1fr);
+      justify-content: stretch;
       align-self: end;
       margin-top: var(--hero-row-gap);
+
+      > div:last-child {
+        text-align: right;
+      }
     }
 
     dt {
@@ -1918,24 +1978,86 @@
     }
     dd {
       margin-top: calc(var(--space-2) - 2px);
-      /* Capped by the panel width so both values fit on one row. */
-      font-size: min(var(--fs-lead), 7cqi);
+      font-size: var(--fs-h4);
       white-space: nowrap;
       font-weight: 700;
       line-height: 1.1;
       letter-spacing: -0.04em;
+
+      /* Desktop (ver o comentário acima): o valor acompanha a largura do
+         painel. Sem suporte a cqi, fica em --fs-h4 e quebra linha. */
+      @media (min-width: 1024px) {
+        font-size: clamp(16px, 7cqi, var(--fs-h4));
+        white-space: normal;
+        text-wrap: balance;
+      }
     }
   }
 
-  @container dates-panel (max-width: 299px) {
-    .dates__facts {
-      grid-template-columns: 1fr;
-      justify-content: stretch;
-      gap: var(--space-4);
+  /* Curso encerrado: o selo perde o ponto de "ao vivo" e o lugar do botão
+     de inscrição explica gravações e certificado. */
+  .hero__tag--ended::after {
+    display: none;
+  }
+  .hero__ended {
+    max-width: 30em;
+    margin: 0;
+    font-size: var(--fs-body);
+    line-height: 1.45;
+    color: var(--on-dark);
+    text-wrap: pretty;
+  }
 
-      dd {
-        white-space: normal;
-      }
+  /* O curso em resumo: faixa logo abaixo do hero, no padrão de Horário/Dias
+     do painel lima (rótulo mono, valor em negrito, nota curta). */
+  .facts {
+    padding-bottom: var(--space-10);
+
+    @media (max-width: 1023px) {
+      padding-bottom: var(--space-8);
+    }
+    @media (max-width: 767px) {
+      padding-top: var(--space-8);
+    }
+  }
+  .facts__list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-6);
+    margin: 0;
+
+    @media (max-width: 1023px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: var(--space-6);
+    }
+    > div {
+      padding-top: var(--space-4);
+      border-top: var(--rule-width-strong) solid var(--ink);
+    }
+    dt {
+      font-family: var(--mono);
+      font-size: var(--fs-label);
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    dd {
+      margin: calc(var(--space-2) - 2px) 0 0;
+      font-size: var(--fs-h4);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      text-wrap: balance;
+    }
+    .facts__note {
+      margin-top: var(--space-1);
+      font-size: var(--fs-small);
+      font-weight: 400;
+      line-height: var(--lh-small);
+      letter-spacing: var(--ls-small);
+      color: var(--text-subtle);
+      text-wrap: pretty;
     }
   }
 
@@ -2573,7 +2695,8 @@
       display: flow-root;
       max-width: 34em;
       padding: 0 var(--space-14) calc(var(--space-8) - var(--space-1)) 0;
-      font-size: var(--fs-h4);
+      /* Texto corrido, um nível abaixo da pergunta (--fs-h4). */
+      font-size: var(--fs-body);
       line-height: 1.55;
       color: var(--text-subtle);
     }
@@ -2588,7 +2711,6 @@
       }
       > p {
         padding-right: 0;
-        font-size: var(--fs-body);
       }
     }
   }
@@ -2693,25 +2815,55 @@
   .js:not(.schedule-ready) .schedule__days > .day:not(:first-child) {
     display: none;
   }
-  /* Access note as a quiet footer of the selected day's card. */
+  /* Aviso de acesso no rodapé do card do dia: separado do cronograma por
+     uma linha, com ícone de atenção (lima, a cor de destaque) e a primeira
+     frase em negrito. */
   .schedule-note {
-    display: block;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
     width: 100%;
-    padding: 0 var(--card-pad) var(--space-4);
+    margin: 0;
+    padding: var(--space-5) var(--card-pad) var(--space-6);
+    border-top: var(--rule-width) solid var(--divider);
     background: var(--white);
-    color: var(--text-muted);
+    color: var(--text-subtle);
     font-size: var(--fs-small);
     font-weight: var(--fw-small);
     line-height: var(--lh-small);
     letter-spacing: var(--ls-small);
 
-    @media (max-width: 767px) {
-      padding: 0 var(--card-pad) var(--space-4);
+    strong {
+      font-weight: 600;
+      color: var(--ink);
     }
     a {
       color: var(--blue);
       font-weight: 600;
     }
+  }
+  .schedule-note__icon {
+    flex: none;
+    display: block;
+    width: var(--space-6);
+    height: var(--space-6);
+    color: var(--lime);
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .schedule-note__mark {
+      stroke: var(--ink);
+    }
+    .schedule-note__dot {
+      fill: var(--ink);
+    }
+  }
+  .schedule-note__text {
+    /* Alinha a primeira linha ao centro do ícone. */
+    padding-top: calc((var(--space-6) - 1em * var(--lh-small)) / 2);
   }
   /* Secondary navigation is useful inside the long card on phones only.
      JavaScript reveals it after the day carousel initializes. */
@@ -2907,7 +3059,7 @@
     div p {
       flex-basis: 100%;
       grid-column: 1 / -1;
-      margin-top: 2px;
+      margin-top: var(--space-half);
       font-size: var(--fs-body);
       color: var(--text-subtle);
     }
@@ -2984,22 +3136,19 @@
   .lesson__title {
     max-width: 580px;
     margin-top: var(--space-2);
-    font-size: var(--fs-h3);
+    /* --fs-h4, um nível abaixo do título do dia ("Encontro N", --fs-h3). */
+    font-size: var(--fs-h4);
     font-weight: 600;
     line-height: 1.22;
     letter-spacing: -0.4px;
     text-wrap: balance;
     color: var(--blue);
-
-    @media (max-width: 430px) {
-      font-size: var(--fs-h4);
-    }
   }
   /* Speaker: a thin blue rule on the left, name over
      "Palestrante · instituição" */
   .lesson__speaker {
     display: grid;
-    gap: 2px;
+    gap: var(--space-half);
     margin-top: var(--space-3);
     padding-left: var(--space-3);
     border-left: 2px solid var(--blue);
@@ -3225,6 +3374,7 @@
   /* Scoped to the grid, not the section, so the section's eyebrow and title
      keep the same fonts as every other section */
   .speakers,
+  .speakers__guests,
   .site-footer {
     --fs-label: 12px;
     --fs-ui: 15px;
@@ -3251,7 +3401,7 @@
     padding: 0;
     list-style: none;
   }
-  .speaker h3 {
+  .speaker__name {
     font-weight: 600;
   }
   .speaker__bio summary {
@@ -3267,7 +3417,7 @@
 
   /* Footer: navy band; course, sections and Realização in columns */
   .site-footer {
-    padding-block: calc(var(--space-20) - var(--space-2)) var(--space-8);
+    padding-block: var(--space-20) var(--space-8);
     background: var(--ink);
     color: var(--white);
 
@@ -3416,28 +3566,63 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
+  /* Nove palestrantes (quem conduz as aulas): 3 × 3 em todo o desktop. */
   @media (min-width: 1024px) {
     .speakers--nine {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
-  /* Dez palestrantes: duas linhas de cinco. Entre 1024 e 1199px, cinco
-     colunas apertariam os nomes; ficam quatro colunas (oito trilhas de
-     meia coluna) com a última dupla centralizada. */
-  @media (min-width: 1200px) {
-    .speakers--ten {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+  /* Startups convidadas, abaixo da grade. No desktop, formam uma quarta linha
+     nas mesmas três colunas: o título na primeira e os dois cards nas outras
+     duas, com a largura dos cards de cima (mesmo --col-gap). No tablet e no
+     celular, o título fica acima dos cards. */
+  .speakers__guests {
+    margin-top: var(--head-gap);
+
+    @media (min-width: 1024px) {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: var(--col-gap);
+      /* Mesmo espaço entre as linhas da grade de cima. */
+      margin-top: var(--space-14);
     }
   }
-  @media (min-width: 1024px) and (max-width: 1199px) {
-    .speakers--ten {
-      grid-template-columns: repeat(8, minmax(0, 1fr));
+  /* Título do grupo no padrão dos títulos de seção ("Quem conduz / as
+     aulas."): segunda linha na cor de destaque, e uma frase de apoio. */
+  .speakers__group-head {
+    max-width: 24em;
+    margin-bottom: var(--subhead-gap);
+
+    @media (min-width: 1024px) {
+      align-self: start;
+      margin: 0;
+      padding-right: var(--space-6);
     }
-    .speakers--ten > .speaker {
-      grid-column: span 2;
+  }
+  .speakers__group {
+    margin: 0;
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+
+    em {
+      font-style: normal;
+      color: var(--accent);
     }
-    .speakers--ten > .speaker:nth-child(9) {
-      grid-column: 3 / span 2;
+  }
+  .speakers__group-lead {
+    max-width: 24em;
+    margin-top: var(--space-3);
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    color: var(--text-subtle);
+    text-wrap: pretty;
+  }
+  @media (min-width: 1024px) {
+    .speakers--guests {
+      grid-column: 2 / -1;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
   .speaker {
@@ -3446,7 +3631,7 @@
     min-width: 0;
     flex-direction: column;
   }
-  .speaker h3 {
+  .speaker__name {
     margin-top: var(--speaker-gap);
     font-size: var(--fs-h4);
     line-height: 1.2;
@@ -3492,15 +3677,9 @@
     }
 
   }
-  /* Nome e tema sempre em duas linhas, em todas as telas: cada <span> é uma
-     linha. Os cortes foram medidos para caber a partir de 360px; abaixo
-     disso, uma linha longa pode quebrar de novo. */
-  .speaker h3 > span,
-  .speaker__topic > span {
-    display: block;
-  }
   .speaker__topic {
     margin-top: var(--speaker-gap);
+    text-wrap: pretty;
     font-size: var(--fs-small);
     font-weight: var(--fw-small);
     line-height: var(--lh-small);
@@ -3890,7 +4069,7 @@
   }
   .enrollment-option__text {
     display: grid;
-    gap: 2px;
+    gap: var(--space-half);
 
     strong {
       color: var(--ink);
@@ -4020,8 +4199,7 @@
     fill: currentColor;
   }
 
-  .program__list > li > span:last-child,
-  .dates__facts dd {
+  .program__list > li > span:last-child {
     font-size: var(--fs-h4);
   }
   @media (min-width: 1024px) {
@@ -4499,9 +4677,11 @@
       align-items: start;
       gap: 0 var(--space-4);
       min-height: calc(var(--speaker-art) + 2 * var(--space-4));
-      padding: var(--space-4);
+      /* Cantos concêntricos: card = canto da foto + espaço interno. */
+      --speaker-pad: var(--space-4);
+      padding: var(--speaker-pad);
       overflow: hidden;
-      border-radius: var(--radius-card);
+      border-radius: calc(var(--radius-inner) + var(--speaker-pad));
       background: var(--white);
     }
     .speaker__art {
@@ -4511,7 +4691,7 @@
       min-height: 0;
       align-self: start;
       aspect-ratio: 1;
-      border-radius: var(--radius-tile);
+      border-radius: var(--radius-inner);
     }
     .speaker__art > span {
       inset: 0;
@@ -4532,7 +4712,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .speaker h3 {
+    .speaker__name {
       grid-area: name;
       min-width: 0;
       margin-top: var(--speaker-gap);
@@ -4771,7 +4951,8 @@
     }
     .speaker {
       min-height: calc(var(--speaker-art) + 2 * var(--space-3));
-      padding: var(--space-3);
+      --speaker-pad: var(--space-3);
+      padding: var(--speaker-pad);
       column-gap: var(--space-3);
     }
   }
@@ -4963,7 +5144,7 @@
       order: initial;
       justify-self: end;
       margin: 0;
-      padding: 2px 6px;
+      padding: var(--space-half) calc(var(--space-2) - var(--space-half));
       font-size: var(--fs-label);
       line-height: 1.2;
       white-space: nowrap;
@@ -4980,7 +5161,7 @@
       text-align: center;
     }
     .schedule-note {
-      padding: 0 var(--space-5) var(--space-3);
+      padding: var(--space-4) var(--space-5);
     }
     .schedule-card-nav:not([hidden]) {
       display: grid;
@@ -5140,7 +5321,7 @@
       letter-spacing: 0.04em;
     }
     .day__badge {
-      padding: 2px 4px;
+      padding: var(--space-half) var(--space-1);
       font-size: var(--fs-label);
     }
   }
@@ -5180,7 +5361,7 @@
       min-height: 56px;
       padding-inline: var(--space-4);
       border-bottom: 0;
-      border-radius: 8px;
+      border-radius: 6px;
       line-height: 1.35;
       font-weight: 600;
     }
@@ -5224,7 +5405,7 @@
       width: 100%;
       min-width: 0;
       min-height: 52px;
-      padding: 12px 4px 12px 0;
+      padding: var(--space-3) var(--space-1) var(--space-3) 0;
       line-height: 1.4;
       overflow-wrap: break-word;
     }
@@ -5237,9 +5418,9 @@
       min-width: 0;
       height: auto;
       max-height: none;
-      margin: 4px 0 0;
+      margin: var(--space-1) 0 0;
       /* Só o texto: o painel azul é do desktop, onde a bio cobre a foto. */
-      padding: 0 0 4px;
+      padding: 0 0 var(--space-1);
       border-radius: 0;
       background: transparent;
       color: var(--text-subtle);
@@ -5369,8 +5550,8 @@
     .audience .icon {
       width: 44px;
       height: 44px;
-      padding: 8px;
-      border-radius: 12px;
+      padding: var(--space-2);
+      border-radius: var(--radius-tile);
       background: var(--paper);
       stroke-width: 1.6;
     }
@@ -5419,544 +5600,3 @@
   }
 }
 /* mobile-editorial-20261030:end */
-
-/* compat-fallback:start */
-/* --------------------------------------------------------------------------
-   Compatibility fallback
-   Flat selectors + classic media-query syntax keep the page responsive in
-   Safari/WebViews that understand layers but not native CSS nesting. Current
-   browsers skip this block and use the richer compositions above.
-   -------------------------------------------------------------------------- */
-@supports not (selector(&)) {
-  @media (max-width: 1023px) {
-    :root {
-      --gutter: 32px;
-      --section-space: 80px;
-      --head-gap: 48px;
-      --block-gap: 64px;
-      --subhead-gap: 24px;
-      --column-gap: 44px;
-      --card-pad: 28px;
-    }
-
-    .hero__grid {
-      grid-template-columns: 1fr;
-      grid-template-rows: none;
-    }
-    .hero__main,
-    .dates {
-      display: flex;
-      grid-row: auto;
-      padding: var(--gutter);
-    }
-    .hero__copy {
-      display: flex;
-      flex-direction: column;
-      padding-top: 32px;
-    }
-    .hero__title {
-      max-width: none;
-      font-size: var(--fs-display);
-    }
-    .hero__title-strong {
-      white-space: normal;
-      font-size: clamp(28px, 7vw, 44px);
-    }
-    .hero__title-sub {
-      display: block;
-      max-width: 28em;
-      margin-top: 12px;
-      font-size: var(--fs-lead);
-      line-height: 1.45;
-      text-transform: none;
-      color: var(--on-dark);
-    }
-    .hero__actions {
-      margin-top: 32px;
-    }
-    .dates > * {
-      width: 100%;
-      max-width: none;
-    }
-    .dates__facts {
-      margin-top: 32px;
-    }
-
-    .schedule {
-      grid-template-columns: 1fr;
-      gap: var(--head-gap);
-    }
-    .schedule__days {
-      margin-top: 0;
-    }
-    .speakers {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 48px 24px;
-    }
-    .site-footer__inner {
-      grid-template-columns: 1fr 1fr;
-    }
-    .site-footer__brand {
-      grid-column: 1 / -1;
-    }
-  }
-
-  @media (max-width: 767px) {
-    :root {
-      --gutter: 24px;
-      --section-space: 56px;
-      --head-gap: 32px;
-      --eyebrow-gap: 20px;
-      --block-gap: 48px;
-      --column-gap: 32px;
-      --card-pad: 24px;
-    }
-
-    html {
-      scroll-padding-top: 56px;
-    }
-    body {
-      overflow-x: hidden;
-    }
-    .container {
-      width: calc(100% - 2 * var(--gutter));
-    }
-    .section__head {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .site-header.has-menu {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      width: 100%;
-      min-height: 56px;
-      margin-inline: 0;
-      padding-inline: var(--gutter);
-      background: var(--paper);
-    }
-    .site-header.has-menu .site-header__brand,
-    .site-header.has-menu .site-header__toggle {
-      display: inline-flex;
-      align-items: center;
-      min-height: 44px;
-    }
-    .site-header.has-menu .site-header__brand {
-      min-width: 0;
-      font-size: 15px;
-      font-weight: 700;
-      line-height: 1.15;
-      text-decoration: none;
-    }
-    .site-header.has-menu .site-nav {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      left: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0;
-      padding: 8px var(--gutter) 24px;
-      background: var(--paper);
-      visibility: hidden;
-      opacity: 0;
-      pointer-events: none;
-    }
-    .site-header.has-menu.is-open .site-nav {
-      visibility: visible;
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .site-header.has-menu .site-nav a {
-      min-height: 52px;
-      border-bottom: 1px solid var(--divider);
-    }
-    .site-header.has-menu .site-nav__extra {
-      display: flex;
-    }
-
-    .hero.container {
-      width: 100%;
-      margin-inline: 0;
-    }
-    .hero {
-      padding-bottom: 0;
-    }
-    .hero__grid,
-    .hero__main,
-    .hero__copy,
-    .hero__heading,
-    .hero__brand,
-    .dates {
-      min-width: 0;
-    }
-    .hero__main,
-    .dates {
-      padding: var(--gutter);
-    }
-    .hero__brand {
-      min-height: 44px;
-      flex-wrap: nowrap;
-      gap: 8px;
-    }
-    .hero__brand .logo {
-      height: 20px;
-    }
-    .hero__copy {
-      padding-top: 24px;
-    }
-    .hero__title-strong {
-      font-size: clamp(30px, 9vw, 42px);
-      line-height: 1.02;
-    }
-    .hero__title-sub {
-      max-width: 22em;
-      font-size: clamp(17px, 4.8vw, 20px);
-      line-height: 1.4;
-    }
-    .hero__icons {
-      gap: 12px;
-      margin-top: 20px;
-      padding-left: 0;
-    }
-    .hero__icons li {
-      width: 48px;
-      height: 48px;
-    }
-    .hero__icons .icon {
-      height: 24px;
-    }
-    .hero__actions {
-      gap: 12px;
-      margin-top: 24px;
-    }
-    .hero__dna {
-      opacity: 0.54;
-    }
-
-    .dates__top {
-      min-height: 44px;
-    }
-    .dates__badge {
-      width: 44px;
-    }
-    .dates__month {
-      margin-top: 20px;
-      font-size: clamp(72px, 24vw, 96px);
-    }
-    .dates__days {
-      margin-block: 16px 24px;
-    }
-    .dates__facts {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-      gap: 16px;
-      margin-top: 0;
-      padding-top: 20px;
-    }
-    .dates__facts > div:last-child {
-      text-align: right;
-    }
-    .dates__facts dd {
-      font-size: clamp(16px, 5vw, 20px);
-      white-space: normal;
-    }
-
-    .program__list {
-      grid-template-columns: 1fr;
-    }
-    .program__list li {
-      flex-direction: row;
-      align-items: center;
-      gap: 16px;
-      min-height: 0;
-      padding: 16px 40px 16px 0;
-      border-right: 0;
-      white-space: normal;
-    }
-    .program__list li::before {
-      top: 50%;
-      right: 0;
-      line-height: 1;
-      transform: translateY(-50%);
-    }
-    .program__list .program__icon {
-      flex: none;
-      width: 44px;
-      height: 44px;
-    }
-    .program__list .program__icon i {
-      width: 24px;
-      height: 24px;
-    }
-    .program__list li > span:last-child {
-      min-height: 0;
-      font-size: var(--fs-h4);
-    }
-    .program__list br {
-      display: none;
-    }
-
-    .goals__intro,
-    .faq__grid {
-      grid-template-columns: 1fr;
-      gap: var(--head-gap);
-    }
-    .audience {
-      margin-top: 0;
-      border-radius: 20px;
-    }
-    .audience ul {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-    }
-    .audience li {
-      grid-template-columns: 1fr;
-      justify-items: center;
-      gap: 8px;
-      text-align: center;
-    }
-    .goal-cards {
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-    .goal-card,
-    .goal-card:nth-child(-n + 2),
-    .goal-card:last-child {
-      grid-column: auto;
-      min-height: 0;
-      padding: 0;
-      border-radius: 20px;
-    }
-    .goal-card__details > summary {
-      display: grid;
-      grid-template-columns: 44px minmax(0, 1fr) 44px;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      min-height: 56px;
-      padding: 6px var(--card-pad);
-    }
-    .goal-card h4 {
-      margin-top: 0;
-      font-size: var(--fs-h4);
-    }
-    .goal-card__more {
-      padding: 0 var(--card-pad) 12px;
-    }
-
-    .faq__list {
-      margin-top: 0;
-    }
-    .faq__item summary {
-      width: 100%;
-      padding-block: 20px;
-    }
-    .faq__item > p {
-      padding-right: 0;
-      font-size: var(--fs-body);
-    }
-
-    .schedule {
-      gap: 32px;
-    }
-    .day-nav__tabs {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 6px;
-    }
-    .day-nav__tabs button {
-      min-width: 0;
-      min-height: 62px;
-      padding-inline: 2px;
-      font-size: var(--fs-h4);
-    }
-    .schedule__days {
-      overflow: hidden;
-      border-radius: 20px;
-    }
-    .day {
-      padding: 20px;
-    }
-    .day__lessons {
-      margin-top: 24px;
-    }
-    .lesson {
-      padding-block: 20px;
-    }
-    .schedule-note {
-      padding: 0 20px 16px;
-    }
-
-    .speakers {
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    .speaker {
-      display: grid;
-      grid-template-columns: 88px minmax(0, 1fr);
-      grid-template-areas:
-        'art meta'
-        'art name'
-        'art topic'
-        'art bio';
-      gap: 8px 16px;
-      padding: 16px;
-      overflow: hidden;
-      border: 0;
-      border-radius: 20px;
-      background: var(--white);
-    }
-    .speaker__art {
-      display: block;
-      grid-area: art;
-      width: 88px;
-      height: 88px;
-      min-height: 0;
-      align-self: start;
-      aspect-ratio: 1;
-      border-radius: 12px;
-    }
-    .speaker__art > span {
-      inset: 0;
-      display: grid;
-      place-items: center;
-      background: var(--tint);
-      font-size: 24px;
-    }
-    .speaker__meta {
-      grid-area: meta;
-      min-height: 24px;
-      margin: 0;
-    }
-    .speaker h3 {
-      grid-area: name;
-      margin: 0;
-      font-size: var(--fs-h4);
-    }
-    .speaker__topic {
-      grid-area: topic;
-      min-height: 0;
-      margin-top: 0;
-      padding: 0;
-    }
-    .site-footer {
-      padding-block: 40px 24px;
-    }
-    .site-footer__inner {
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
-    .site-footer__brand,
-    .site-footer__bottom {
-      grid-column: auto;
-    }
-    .site-footer__nav,
-    .site-footer__org {
-      padding-top: 20px;
-      border-top: 1px solid rgb(255 255 255 / 0.22);
-    }
-  }
-
-  @media (max-width: 480px) {
-    :root {
-      --gutter: 20px;
-      --section-space: 48px;
-      --eyebrow-gap: 16px;
-      --block-gap: 40px;
-      --card-pad: 20px;
-    }
-
-    .hero__tag {
-      padding: 4px 8px;
-      font-size: var(--fs-label);
-      letter-spacing: 0.02em;
-    }
-    .hero__actions {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-    .hero__actions .pill,
-    .hero__actions .hero__link {
-      width: 100%;
-      justify-content: center;
-    }
-    .hero__actions .hero__link {
-      padding-inline: 16px;
-      border: 1px solid var(--on-dark-border);
-      border-radius: var(--pill);
-    }
-
-    .dates__days {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      border-top: 0;
-    }
-    .dates__days li {
-      gap: 4px;
-      padding: 10px 4px;
-      border: 0;
-      border-radius: 12px;
-      background: rgb(255 255 255 / 0.3);
-    }
-    .dates__days b {
-      font-size: 24px;
-    }
-
-    .audience ul {
-      grid-template-columns: 1fr;
-      gap: 0;
-    }
-    .audience li {
-      grid-template-columns: 36px minmax(0, 1fr);
-      justify-items: start;
-      padding-block: 12px;
-      border-bottom: 1px solid var(--divider);
-      text-align: left;
-    }
-    .audience li:last-child {
-      border-bottom: 0;
-    }
-
-    .day-nav__tabs {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-    .day-nav__tabs button {
-      min-height: 56px;
-    }
-    .day__label {
-      grid-template-columns: 40px minmax(0, 1fr);
-    }
-    .day__icon {
-      width: 40px;
-      height: 40px;
-    }
-  }
-
-  @media (max-width: 359px) {
-    .site-header__brand span {
-      display: none;
-    }
-    .site-header__brand-logo {
-      display: block;
-    }
-    .hero__brand {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-    .speaker {
-      grid-template-columns: 76px minmax(0, 1fr);
-      gap: 8px 12px;
-      padding: 12px;
-    }
-    .speaker__art {
-      width: 76px;
-      height: 76px;
-    }
-  }
-}

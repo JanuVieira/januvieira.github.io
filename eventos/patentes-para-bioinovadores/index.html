@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR" data-site-version="9d558a2444">
+<html lang="pt-BR" data-course-end="2026-11-19" data-site-version="eefd2e0bfb">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -51,38 +51,81 @@
         }
       });
     </script>
+    <!-- Depois do último encontro (a partir do dia seguinte, como “Aula
+         encerrada”), a página entra no estado “curso encerrado”: o CSS
+         troca os elementos marcados com data-when="open" pelos de
+         data-when="ended". Roda antes da pintura para não piscar. -->
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var end = root.getAttribute('data-course-end');
+        if (end && new Date().toLocaleDateString('sv') > end) root.classList.add('course-ended');
+      })();
+    </script>
     <title>Patentes para Bioinovadores | INPI</title>
     <meta
       name="description"
-      content="Curso online com aulas ao vivo sobre patentes de tecnologias da Bioeconomia. 3 a 19 de novembro de 2026, das 14h às 17h. Realização CGDI/INPI."
+      content="Curso online, gratuito e ao vivo sobre patentes de tecnologias da bioeconomia. De 3 a 19 de novembro de 2026, às terças e quintas, das 14h às 17h. Realização CGDI/INPI."
     />
     <meta name="theme-color" content="#f4f5ef" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Patentes para Bioinovadores" />
     <meta
       property="og:description"
-      content="Curso online com aulas ao vivo sobre patentes de tecnologias da Bioeconomia, em novembro de 2026."
+      content="Curso online, gratuito e ao vivo do INPI sobre patentes de tecnologias da bioeconomia. De 3 a 19 de novembro de 2026."
     />
     <meta property="og:url" content="https://januvieira.tech/eventos/patentes-para-bioinovadores/" />
     <meta property="og:locale" content="pt_BR" />
-    <meta property="og:image" content="https://januvieira.tech/eventos/patentes-para-bioinovadores/assets/img/og-image.png?v=9d558a2444" />
+    <meta property="og:image" content="https://januvieira.tech/eventos/patentes-para-bioinovadores/assets/img/og-image.png?v=eefd2e0bfb" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Patentes para Bioinovadores: curso online do INPI com seis encontros ao vivo em novembro de 2026, terças e quintas, das 14h às 17h." />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="canonical" href="https://januvieira.tech/eventos/patentes-para-bioinovadores/" />
-    <link rel="icon" href="assets/img/favicon-32.png?v=9d558a2444" sizes="32x32" type="image/png" />
-    <link rel="icon" href="assets/img/logo.svg?v=9d558a2444" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png?v=9d558a2444" />
+    <!-- Dados do curso para buscadores (schema.org): só informações que já
+         estão na página. Atualize junto com datas, horários e inscrição. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationEvent",
+      "name": "Patentes para Bioinovadores: detalhes sobre patentes de tecnologias da Bioeconomia",
+      "description": "Curso online, gratuito e ao vivo sobre patentes de tecnologias da bioeconomia. Seis encontros, às terças e quintas, das 14h às 17h (horário de Brasília). Realização CGDI/INPI.",
+      "startDate": "2026-11-03T14:00-03:00",
+      "endDate": "2026-11-19T17:00-03:00",
+      "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+      "eventStatus": "https://schema.org/EventScheduled",
+      "inLanguage": "pt-BR",
+      "isAccessibleForFree": true,
+      "location": {
+        "@type": "VirtualLocation",
+        "url": "https://januvieira.tech/eventos/patentes-para-bioinovadores/"
+      },
+      "image": "https://januvieira.tech/eventos/patentes-para-bioinovadores/assets/img/og-image.png",
+      "organizer": {
+        "@type": "Organization",
+        "name": "Instituto Nacional da Propriedade Industrial (INPI) · CGDI"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "BRL",
+        "availability": "https://schema.org/InStock",
+        "url": "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=CPgVWJFgvUesqzDAj-e58jzfPrjp7eNKrmYV1YoTAwpUOThXSllGU1NSU09FWEgwRzc1V1BFQVlDNy4u"
+      }
+    }
+    </script>
+    <link rel="icon" href="assets/img/favicon-32.png?v=eefd2e0bfb" sizes="32x32" type="image/png" />
+    <link rel="icon" href="assets/img/logo.svg?v=eefd2e0bfb" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png?v=eefd2e0bfb" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap"
     />
-    <link rel="stylesheet" href="assets/css/main.compat.css?v=9d558a2444" />
-    <script src="assets/js/main.js?v=9d558a2444" defer></script>
-    <script src="assets/js/dna.js?v=9d558a2444" defer></script>
+    <link rel="stylesheet" href="assets/css/main.compat.css?v=eefd2e0bfb" />
+    <script src="assets/js/main.js?v=eefd2e0bfb" defer></script>
+    <script src="assets/js/dna.js?v=eefd2e0bfb" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -94,6 +137,8 @@
         <span>Patentes para Bioinovadores</span>
         <svg class="site-header__brand-logo" viewBox="0 0 149 54" aria-hidden="true"><path d="M14.2903 0H31.197L16.9068 54H0L14.2903 0Z"/><path d="M43.1269 25.9473L34.5781 54.0004H55.5951L43.1269 25.9473Z"/><path d="M62.5112 28.0636L71.0599 0H50.043L62.5112 28.0636Z"/><path d="M87.0977 0H115.127C121.229 0 125.424 1.43567 127.712 4.30701C129.99 7.17834 130.424 11.2653 129.026 16.5783C127.585 22.0276 124.799 26.2926 120.668 29.3526C116.547 32.423 111.081 33.953 104.28 33.953H95.0426L89.7354 53.9895H72.7969L87.0977 0ZM97.9346 23.0231H102.066C105.318 23.0231 107.744 22.4677 109.365 21.3464C110.975 20.2356 112.013 18.7999 112.479 17.0604C112.924 15.3627 112.733 13.927 111.907 12.7533C111.081 11.5692 109.089 10.9823 105.932 10.9823H101.134L97.9452 23.0231H97.9346Z"/><path d="M132.001 0H148.908L134.618 54H117.711L132.001 0Z"/></svg>
       </a>
+      <!-- Aparece quando o "Inscreva-se" do hero sai da tela (main.js). -->
+      <a class="site-header__cta" href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=CPgVWJFgvUesqzDAj-e58jzfPrjp7eNKrmYV1YoTAwpUOThXSllGU1NSU09FWEgwRzc1V1BFQVlDNy4u" target="_blank" rel="noopener noreferrer" data-header-cta data-when="open" hidden>Inscreva-se<span class="visually-hidden"> (abre em nova aba)</span></a>
       <button class="site-header__toggle" type="button" aria-expanded="false" aria-controls="site-nav" hidden>
         Menu<span class="site-header__toggle-icon" aria-hidden="true"></span>
       </button>
@@ -102,7 +147,7 @@
         <a class="site-nav__extra" href="#objetivos">Objetivos</a>
         <a href="#cronograma">Cronograma</a>
         <a href="#palestrantes">Palestrantes</a>
-        <a class="site-nav__extra" href="#faq">Dúvidas</a>
+        <a href="#faq">Dúvidas</a>
       </nav>
     </header>
 
@@ -114,7 +159,8 @@
             <canvas class="hero__dna" aria-hidden="true"></canvas>
             <div class="hero__brand">
               <svg class="logo" viewBox="0 0 149 54" width="149" height="54" fill="currentColor" role="img" aria-label="INPI"><path d="M14.2903 0H31.197L16.9068 54H0L14.2903 0Z"/><path d="M43.1269 25.9473L34.5781 54.0004H55.5951L43.1269 25.9473Z"/><path d="M62.5112 28.0636L71.0599 0H50.043L62.5112 28.0636Z"/><path d="M87.0977 0H115.127C121.229 0 125.424 1.43567 127.712 4.30701C129.99 7.17834 130.424 11.2653 129.026 16.5783C127.585 22.0276 124.799 26.2926 120.668 29.3526C116.547 32.423 111.081 33.953 104.28 33.953H95.0426L89.7354 53.9895H72.7969L87.0977 0ZM97.9346 23.0231H102.066C105.318 23.0231 107.744 22.4677 109.365 21.3464C110.975 20.2356 112.013 18.7999 112.479 17.0604C112.924 15.3627 112.733 13.927 111.907 12.7533C111.081 11.5692 109.089 10.9823 105.932 10.9823H101.134L97.9452 23.0231H97.9346Z"/><path d="M132.001 0H148.908L134.618 54H117.711L132.001 0Z"/></svg>
-              <span class="hero__tag">Curso online · Aulas ao vivo</span>
+              <span class="hero__tag" data-when="open">Curso gratuito · Online e ao vivo</span>
+              <span class="hero__tag hero__tag--ended" data-when="ended">Curso encerrado</span>
             </div>
             <div class="hero__copy">
               <div class="hero__heading">
@@ -150,8 +196,9 @@
                 </ul>
               </div>
               <div class="hero__actions">
-                <a class="pill" href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=CPgVWJFgvUesqzDAj-e58jzfPrjp7eNKrmYV1YoTAwpUOThXSllGU1NSU09FWEgwRzc1V1BFQVlDNy4u" target="_blank" rel="noopener noreferrer">Inscreva-se<span class="visually-hidden"> (abre em nova aba)</span></a>
-                <a class="hero__link" href="#cronograma">Cronograma <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg></a>
+                <a class="pill" data-when="open" href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=CPgVWJFgvUesqzDAj-e58jzfPrjp7eNKrmYV1YoTAwpUOThXSllGU1NSU09FWEgwRzc1V1BFQVlDNy4u" target="_blank" rel="noopener noreferrer">Inscreva-se<span class="visually-hidden"> (abre em nova aba)</span></a>
+                <p class="hero__ended" data-when="ended">As gravações chegam por e-mail aos inscritos. O certificado sai para quem teve pelo menos 75% de presença.</p>
+                <a class="hero__link" href="#cronograma">Ver cronograma <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg></a>
               </div>
             </div>
           </div>
@@ -159,7 +206,7 @@
           <div class="dates">
             <div class="dates__top">
               <p>6 encontros</p>
-              <span class="dates__badge">30h</span>
+              <span class="dates__badge">30h<span class="visually-hidden"> de carga horária</span></span>
             </div>
             <div class="dates__cal">
               <p class="dates__month">NOV<span>/</span>26</p>
@@ -179,20 +226,46 @@
               </div>
               <div>
                 <dt>Dias</dt>
-                <dd>Terças e quintas</dd>
+                <dd><span aria-hidden="true">Ter e qui</span><span class="visually-hidden">Terças e quintas</span></dd>
               </div>
             </dl>
           </div>
         </div>
       </section>
 
+      <!-- O curso em resumo: o que decide a inscrição, logo abaixo do hero.
+           Tudo confirmado no FAQ; mesmo padrão de Horário/Dias do painel. -->
+      <section class="facts container" aria-label="O curso em resumo">
+        <dl class="facts__list">
+          <div>
+            <dt>Investimento</dt>
+            <dd>Gratuito</dd>
+            <dd class="facts__note">Inscrição e aulas sem custo</dd>
+          </div>
+          <div>
+            <dt>Certificado</dt>
+            <dd>75% de presença</dd>
+            <dd class="facts__note">Liberado ao fim do curso</dd>
+          </div>
+          <div>
+            <dt>Gravações</dt>
+            <dd>Todas as aulas</dd>
+            <dd class="facts__note">Link por e-mail para inscritos</dd>
+          </div>
+          <div>
+            <dt>Carga horária</dt>
+            <dd>30 horas-aula</dd>
+            <dd class="facts__note">18 de teoria e 12 de exercícios</dd>
+          </div>
+        </dl>
+      </section>
 
       <!-- 01 · Conteúdo programático -->
       <section class="section section--light program" id="conteudo-programatico" aria-labelledby="program-title">
         <div class="container">
           <header class="program__head">
             <p class="eyebrow">01 / Conteúdo programático</p>
-            <h2 class="section__title" id="program-title">Conteúdo <em>programático.</em></h2>
+            <h2 class="section__title" id="program-title">O que você<br /><em>vai aprender.</em></h2>
           </header>
           <ol class="program__list">
             <li data-index="01"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/fundamentos.svg'); -webkit-mask-image: url('assets/img/icons/fundamentos.svg')"></i></span><span>Fundamentos de propriedade <br />industrial e patentes</span></li>
@@ -200,8 +273,7 @@
             <li data-index="03"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/protecao-internacional.svg'); -webkit-mask-image: url('assets/img/icons/protecao-internacional.svg')"></i></span><span>Patentes verdes e <br />proteção internacional</span></li>
             <li data-index="04"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/pesquisador.svg'); -webkit-mask-image: url('assets/img/icons/pesquisador.svg')"></i></span><span>Especificidades do setor <br />farmacêutico e químico</span></li>
             <li data-index="05"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/dna.svg'); -webkit-mask-image: url('assets/img/icons/dna.svg')"></i></span><span>Patentes aplicadas <br />à biotecnologia</span></li>
-            <li data-index="06"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/cultivares.svg'); -webkit-mask-image: url('assets/img/icons/cultivares.svg')"></i></span><span>Proteção <br />de cultivares</span></li>
-            <li data-index="07"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/patente.svg'); -webkit-mask-image: url('assets/img/icons/patente.svg')"></i></span><span>Busca de patentes e mapeamento <br />tecnológico em bioeconomia</span></li>
+            <li data-index="06"><span class="program__icon" aria-hidden="true"><i style="mask-image: url('assets/img/icons/patente.svg'); -webkit-mask-image: url('assets/img/icons/patente.svg')"></i></span><span>Busca de patentes e mapeamento <br />tecnológico em bioeconomia</span></li>
           </ol>
         </div>
       </section>
@@ -215,7 +287,7 @@
                 <h2 class="section__title" id="goals-title">Por que <em>fazer o curso.</em></h2>
               </header>
               <p class="goals__general">
-                O curso capacita pesquisadores, bioinovadores e profissionais da bioeconomia a transformar descobertas científicas e recursos biológicos em ativos protegidos por propriedade industrial, dominando os requisitos de patenteabilidade e regulatórios, as técnicas de busca e redação de patentes e as estratégias de depósito no Brasil e no exterior.
+                O curso prepara pesquisadores, bioinovadores e profissionais da bioeconomia para transformar descobertas científicas e recursos biológicos em ativos protegidos por propriedade industrial. Você vai dominar os requisitos de patenteabilidade e regulatórios, as técnicas de busca e redação de patentes e as estratégias de depósito no Brasil e no exterior.
               </p>
             </div>
             <section class="audience" aria-labelledby="audience-title">
@@ -249,7 +321,6 @@
                   <span>Profissionais da bioeconomia</span>
                 </li>
               </ul>
-              <!-- TODO: se confirmado, acrescentar linha sobre pré-requisito (ex.: "Não é preciso conhecimento prévio sobre patentes"). -->
             </section>
           </div>
 
@@ -259,7 +330,7 @@
               <details class="goal-card__details" open>
               <summary><span class="goal-card__num" aria-hidden="true">01</span><h4>Patenteabilidade</h4><span class="goal-card__toggle" aria-hidden="true"></span></summary>
               <div class="goal-card__more">
-                <p>Compreender a fronteira que distingue simples descobertas científicas de invenções patenteáveis na bioeconomia.</p>
+                <p>Distinguir descobertas científicas de invenções patenteáveis na bioeconomia.</p>
                 <ul class="goal-card__tags" aria-label="Temas">
                   <li>Descoberta × invenção</li>
                   <li>Patenteabilidade</li>
@@ -271,7 +342,7 @@
               <details class="goal-card__details" open>
               <summary><span class="goal-card__num" aria-hidden="true">02</span><h4>Biodiversidade</h4><span class="goal-card__toggle" aria-hidden="true"></span></summary>
               <div class="goal-card__more">
-                <p>Navegar pelas exigências legais da biodiversidade, como o cadastramento no SisGen/CGen, a conformidade com o Protocolo de Nagoia e o depósito de material genético pelo Tratado de Budapeste.</p>
+                <p>Cumprir as exigências legais da biodiversidade: cadastro no SisGen/CGen, conformidade com o Protocolo de Nagoia e depósito de material genético pelo Tratado de Budapeste.</p>
                 <ul class="goal-card__tags" aria-label="Temas">
                   <li>SisGen/CGen</li>
                   <li>Protocolo de Nagoia</li>
@@ -284,7 +355,7 @@
               <details class="goal-card__details" open>
               <summary><span class="goal-card__num" aria-hidden="true">03</span><h4>Reivindicações</h4><span class="goal-card__toggle" aria-hidden="true"></span></summary>
               <div class="goal-card__more">
-                <p>Aplicar técnicas de redação de quadros reivindicatórios específicos para as áreas de biotecnologia, como microrganismos e listagem de sequências, e para o setor farmacêutico, como fórmulas de Markush e segundo uso médico.</p>
+                <p>Redigir quadros reivindicatórios para biotecnologia, como microrganismos e listagem de sequências, e para o setor farmacêutico, como fórmulas de Markush e segundo uso médico.</p>
                 <ul class="goal-card__tags" aria-label="Temas">
                   <li>Microrganismos</li>
                   <li>Listagem de sequências</li>
@@ -298,7 +369,7 @@
               <details class="goal-card__details" open>
               <summary><span class="goal-card__num" aria-hidden="true">04</span><h4>Proteção internacional</h4><span class="goal-card__toggle" aria-hidden="true"></span></summary>
               <div class="goal-card__more">
-                <p>Estruturar estratégias de proteção e divulgação internacional e sustentável, utilizando mecanismos como PCT, CUP, Patentes Verdes e WIPO GREEN.</p>
+                <p>Planejar a proteção e a divulgação internacional e sustentável das invenções, com mecanismos como PCT, CUP, Patentes Verdes e WIPO GREEN.</p>
                 <ul class="goal-card__tags" aria-label="Temas">
                   <li>PCT</li>
                   <li>CUP</li>
@@ -312,7 +383,7 @@
               <details class="goal-card__details" open>
               <summary><span class="goal-card__num" aria-hidden="true">05</span><h4>Busca tecnológica</h4><span class="goal-card__toggle" aria-hidden="true"></span></summary>
               <div class="goal-card__more">
-                <p>Executar pesquisas de prospecção e busca tecnológica em bases de dados para mapear patentes na área da bioeconomia.</p>
+                <p>Fazer buscas e prospecção tecnológica em bases de patentes para mapear as invenções da bioeconomia.</p>
                 <ul class="goal-card__tags" aria-label="Temas">
                   <li>Bases de patentes</li>
                   <li>Mapeamento tecnológico</li>
@@ -382,7 +453,7 @@
             <ol class="day__lessons">
               <li class="lesson">
                 <p class="lesson__time">
-                  <time datetime="2026-11-03T14:00">14h</time> às <time datetime="2026-11-03T16:00">16h</time>
+                  <time datetime="2026-11-03T14:00-03:00">14h</time> às <time datetime="2026-11-03T16:00-03:00">16h</time>
                 </p>
                 <h4 class="lesson__title">Fundamentos de patentes e propriedade industrial</h4>
                 <p class="lesson__speaker">
@@ -390,7 +461,7 @@
                   <small>Palestrante · INPI</small>
                 </p>
                 <details class="lesson__topics">
-                  <summary><span class="visually-hidden">Fundamentos de patentes e propriedade industrial: </span><span class="lesson__more">Abrir 5 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <summary><span class="visually-hidden">Fundamentos de patentes e propriedade industrial: </span><span class="lesson__more">Abrir tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
                   <ul>
                     <li>O papel da propriedade intelectual (PI) na inovação e no desenvolvimento dos países</li>
                     <li>Patente: definição, tipos e principais características</li>
@@ -402,7 +473,7 @@
               </li>
               <li class="lesson">
                 <p class="lesson__time">
-                  <time datetime="2026-11-03T16:00">16h</time> às <time datetime="2026-11-03T17:00">17h</time>
+                  <time datetime="2026-11-03T16:00-03:00">16h</time> às <time datetime="2026-11-03T17:00-03:00">17h</time>
                 </p>
                 <h4 class="lesson__title">Patentes verdes</h4>
                 <p class="lesson__speaker">
@@ -410,7 +481,7 @@
                   <small>Palestrante · INPI</small>
                 </p>
                 <details class="lesson__topics">
-                  <summary><span class="visually-hidden">Patentes verdes: </span><span class="lesson__more">Abrir 3 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <summary><span class="visually-hidden">Patentes verdes: </span><span class="lesson__more">Abrir tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
                   <ul>
                     <li>Inovação sustentável</li>
                     <li>Trâmite prioritário no INPI e Patentes Verdes</li>
@@ -434,24 +505,23 @@
               </div>
             </header>
             <div class="day__actions" role="group" aria-labelledby="encontro-2-title">
-              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 2 (em breve)" aria-describedby="schedule-access-note">
+              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 2 (link em breve)" aria-describedby="schedule-access-note">
                 <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
-                <span class="btn__label">Assistir aula<span class="btn__status">Em breve</span></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Link em breve</span></span>
               </button>
             </div>
             <ol class="day__lessons">
               <li class="lesson">
                 <p class="lesson__time">
-                  <time datetime="2026-11-05T14:00">14h</time> às <time datetime="2026-11-05T15:00">15h</time>
+                  <time datetime="2026-11-05T14:00-03:00">14h</time> às <time datetime="2026-11-05T15:00-03:00">15h</time>
                 </p>
                 <h4 class="lesson__title">Proteção internacional das patentes de tecnologias da bioeconomia</h4>
                 <p class="lesson__speaker">
                   <strong>Dr. Jeferson Monteiro</strong>
                   <small>Palestrante · PCT-INPI</small>
-                  <!-- TODO: confirmar significado e grafia de "PCT-INPI". -->
                 </p>
                 <details class="lesson__topics">
-                  <summary><span class="visually-hidden">Proteção internacional das patentes de tecnologias da bioeconomia: </span><span class="lesson__more">Abrir 1 tópico</span><span class="lesson__less">Fechar tópico</span></summary>
+                  <summary><span class="visually-hidden">Proteção internacional das patentes de tecnologias da bioeconomia: </span><span class="lesson__more">Abrir tópicos</span><span class="lesson__less">Fechar tópico</span></summary>
                   <ul>
                     <li>Internacionalização de patentes: estratégias e vias de depósito no exterior pela Convenção da União de Paris (CUP) e pelo Tratado de Cooperação em Matéria de Patentes (PCT)</li>
                   </ul>
@@ -459,7 +529,7 @@
               </li>
               <li class="lesson">
                 <p class="lesson__time">
-                  <time datetime="2026-11-05T15:00">15h</time> às <time datetime="2026-11-05T17:00">17h</time>
+                  <time datetime="2026-11-05T15:00-03:00">15h</time> às <time datetime="2026-11-05T17:00-03:00">17h</time>
                 </p>
                 <h4 class="lesson__title">Limites de patenteabilidade, ativos biológicos e transferência de tecnologia</h4>
                 <p class="lesson__speaker">
@@ -467,7 +537,7 @@
                   <small>Palestrante · UERJ</small>
                 </p>
                 <details class="lesson__topics">
-                  <summary><span class="visually-hidden">Limites de patenteabilidade, ativos biológicos e transferência de tecnologia: </span><span class="lesson__more">Abrir 3 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <summary><span class="visually-hidden">Limites de patenteabilidade, ativos biológicos e transferência de tecnologia: </span><span class="lesson__more">Abrir tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
                   <ul>
                     <li>Limites de patenteabilidade: o que pode ser patenteado em biotecnologia, inclusive microrganismos transgênicos</li>
                     <li>Ativos biológicos: requisitos de acesso a recursos genéticos e tratamento formal da listagem de sequências</li>
@@ -491,15 +561,15 @@
               </div>
             </header>
             <div class="day__actions" role="group" aria-labelledby="encontro-3-title">
-              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 3 (em breve)" aria-describedby="schedule-access-note">
+              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 3 (link em breve)" aria-describedby="schedule-access-note">
                 <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
-                <span class="btn__label">Assistir aula<span class="btn__status">Em breve</span></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Link em breve</span></span>
               </button>
             </div>
             <ol class="day__lessons">
               <li class="lesson">
                 <p class="lesson__time">
-                  <time datetime="2026-11-10T14:00">14h</time> às <time datetime="2026-11-10T16:00">16h</time>
+                  <time datetime="2026-11-10T14:00-03:00">14h</time> às <time datetime="2026-11-10T16:00-03:00">16h</time>
                 </p>
                 <h4 class="lesson__title">Legislação de biodiversidade e depósito no INPI</h4>
                 <p class="lesson__speaker">
@@ -507,7 +577,7 @@
                   <small>Palestrante · UFT</small>
                 </p>
                 <details class="lesson__topics">
-                  <summary><span class="visually-hidden">Legislação de biodiversidade e depósito no INPI: </span><span class="lesson__more">Abrir 3 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <summary><span class="visually-hidden">Legislação de biodiversidade e depósito no INPI: </span><span class="lesson__more">Abrir tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
                   <ul>
                     <li>Acesso e repartição de benefícios: Lei da Biodiversidade, Protocolo de Nagoia, CGen e SisGen</li>
                     <li>Tratados e depósitos internacionais: normas da OMPI e Tratado de Budapeste para depósito de material genético e microrganismos</li>
@@ -515,15 +585,29 @@
                   </ul>
                 </details>
               </li>
-              <li class="lesson">
+              <!-- Empresa convidada: mesmo formato da aula da Inovafhytos
+                   (Encontro 4). Logo: SVG oficial do site da NAtiva, com o
+                   branco trocado pelo verde da marca (#223513). -->
+              <li class="lesson lesson--company">
                 <p class="lesson__time">
-                  <time datetime="2026-11-10T16:00">16h</time> às <time datetime="2026-11-10T17:00">17h</time>
+                  <time datetime="2026-11-10T16:00-03:00">16h</time> às <time datetime="2026-11-10T17:00-03:00">17h</time>
                 </p>
-                <h4 class="lesson__title">Apresentação de uma empresa inovadora da bioeconomia</h4>
+                <h4 class="lesson__title">Apresentação da startup NAtiva</h4>
                 <p class="lesson__speaker">
-                  <strong>Empresa a confirmar</strong>
-                  <small>Empresa convidada</small>
+                  <strong>Dra. Renata Mendes</strong>
+                  <small>Diretora executiva · NAtiva</small>
                 </p>
+                <details class="lesson__topics">
+                  <summary><span class="visually-hidden">Apresentação da startup NAtiva: </span><span class="lesson__more">Conhecer a startup</span><span class="lesson__less">Fechar apresentação</span></summary>
+                  <div class="lesson__about">
+                    <img class="lesson__logo" src="assets/img/empresas/nativa.svg" alt="Logo da NAtiva" width="123" height="22" loading="lazy" decoding="async" />
+                    <p class="lesson__about-lead">Biotech de liderança 100% feminina, fundada em 2022</p>
+                    <p>A NAtiva é especializada na otimização da descoberta de bioativos e conta com seis tecnologias no pipeline. Vem atuando na construção da plataforma [Somos] bio, um ecossistema tecnológico que reúne dados científicos, biblioteca de insumos biotecnológicos e inteligência aplicada à prospecção, caracterização e desenvolvimento de ingredientes naturais.</p>
+                    <p>A empresa possui uma trajetória marcada pela geração e valorização de ativos de propriedade intelectual, com patentes de fitoprodutos, incluindo tecnologias em cotitularidade com ICT, iniciativas de licenciamento e transferência de tecnologia e acordos de codesenvolvimento tecnológico com empresas do setor produtivo.</p>
+                    <p>Com soluções direcionadas às indústrias farmacêutica, cosmética e alimentícia, a NAtiva busca transformar o conhecimento científico em tecnologias e ativos de valor, fortalecer cadeias produtivas sustentáveis e contribuir para a valorização do patrimônio natural brasileiro.</p>
+                    <p><a href="https://nativabiotech.com/" target="_blank" rel="noopener noreferrer">nativabiotech.com<span class="visually-hidden"> (site da NAtiva, abre em nova aba)</span></a></p>
+                  </div>
+                </details>
               </li>
             </ol>
           </article>
@@ -541,15 +625,15 @@
               </div>
             </header>
             <div class="day__actions" role="group" aria-labelledby="encontro-4-title">
-              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 4 (em breve)" aria-describedby="schedule-access-note">
+              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 4 (link em breve)" aria-describedby="schedule-access-note">
                 <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
-                <span class="btn__label">Assistir aula<span class="btn__status">Em breve</span></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Link em breve</span></span>
               </button>
             </div>
             <ol class="day__lessons">
               <li class="lesson">
                 <p class="lesson__time">
-                  <time datetime="2026-11-12T14:00">14h</time> às <time datetime="2026-11-12T16:00">16h</time>
+                  <time datetime="2026-11-12T14:00-03:00">14h</time> às <time datetime="2026-11-12T16:00-03:00">16h</time>
                 </p>
                 <h4 class="lesson__title">Patentes do setor de biotecnologia</h4>
                 <p class="lesson__speaker">
@@ -557,7 +641,7 @@
                   <small>Palestrante · INPI</small>
                 </p>
                 <details class="lesson__topics">
-                  <summary><span class="visually-hidden">Patentes do setor de biotecnologia: </span><span class="lesson__more">Abrir 5 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <summary><span class="visually-hidden">Patentes do setor de biotecnologia: </span><span class="lesson__more">Abrir tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
                   <ul>
                     <li>Particularidades da proteção em biotecnologia</li>
                     <li>Exemplos de patentes concedidas</li>
@@ -572,7 +656,7 @@
                    no lugar dos tópicos. -->
               <li class="lesson lesson--company">
                 <p class="lesson__time">
-                  <time datetime="2026-11-12T16:00">16h</time> às <time datetime="2026-11-12T17:00">17h</time>
+                  <time datetime="2026-11-12T16:00-03:00">16h</time> às <time datetime="2026-11-12T17:00-03:00">17h</time>
                 </p>
                 <h4 class="lesson__title">Apresentação da startup Inovafhytos Cerrado</h4>
                 <p class="lesson__speaker">
@@ -608,15 +692,15 @@
               </div>
             </header>
             <div class="day__actions" role="group" aria-labelledby="encontro-5-title">
-              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 5 (em breve)" aria-describedby="schedule-access-note">
+              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 5 (link em breve)" aria-describedby="schedule-access-note">
                 <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
-                <span class="btn__label">Assistir aula<span class="btn__status">Em breve</span></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Link em breve</span></span>
               </button>
             </div>
             <ol class="day__lessons">
               <li class="lesson">
                 <p class="lesson__time">
-                  <time datetime="2026-11-17T14:00">14h</time> às <time datetime="2026-11-17T15:00">15h</time>
+                  <time datetime="2026-11-17T14:00-03:00">14h</time> às <time datetime="2026-11-17T15:00-03:00">15h</time>
                 </p>
                 <h4 class="lesson__title">Quadro reivindicatório em biotecnologias</h4>
                 <p class="lesson__speaker">
@@ -624,7 +708,7 @@
                   <small>Palestrante · INPI</small>
                 </p>
                 <details class="lesson__topics">
-                  <summary><span class="visually-hidden">Quadro reivindicatório em biotecnologias: </span><span class="lesson__more">Abrir 1 tópico</span><span class="lesson__less">Fechar tópico</span></summary>
+                  <summary><span class="visually-hidden">Quadro reivindicatório em biotecnologias: </span><span class="lesson__more">Abrir tópicos</span><span class="lesson__less">Fechar tópico</span></summary>
                   <ul>
                     <li>Técnicas de redação de reivindicações para proteger invenções biológicas</li>
                   </ul>
@@ -632,7 +716,7 @@
               </li>
               <li class="lesson">
                 <p class="lesson__time">
-                  <time datetime="2026-11-17T15:00">15h</time> às <time datetime="2026-11-17T17:00">17h</time>
+                  <time datetime="2026-11-17T15:00-03:00">15h</time> às <time datetime="2026-11-17T17:00-03:00">17h</time>
                 </p>
                 <h4 class="lesson__title">Patentes do setor farmacêutico e químico</h4>
                 <p class="lesson__speaker">
@@ -640,7 +724,7 @@
                   <small>Palestrante · INPI</small>
                 </p>
                 <details class="lesson__topics">
-                  <summary><span class="visually-hidden">Patentes do setor farmacêutico e químico: </span><span class="lesson__more">Abrir 4 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <summary><span class="visually-hidden">Patentes do setor farmacêutico e químico: </span><span class="lesson__more">Abrir tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
                   <ul>
                     <li>Patentes de compostos químicos: fórmulas de Markush</li>
                     <li>Formulações e sinergia: proteção de composições (como cosméticos e alimentos) e de combinações com efeito sinérgico</li>
@@ -665,15 +749,15 @@
               </div>
             </header>
             <div class="day__actions" role="group" aria-labelledby="encontro-6-title">
-              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 6 (em breve)" aria-describedby="schedule-access-note">
+              <button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 6 (link em breve)" aria-describedby="schedule-access-note">
                 <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
-                <span class="btn__label">Assistir aula<span class="btn__status">Em breve</span></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Link em breve</span></span>
               </button>
             </div>
             <ol class="day__lessons">
               <li class="lesson">
                 <p class="lesson__time">
-                  <time datetime="2026-11-19T14:00">14h</time> às <time datetime="2026-11-19T15:00">15h</time>
+                  <time datetime="2026-11-19T14:00-03:00">14h</time> às <time datetime="2026-11-19T15:00-03:00">15h</time>
                 </p>
                 <h4 class="lesson__title">Proteção de cultivares</h4>
                 <p class="lesson__speaker">
@@ -681,7 +765,7 @@
                   <small>Palestrante · Ministério da Agricultura e Pecuária (MAPA)</small>
                 </p>
                 <details class="lesson__topics">
-                  <summary><span class="visually-hidden">Proteção de cultivares: </span><span class="lesson__more">Abrir 4 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <summary><span class="visually-hidden">Proteção de cultivares: </span><span class="lesson__more">Abrir tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
                   <ul>
                     <li>Principais aspectos da proteção de cultivares</li>
                     <li>Registro: por que, quando e como pedir, e extensão da validade</li>
@@ -692,7 +776,7 @@
               </li>
               <li class="lesson">
                 <p class="lesson__time">
-                  <time datetime="2026-11-19T15:00">15h</time> às <time datetime="2026-11-19T16:50">16h50</time>
+                  <time datetime="2026-11-19T15:00-03:00">15h</time> às <time datetime="2026-11-19T16:50-03:00">16h50</time>
                 </p>
                 <h4 class="lesson__title">Busca de patentes e mapeamento tecnológico em bioeconomia</h4>
                 <p class="lesson__speaker">
@@ -700,7 +784,7 @@
                   <small>Palestrante · INPI</small>
                 </p>
                 <details class="lesson__topics">
-                  <summary><span class="visually-hidden">Busca de patentes e mapeamento tecnológico em bioeconomia: </span><span class="lesson__more">Abrir 2 tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
+                  <summary><span class="visually-hidden">Busca de patentes e mapeamento tecnológico em bioeconomia: </span><span class="lesson__more">Abrir tópicos</span><span class="lesson__less">Fechar tópicos</span></summary>
                   <ul>
                     <li>Busca de patentes de tecnologias da bioeconomia</li>
                     <li>Mapeamento tecnológico em bases de dados de patentes</li>
@@ -709,7 +793,7 @@
               </li>
               <li class="lesson">
                 <p class="lesson__time">
-                  <time datetime="2026-11-19T16:50">16h50</time> às <time datetime="2026-11-19T17:00">17h</time>
+                  <time datetime="2026-11-19T16:50-03:00">16h50</time> às <time datetime="2026-11-19T17:00-03:00">17h</time>
                 </p>
                 <h4 class="lesson__title">Próximos passos e encerramento</h4>
                 <p class="lesson__speaker">
@@ -719,10 +803,12 @@
               </li>
             </ol>
           </article>
+          <!-- Aviso de acesso: separado do cronograma por uma linha, com ícone de
+               atenção na cor de destaque e a primeira frase em negrito. -->
           <p class="schedule-note" id="schedule-access-note" role="note">
-            Para participar das aulas, é preciso fazer a inscrição.
-            <a href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=CPgVWJFgvUesqzDAj-e58jzfPrjp7eNKrmYV1YoTAwpUOThXSllGU1NSU09FWEgwRzc1V1BFQVlDNy4u" target="_blank" rel="noopener noreferrer">Inscreva-se<span class="visually-hidden"> (abre em nova aba)</span></a>.
-            Os links dos próximos encontros estarão disponíveis em breve.
+            <span class="schedule-note__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="currentColor" /><path class="schedule-note__mark" d="M12 6.5v7" stroke-width="2.2" stroke-linecap="round" /><circle class="schedule-note__dot" cx="12" cy="17.25" r="1.35" /></svg></span>
+            <span class="schedule-note__text" data-when="ended"><strong>O curso foi encerrado em 19 de novembro.</strong> As gravações chegam por e-mail aos inscritos.</span>
+            <span class="schedule-note__text" data-when="open"><strong>As aulas são exclusivas para inscritos.</strong> <a href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=CPgVWJFgvUesqzDAj-e58jzfPrjp7eNKrmYV1YoTAwpUOThXSllGU1NSU09FWEgwRzc1V1BFQVlDNy4u" target="_blank" rel="noopener noreferrer">Inscreva-se<span class="visually-hidden"> (abre em nova aba)</span></a>. No dia de cada aula, o link aparece no botão “Assistir aula” e também chega por e-mail.</span>
           </p>
           <template id="schedule-card-nav-template">
             <nav class="schedule-card-nav" aria-label="Navegação entre encontros" hidden>
@@ -753,7 +839,7 @@
               </div>
               <h2 id="enrollment-dialog-title" tabindex="-1" data-enrollment-title>Você já se inscreveu no curso?</h2>
               <p class="enrollment-dialog__text" id="enrollment-dialog-text">
-                A participação nas aulas ao vivo é exclusiva para quem fez a inscrição. Escolha uma opção para continuar.
+                As aulas ao vivo são exclusivas para inscritos. Escolha uma opção para continuar.
               </p>
             </header>
             <div class="enrollment-dialog__options" role="radiogroup" aria-labelledby="enrollment-dialog-title">
@@ -773,7 +859,7 @@
                   <span class="enrollment-option__mark" aria-hidden="true"></span>
                   <span class="enrollment-option__text">
                     <strong>Ainda não me inscrevi</strong>
-                    <span>Fazer a inscrição no formulário oficial</span>
+                    <span>Fazer a inscrição pelo formulário oficial</span>
                   </span>
                 </span>
               </label>
@@ -802,7 +888,7 @@
               </h2>
             </div>
           </header>
-          <ul class="speakers speakers--ten">
+          <ul class="speakers speakers--nine">
             <li class="speaker">
               <div class="speaker__art">
                 <span aria-hidden="true">TC</span>
@@ -815,8 +901,8 @@
                 </div>
               </details>
               <p class="speaker__meta"><span>INPI</span><span>03 e 19/11</span></p>
-              <h3><span>Dra. Tatiana</span> <span>Carestiato</span></h3>
-              <p class="speaker__topic"><span>Fundamentos de patentes</span> <span>e patentes verdes</span></p>
+              <h3 class="speaker__name">Dra. Tatiana Carestiato</h3>
+              <p class="speaker__topic">Fundamentos de patentes e patentes verdes</p>
             </li>
             <li class="speaker">
               <div class="speaker__art">
@@ -830,8 +916,8 @@
                 </div>
               </details>
               <p class="speaker__meta"><span>PCT-INPI</span><span>05/11</span></p>
-              <h3><span>Dr. Jeferson</span> <span>Monteiro</span></h3>
-              <p class="speaker__topic"><span>Proteção internacional</span> <span>de patentes</span></p>
+              <h3 class="speaker__name">Dr. Jeferson Monteiro</h3>
+              <p class="speaker__topic">Proteção internacional de patentes</p>
             </li>
             <li class="speaker">
               <div class="speaker__art">
@@ -845,8 +931,8 @@
                 </div>
               </details>
               <p class="speaker__meta"><span>UERJ</span><span>05/11</span></p>
-              <h3><span>Profa. Dra.</span> <span>Renata Angeli</span></h3>
-              <p class="speaker__topic"><span>Limites de patenteabilidade</span> <span>e ativos biológicos</span></p>
+              <h3 class="speaker__name">Profa. Dra. Renata Angeli</h3>
+              <p class="speaker__topic">Limites de patenteabilidade e ativos biológicos</p>
             </li>
             <li class="speaker">
               <div class="speaker__art">
@@ -860,8 +946,8 @@
                 </div>
               </details>
               <p class="speaker__meta"><span>UFT</span><span>10/11</span></p>
-              <h3><span>Profa. Dra.</span> <span>Cláudia Auler</span></h3>
-              <p class="speaker__topic"><span>Lei da Biodiversidade</span> <span>e depósito no INPI</span></p>
+              <h3 class="speaker__name">Profa. Dra. Cláudia Auler</h3>
+              <p class="speaker__topic">Lei da Biodiversidade e depósito no INPI</p>
             </li>
             <li class="speaker">
               <div class="speaker__art">
@@ -875,23 +961,8 @@
                 </div>
               </details>
               <p class="speaker__meta"><span>INPI</span><span>12/11</span></p>
-              <h3><span>Dr. Rodrigo</span> <span>Ferraro</span></h3>
-              <p class="speaker__topic"><span>Patentes do setor</span> <span>de biotecnologia</span></p>
-            </li>
-            <li class="speaker">
-              <div class="speaker__art">
-                <span aria-hidden="true">JC</span>
-                <img src="assets/img/palestrantes/jaqueline-cibene.webp" alt="" width="800" height="800" loading="lazy" decoding="async" />
-              </div>
-              <details class="speaker__bio">
-                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Profa. Dra. Jaqueline Cibene</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Profa. Dra. Jaqueline Cibene</span></span></summary>
-                <div class="speaker__bio-content">
-                  <p>Farmacêutica, doutora em Biodiversidade e Biotecnologia pela UFT. É docente permanente do Programa de Pós-Graduação da Universidade de Gurupi (UnirG) e professora efetiva do curso de Farmácia. Desenvolve pesquisa aplicada com foco em bioprospecção de plantas medicinais, padronização de extratos, ensaios farmacológicos pré-clínicos e inovação baseada na biodiversidade, incluindo tecnologias em níveis avançados de maturidade tecnológica (TRL), com patentes de invenção concedidas e processos de transferência tecnológica. Também desenvolve projetos de pesquisa, desenvolvimento tecnológico e extensão com comunidades tradicionais e rurais do Tocantins, em conformidade com o marco legal da biodiversidade (SisGen).</p>
-                </div>
-              </details>
-              <p class="speaker__meta"><span>UnirG</span><span>12/11</span></p>
-              <h3><span>Profa. Dra.</span> <span>Jaqueline Cibene</span></h3>
-              <p class="speaker__topic"><span>Apresentação da startup</span> <span>Inovafhytos Cerrado</span></p>
+              <h3 class="speaker__name">Dr. Rodrigo Ferraro</h3>
+              <p class="speaker__topic">Patentes do setor de biotecnologia</p>
             </li>
             <li class="speaker">
               <div class="speaker__art">
@@ -905,8 +976,8 @@
                 </div>
               </details>
               <p class="speaker__meta"><span>INPI</span><span>17/11</span></p>
-              <h3><span>Dr. Fábio</span> <span>Barros</span></h3>
-              <p class="speaker__topic"><span>Quadro reivindicatório</span> <span>em biotecnologias</span></p>
+              <h3 class="speaker__name">Dr. Fábio Barros</h3>
+              <p class="speaker__topic">Quadro reivindicatório em biotecnologias</p>
             </li>
             <li class="speaker">
               <div class="speaker__art">
@@ -920,8 +991,8 @@
                 </div>
               </details>
               <p class="speaker__meta"><span>INPI</span><span>17/11</span></p>
-              <h3><span>Dra. Paula</span> <span>Adamis de Barros</span></h3>
-              <p class="speaker__topic"><span>Patentes do setor</span> <span>farmacêutico e químico</span></p>
+              <h3 class="speaker__name">Dra. Paula Adamis de Barros</h3>
+              <p class="speaker__topic">Patentes do setor farmacêutico e químico</p>
             </li>
             <li class="speaker">
               <div class="speaker__art">
@@ -934,8 +1005,8 @@
                 </div>
               </details>
               <p class="speaker__meta"><span>MAPA</span><span>19/11</span></p>
-              <h3><span>Dra. Stefania</span> <span>Palma Araujo</span></h3>
-              <p class="speaker__topic"><span>Proteção</span> <span>de cultivares</span></p>
+              <h3 class="speaker__name">Dra. Stefania Palma Araujo</h3>
+              <p class="speaker__topic">Proteção de cultivares</p>
             </li>
             <li class="speaker">
               <div class="speaker__art">
@@ -949,10 +1020,51 @@
                 </div>
               </details>
               <p class="speaker__meta"><span>INPI</span><span>19/11</span></p>
-              <h3><span>Dra. Cristina</span> <span>D’Urso</span></h3>
-              <p class="speaker__topic"><span>Busca de patentes e</span> <span>mapeamento tecnológico</span></p>
+              <h3 class="speaker__name">Dra. Cristina D’Urso</h3>
+              <p class="speaker__topic">Busca de patentes e mapeamento tecnológico</p>
             </li>
           </ul>
+          <!-- Startups convidadas: grupo à parte, abaixo de quem conduz as
+               aulas. No desktop, o título ocupa a primeira coluna e os dois
+               cards, as outras duas. -->
+          <div class="speakers__guests">
+            <header class="speakers__group-head">
+              <h3 class="speakers__group" id="speakers-guests-title">Startups<br /><em>convidadas.</em></h3>
+              <p class="speakers__group-lead">Empresas inovadoras da bioeconomia se apresentam nos encontros de 10 e 12 de novembro, às 16h.</p>
+            </header>
+            <ul class="speakers speakers--guests" aria-labelledby="speakers-guests-title">
+            <li class="speaker">
+              <div class="speaker__art">
+                <span aria-hidden="true">RM</span>
+                <img src="assets/img/palestrantes/renata-mendes.webp" alt="" width="800" height="800" loading="lazy" decoding="async" />
+              </div>
+              <details class="speaker__bio">
+                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Dra. Renata Mendes</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Dra. Renata Mendes</span></span></summary>
+                <div class="speaker__bio-content">
+                  <p>Doutora, com mais de 20 anos de experiência em pesquisa com produtos naturais. É cofundadora, diretora executiva e líder científica da NAtiva, biotech de liderança 100% feminina fundada em 2022 com o propósito de transformar a biodiversidade brasileira em inovação para a saúde e o bem-estar. Atua na conexão entre ciência, propriedade intelectual e inovação industrial.</p>
+                </div>
+              </details>
+              <p class="speaker__meta"><span>NAtiva</span><span>10/11</span></p>
+              <h4 class="speaker__name">Dra. Renata Mendes</h4>
+              <p class="speaker__topic">Apresentação da startup NAtiva</p>
+            </li>
+            <li class="speaker">
+              <div class="speaker__art">
+                <span aria-hidden="true">JC</span>
+                <img src="assets/img/palestrantes/jaqueline-cibene.webp" alt="" width="800" height="800" loading="lazy" decoding="async" />
+              </div>
+              <details class="speaker__bio">
+                <summary><span class="speaker__bio-more">Abrir biografia<span class="visually-hidden"> de Profa. Dra. Jaqueline Cibene</span></span><span class="speaker__bio-less">Fechar biografia<span class="visually-hidden"> de Profa. Dra. Jaqueline Cibene</span></span></summary>
+                <div class="speaker__bio-content">
+                  <p>Farmacêutica, doutora em Biodiversidade e Biotecnologia pela UFT. É docente permanente do Programa de Pós-Graduação da Universidade de Gurupi (UnirG) e professora efetiva do curso de Farmácia. Desenvolve pesquisa aplicada com foco em bioprospecção de plantas medicinais, padronização de extratos, ensaios farmacológicos pré-clínicos e inovação baseada na biodiversidade, incluindo tecnologias em níveis avançados de maturidade tecnológica (TRL), com patentes de invenção concedidas e processos de transferência tecnológica. Também desenvolve projetos de pesquisa, desenvolvimento tecnológico e extensão com comunidades tradicionais e rurais do Tocantins, em conformidade com o marco legal da biodiversidade (SisGen).</p>
+                </div>
+              </details>
+              <p class="speaker__meta"><span>Inovafhytos</span><span>12/11</span></p>
+              <h4 class="speaker__name">Profa. Dra. Jaqueline Cibene</h4>
+              <p class="speaker__topic">Apresentação da startup Inovafhytos Cerrado</p>
+            </li>
+            </ul>
+          </div>
           <dialog class="speaker-bio-dialog" data-speaker-bio-dialog aria-labelledby="speaker-bio-dialog-title">
             <div class="speaker-bio-dialog__surface">
               <header class="speaker-bio-dialog__header">
@@ -981,14 +1093,23 @@
           </header>
 
           <div class="faq__list">
-            <details class="faq__item">
+            <details class="faq__item" data-when="open">
               <summary>
                 <span>Como me inscrevo?</span>
                 <i class="faq__icon" aria-hidden="true"></i>
               </summary>
               <p>
-                As inscrições são feitas por formulário online.
+                Pelo formulário online de inscrição.
                 <a class="faq__link" href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=CPgVWJFgvUesqzDAj-e58jzfPrjp7eNKrmYV1YoTAwpUOThXSllGU1NSU09FWEgwRzc1V1BFQVlDNy4u" target="_blank" rel="noopener noreferrer">Inscreva-se no curso<span class="visually-hidden"> (abre em nova aba)</span><svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg></a>
+              </p>
+            </details>
+            <details class="faq__item">
+              <summary>
+                <span>O curso é gratuito?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </summary>
+              <p>
+                Sim. A inscrição e todas as aulas são gratuitas.
               </p>
             </details>
             <details class="faq__item">
@@ -997,7 +1118,7 @@
                 <i class="faq__icon" aria-hidden="true"></i>
               </summary>
               <p>
-                O curso é destinado a pesquisadores, bioinovadores e profissionais da bioeconomia.
+                O curso é voltado a pesquisadores, bioinovadores e profissionais da bioeconomia.
               </p>
             </details>
             <details class="faq__item">
@@ -1006,7 +1127,7 @@
                 <i class="faq__icon" aria-hidden="true"></i>
               </summary>
               <p>
-                As aulas acontecem nos dias 3, 5, 10, 12, 17 e 19 de novembro de 2026, das 14h às 17h.
+                Nos dias 3, 5, 10, 12, 17 e 19 de novembro de 2026, às terças e quintas, das 14h às 17h (horário de Brasília).
               </p>
             </details>
             <details class="faq__item">
@@ -1015,7 +1136,16 @@
                 <i class="faq__icon" aria-hidden="true"></i>
               </summary>
               <p>
-                Os encontros são online e ao vivo. No dia de cada aula, o link fica no botão “Assistir aula”, no <a href="#cronograma">cronograma</a>. Ele também é enviado por e-mail e disponibilizado na plataforma de ensino.
+                As aulas são online e ao vivo. No dia de cada aula, o link aparece no botão “Assistir aula”, no <a href="#cronograma">cronograma</a>, e também chega por e-mail e pela plataforma de ensino.
+              </p>
+            </details>
+            <details class="faq__item">
+              <summary>
+                <span>As aulas ficam gravadas?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </summary>
+              <p>
+                Sim. Todas as aulas são gravadas, e os inscritos recebem o link das gravações por e-mail.
               </p>
             </details>
             <details class="faq__item">
@@ -1024,7 +1154,7 @@
                 <i class="faq__icon" aria-hidden="true"></i>
               </summary>
               <p>
-                A carga horária é de 30 horas-aula: 18 de aulas teóricas e 12 de exercícios.
+                São 30 horas-aula: 18 de aulas teóricas e 12 de exercícios.
               </p>
             </details>
             <details class="faq__item">
@@ -1033,14 +1163,18 @@
                 <i class="faq__icon" aria-hidden="true"></i>
               </summary>
               <p>
-                O certificado será disponibilizado após o término do curso aos participantes que cumprirem, no mínimo, 75% de presença.
+                O certificado é liberado ao fim do curso para quem tiver pelo menos 75% de presença.
               </p>
             </details>
-            <!-- TODO: perguntas sugeridas, publicar só com resposta confirmada:
-                 "O curso é gratuito?"
-                 "As aulas ficam gravadas?"
-                 "Preciso ter conhecimento prévio sobre patentes?"
-                 "Com quem falo se tiver outra dúvida?" -->
+            <details class="faq__item">
+              <summary>
+                <span>Ainda tem dúvidas?</span>
+                <i class="faq__icon" aria-hidden="true"></i>
+              </summary>
+              <p>
+                Escreva para a equipe do curso: <a href="mailto:curso.bioinovadores@inpi.gov.br">curso.bioinovadores@inpi.gov.br</a>.
+              </p>
+            </details>
           </div>
         </div>
       </section>
@@ -1054,7 +1188,7 @@
           </a>
           <p>
             <strong>Patentes para Bioinovadores</strong>
-            Curso online, aulas ao vivo<br />3 a 19 de novembro de 2026
+            Curso online, gratuito e ao vivo<br />De 3 a 19 de novembro de 2026
           </p>
         </div>
 

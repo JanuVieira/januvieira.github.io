@@ -65,23 +65,54 @@ try:
               cards => cards.every((card) => {
                 const box = (selector) => card.querySelector(selector)?.getBoundingClientRect();
                 const meta = box('.speaker__meta');
-                const name = box('h3');
+                const name = box('.speaker__name');
                 const topic = box('.speaker__topic');
                 const near = (value) => Math.abs(value - 8) <= 1;
                 return near(name.top - meta.bottom) && (!topic || near(topic.top - name.bottom));
               })
             """)
             check(speaker_rhythm, f"cards de palestrantes mantêm 8px entre selo, nome e tema em {width}x{height}")
-            two_lines = page.locator('.speaker').evaluate_all("""
-              cards => cards.map((card) => {
-                const lines = (el) => el ? Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)) : 2;
-                return [card.querySelector('h3'), card.querySelector('.speaker__topic')].map(lines);
+            # Cantos concêntricos: quando o card é uma caixa branca, o canto dele é
+            # o canto da foto mais a distância entre os dois (R = r + d).
+            concentric = page.locator('.speaker').evaluate_all("""
+              cards => cards.every((card) => {
+                const cs = getComputedStyle(card);
+                if (cs.backgroundColor === 'rgba(0, 0, 0, 0)') return true;
+                const art = card.querySelector('.speaker__art');
+                const d = art.getBoundingClientRect().left - card.getBoundingClientRect().left;
+                return Math.abs(parseFloat(cs.borderTopLeftRadius) - (parseFloat(getComputedStyle(art).borderTopLeftRadius) + d)) <= 1;
               })
             """)
-            names_ok = all(name == 2 for name, _ in two_lines)
-            # Abaixo de 360px, uma linha longa do tema pode quebrar de novo.
-            topics_ok = all(topic == 2 if width >= 360 else topic <= 3 for _, topic in two_lines)
-            check(names_ok and topics_ok, f"nomes e temas dos palestrantes ficam em duas linhas em {width}x{height}", str(two_lines))
+            check(concentric, f"cantos do card e da foto do palestrante são concêntricos em {width}x{height}")
+            facts = page.evaluate("""() => {
+              const items = [...document.querySelectorAll('.facts__list > div')];
+              const tops = new Set(items.map((el) => Math.round(el.getBoundingClientRect().top)));
+              const hero = document.querySelector('.hero').getBoundingClientRect(), list = document.querySelector('.facts').getBoundingClientRect();
+              return {count: items.length, columns: items.length / tops.size, afterHero: list.top >= hero.bottom - 1,
+                      fits: items.every((el) => el.scrollWidth <= el.clientWidth + 1)};
+            }""")
+            check(facts['count'] == 4 and facts['afterHero'] and facts['fits'] and facts['columns'] == (4 if width >= 1024 else 2),
+                  f"faixa de resumo logo abaixo do hero, com 4 fatos em {4 if width >= 1024 else 2} colunas, em {width}x{height}", str(facts))
+            program_rows = page.locator('.program__list > li').evaluate_all("""
+              items => Object.values(items.reduce((rows, item) => {
+                const top = Math.round(item.getBoundingClientRect().top);
+                rows[top] = (rows[top] || 0) + 1;
+                return rows;
+              }, {}))
+            """)
+            check(len(set(program_rows)) == 1, f"conteúdo programático sem item sozinho na última linha em {width}x{height}", str(program_rows))
+            # Nome e tema quebram linha naturalmente (sem cortes forçados): cabem
+            # no card, sem vazar, e o nome nunca passa de duas linhas.
+            card_text = page.locator('.speaker').evaluate_all("""
+              cards => cards.map((card) => {
+                const box = card.getBoundingClientRect();
+                const lines = (el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight));
+                const fits = (el) => el.scrollWidth <= el.clientWidth + 1 && el.getBoundingClientRect().right <= box.right + 1;
+                const name = card.querySelector('.speaker__name'), topic = card.querySelector('.speaker__topic');
+                return {name: lines(name), fits: fits(name) && fits(topic)};
+              })
+            """)
+            check(all(c['fits'] and c['name'] <= 2 for c in card_text), f"nomes e temas dos palestrantes cabem no card, sem quebra forçada, em {width}x{height}", str(card_text))
             footer_balance = page.locator('.speaker').evaluate_all("""
               cards => cards.every((card) => {
                 if (getComputedStyle(card).display !== 'grid') return true;
@@ -116,8 +147,10 @@ try:
             }""")
             check(enrollment_fit['open'] and enrollment_fit['inside'] and enrollment_fit['noOverflowX'], f"confirmação de inscrição cabe na tela {width}x{height}", str(enrollment_fit))
             check(enrollment_fit['titleOneLine'] and enrollment_fit['cardsEqual'], f"confirmação mantém título em uma linha e cards alinhados em {width}x{height}")
-            page.locator('.day-nav__tabs [data-day="3"]').click()
-            company_layout = page.locator('#encontro-4').evaluate("""day => {
+            company_layouts = {}
+            for tab, day_id in (('2', 'encontro-3'), ('3', 'encontro-4')):
+              page.locator(f'.day-nav__tabs [data-day="{tab}"]').click()
+              company_layouts[day_id] = page.locator(f'#{day_id}').evaluate("""day => {
               const lessons = [...day.querySelectorAll('.lesson')];
               const company = day.querySelector('.lesson--company');
               const details = company.querySelector('.lesson__topics');
@@ -140,11 +173,16 @@ try:
                 aboveText: logo.top >= summary.bottom && logo.bottom <= lead.top,
                 alignedWithText: Math.abs(logo.left - lead.left) <= 1,
                 inside: logo.left >= lesson.left - 1 && logo.right <= lesson.right + 1,
+                // Mesmo padrão nas duas empresas: largura igual e sem moldura.
+                width: Math.round(logo.width),
+                frameless: getComputedStyle(img).backgroundColor === 'rgba(0, 0, 0, 0)' &&
+                  getComputedStyle(img).borderRadius === '0px' && getComputedStyle(img).borderStyle === 'none',
               };
               details.open = false;
               return {...closed, ...opened};
-            }""")
-            check(all(company_layout.values()), f"logo da Inovafhytos só aparece ao abrir a apresentação, acima do texto, em {width}x{height}", str(company_layout))
+              }""")
+            check(all(all(v.values()) for v in company_layouts.values()), f"logos da NAtiva e da Inovafhytos só aparecem ao abrir a apresentação, acima do texto, em {width}x{height}", str(company_layouts))
+            check(len({v['width'] for v in company_layouts.values()}) == 1, f"logos da NAtiva e da Inovafhytos seguem o mesmo padrão de tamanho em {width}x{height}", str({k: v['width'] for k, v in company_layouts.items()}))
             page.close()
 
         page = open_page(viewport={"width":390,"height":844}, reduced_motion="reduce")
@@ -195,13 +233,13 @@ try:
         forms = page.locator('a[href*="forms.cloud.microsoft"]')
         check(forms.count() >= 1 and all(forms.nth(i).inner_text().strip() for i in range(forms.count()) if forms.nth(i).is_visible()) and any(forms.nth(i).is_visible() for i in range(forms.count())), "links de inscrição identificáveis")
         program_numbers = page.locator('.program__list li').evaluate_all("""
-          els => els.map((el) => el.dataset.index).join(',') === '01,02,03,04,05,06,07' &&
+          els => els.map((el) => el.dataset.index).join(',') === '01,02,03,04,05,06' &&
             els.every((el) => {
               const content = getComputedStyle(el, '::before').content;
               return content.includes('attr') || content.replace(/"/g, '') === el.dataset.index;
             })
         """)
-        check(program_numbers, 'conteúdo programático numerado de 01 a 07 sem contador CSS (evita "00" no Safari)')
+        check(program_numbers, 'conteúdo programático com os seis eixos do convite, numerados de 01 a 06 sem contador CSS (evita "00" no Safari)')
         nav_toggle = page.locator('.site-header__toggle')
         if nav_toggle.is_visible():
             check(not page.locator('.site-header__brand').is_visible(), 'header mobile mantém somente o botão Menu')
@@ -232,6 +270,10 @@ try:
             first = faq.first
             first.locator('summary').click()
             check(first.get_attribute('open') is not None, 'FAQ expande ao clicar')
+            faq_questions = page.locator('.faq__item summary > span').all_text_contents()
+            check(len(faq_questions) == 9 and {'O curso é gratuito?', 'As aulas ficam gravadas?', 'Ainda tem dúvidas?'} <= set(faq_questions) and
+                  page.locator('.faq__item a[href="mailto:curso.bioinovadores@inpi.gov.br"]').count() == 1,
+                  'FAQ responde gratuidade, gravações e contato por e-mail', str(faq_questions))
         else:
             check(False, 'existe FAQ interativo')
 
@@ -255,9 +297,9 @@ try:
         """)
         check(statuses_inline, 'rótulo e estado do botão ficam na mesma linha quando há espaço no mobile')
         pending_statuses = page.locator('.day__actions .btn:disabled .btn__status').evaluate_all(
-            "els => els.length > 0 && els.every((el) => el.textContent.trim() === 'Em breve')"
+            "els => els.length > 0 && els.every((el) => el.textContent.trim() === 'Link em breve')"
         )
-        check(pending_statuses, 'ações pendentes indicam Em breve')
+        check(pending_statuses, 'ações pendentes indicam Link em breve')
         lesson_link = page.locator('#encontro-1 .day__actions a.btn--primary').evaluate_all("""
           els => els.length === 1 && (() => {
             const link = els[0];
@@ -372,7 +414,7 @@ try:
             return rect.width > 0 && rect.height > 0;
           }).length
         """)
-        check(speaker_count == 10 and bios.count() == speaker_count and visible_bios == speaker_count, 'as dez biografias ficam acessíveis no mobile')
+        check(speaker_count == 11 and bios.count() == speaker_count and visible_bios == speaker_count, 'as onze biografias ficam acessíveis no mobile')
         check(page.locator('.speaker > .speaker__bio').count() == speaker_count and page.locator('.speaker__art .speaker__bio').count() == 0, 'biografias ficam fora da área da foto')
         if bios.count():
             first_bio = bios.first
@@ -420,7 +462,7 @@ try:
         expected_schedule = {
             'encontro-1': [('14:00', '16:00', 'Dra. Tatiana Carestiato'), ('16:00', '17:00', 'Dra. Tatiana Carestiato')],
             'encontro-2': [('14:00', '15:00', 'Dr. Jeferson Monteiro'), ('15:00', '17:00', 'Profa. Dra. Renata Angeli')],
-            'encontro-3': [('14:00', '16:00', 'Profa. Dra. Cláudia Auler'), ('16:00', '17:00', 'Empresa a confirmar')],
+            'encontro-3': [('14:00', '16:00', 'Profa. Dra. Cláudia Auler'), ('16:00', '17:00', 'Dra. Renata Mendes')],
             'encontro-4': [('14:00', '16:00', 'Dr. Rodrigo Ferraro'), ('16:00', '17:00', 'Profa. Dra. Jaqueline Cibene')],
             'encontro-5': [('14:00', '15:00', 'Dr. Fábio Barros'), ('15:00', '17:00', 'Dra. Paula Adamis de Barros')],
             'encontro-6': [('14:00', '15:00', 'Dra. Stefania Palma Araujo'), ('15:00', '16:50', 'Dra. Cristina D’Urso'), ('16:50', '17:00', 'Dra. Tatiana Carestiato')],
@@ -444,19 +486,39 @@ try:
             });
           });
           return [...document.querySelectorAll('.speaker')].map((card) => {
-            const name = card.querySelector('h3').textContent.trim();
-            const meta = card.querySelector('.speaker__meta span:last-child').textContent.trim();
-            return {name, card: meta.replace(/\\/\\d{2}$/, '').match(/\\d{2}/g) || [], schedule: days[name] || []};
+            const name = card.querySelector('.speaker__name').textContent.trim();
+            const meta = card.querySelector('.speaker__meta > span:last-child').textContent.trim();
+            return {name, group: card.closest('.speakers--guests') ? 'guests' : 'main',
+                    card: meta.replace(/\\/\\d{2}$/, '').match(/\\d{2}/g) || [], schedule: days[name] || []};
           });
         }""")
         dates_match = all(item['card'] == item['schedule'] and item['card'] for item in cards_vs_schedule)
-        firsts = [item['card'][0] for item in cards_vs_schedule if item['card']]
-        check(dates_match and firsts == sorted(firsts), 'datas dos cards de palestrantes batem com o cronograma e seguem a ordem dos dias', str(cards_vs_schedule))
+        # A ordem dos dias vale dentro de cada grupo (aulas e startups convidadas).
+        in_order = all(
+            [item['card'][0] for item in cards_vs_schedule if item['group'] == group] ==
+            sorted(item['card'][0] for item in cards_vs_schedule if item['group'] == group)
+            for group in ('main', 'guests')
+        )
+        guests = [item['name'] for item in cards_vs_schedule if item['group'] == 'guests']
+        check(dates_match and in_order and guests == ['Dra. Renata Mendes', 'Profa. Dra. Jaqueline Cibene'],
+              'datas dos cards batem com o cronograma, na ordem dos dias dentro de cada grupo, e as startups ficam no grupo de convidadas', str(cards_vs_schedule))
         company = page.locator('#encontro-4 .lesson--company')
         logo_ok = company.locator('.lesson__logo').evaluate("img => img.complete || img.loading === 'lazy'") and company.locator('.lesson__logo').get_attribute('alt')
         instagram = page.locator('#encontro-4 .lesson__about a[href*="instagram.com/inovafhytos_cerrado"]')
         check(company.count() == 1 and bool(logo_ok) and instagram.count() == 1 and instagram.get_attribute('rel') == 'noopener noreferrer',
               'aula da Inovafhytos mostra logo, apresentação e Instagram')
+        nativa = page.locator('#encontro-3 .lesson--company')
+        nativa_site = page.locator('#encontro-3 .lesson__about a[href="https://nativabiotech.com/"]')
+        check(nativa.count() == 1 and nativa.locator('.lesson__logo').get_attribute('alt') == 'Logo da NAtiva' and
+              nativa_site.count() == 1 and nativa_site.get_attribute('rel') == 'noopener noreferrer',
+              'aula da NAtiva mostra logo, apresentação e site')
+        group_head = page.locator('.speakers__group-head')
+        check(group_head.locator('h3').inner_text().split() == ['Startups', 'convidadas.'] and group_head.locator('h3 em').count() == 1 and
+              '10 e 12 de novembro' in group_head.locator('.speakers__group-lead').inner_text(),
+              'grupo das startups tem título no padrão das seções e frase de apoio')
+        company_chips = {name: page.locator('.speaker', has_text=name).locator('.speaker__meta > span:first-child').text_content().strip()
+                         for name in ('Renata Mendes', 'Jaqueline Cibene')}
+        check(company_chips == {'Renata Mendes': 'NAtiva', 'Jaqueline Cibene': 'Inovafhytos'}, 'cards das startups mostram o selo da empresa', str(company_chips))
 
         manifest = page.evaluate("async () => await (await fetch('version.json', {cache: 'no-store'})).json()")
         embedded_version = page.locator('html').get_attribute('data-site-version')
@@ -469,10 +531,13 @@ try:
           const header = document.querySelector('.site-header').getBoundingClientRect();
           const hero = document.querySelector('.hero__grid').getBoundingClientRect();
           const next = document.querySelector('#conteudo-programatico .eyebrow').getBoundingClientRect();
-          return {above: Math.round(hero.top - header.bottom), below: Math.round(next.top - hero.bottom), fits: hero.bottom <= innerHeight};
+          const facts = document.querySelector('.facts__list').getBoundingClientRect();
+          return {above: Math.round(hero.top - header.bottom), toFacts: Math.round(facts.top - hero.bottom),
+                  below: Math.round(next.top - facts.bottom), fits: hero.bottom <= innerHeight};
         }""")
-        check(hero_space['above'] >= 32 and hero_space['below'] <= 160 and hero_space['fits'],
-              'hero tem respiro abaixo do menu e não acumula espaço antes da seção seguinte', str(hero_space))
+        # Entre o hero e a seção 01 fica a faixa de resumo: nem colada, nem com vazio acumulado.
+        check(hero_space['above'] >= 32 and 24 <= hero_space['toFacts'] <= 48 and hero_space['below'] <= 160 and hero_space['fits'],
+              'hero tem respiro abaixo do menu, a faixa de resumo vem logo depois e não acumula espaço antes da seção seguinte', str(hero_space))
         fold_issues = []
         for fold_w, fold_h in ((1024, 600), (1280, 720), (1366, 768), (1440, 900)):
             desktop.set_viewport_size({"width": fold_w, "height": fold_h})
@@ -573,29 +638,98 @@ try:
             };
           }
         """
-        ten_grid = desktop.locator('.speakers').evaluate(speaker_grid_js)
-        check(
-            ten_grid['columns'] == 5 and ten_grid['rows'] == 2 and
-            ten_grid['leftGap'] <= 1 and ten_grid['rightGap'] <= 1,
-            'grade de dez palestrantes forma duas linhas de cinco alinhadas ao container no desktop',
-            str(ten_grid),
-        )
-        desktop.set_viewport_size({"width": 1100, "height": 900})
-        narrow_grid = desktop.locator('.speakers').evaluate(speaker_grid_js)
-        check(
-            narrow_grid['rows'] == 3 and narrow_grid['lastRowCount'] == 2 and narrow_grid['lastRowCentered'] and
-            narrow_grid['leftGap'] <= 1 and narrow_grid['rightGap'] <= 1,
-            'entre 1024 e 1199px, a grade usa quatro colunas e centraliza a última dupla',
-            str(narrow_grid),
-        )
+        # Quem conduz as aulas (nove): 3 × 3 em todo o desktop; no tablet, duas
+        # colunas e o 9º card centralizado. As startups convidadas vêm abaixo,
+        # com cards da mesma largura: no desktop, numa quarta linha com o título
+        # na 1ª coluna e os cards na 2ª e na 3ª; no tablet, o título fica acima.
+        groups_js = """() => {
+          const main = [...document.querySelectorAll('.speakers--nine > .speaker')].map((c) => c.getBoundingClientRect());
+          const guests = [...document.querySelectorAll('.speakers--guests > .speaker')].map((c) => c.getBoundingClientRect());
+          const label = document.querySelector('.speakers__group').getBoundingClientRect();
+          const lefts = [...new Set(main.map((r) => Math.round(r.left)))].sort((a, b) => a - b);
+          const near = (a, b) => Math.abs(a - b) <= 1;
+          const desktop = innerWidth >= 1024;
+          return {
+            sameWidth: near(guests[0].width, main[0].width) && near(guests[1].width, main[0].width),
+            oneRow: near(guests[0].top, guests[1].top),
+            below: Math.min(label.top, guests[0].top) >= Math.max(...main.map((r) => r.bottom)),
+            labelLeft: near(label.left, lefts[0]),
+            placement: desktop
+              ? near(label.top, guests[0].top) && near(guests[0].left, lefts[1]) && near(guests[1].left, lefts[2])
+              : label.bottom <= guests[0].top && near(guests[0].left, lefts[0]),
+          };
+        }"""
+        for grid_width, rows, last in ((1024, 3, 3), (1100, 3, 3), (1280, 3, 3), (1440, 3, 3), (1920, 3, 3), (820, 5, 1)):
+            desktop.set_viewport_size({"width": grid_width, "height": 900})
+            main_grid = desktop.locator('.speakers--nine').evaluate(speaker_grid_js)
+            groups = desktop.evaluate(groups_js)
+            check(
+                main_grid['rows'] == rows and main_grid['lastRowCount'] == last and main_grid['lastRowCentered'] and
+                main_grid['leftGap'] <= 1 and main_grid['rightGap'] <= 1,
+                f'grade de quem conduz as aulas fica com {rows} linhas e a última centralizada em {grid_width}px',
+                str(main_grid),
+            )
+            where = 'título ao lado dos cards' if grid_width >= 1024 else 'título acima dos cards'
+            check(all(groups.values()), f'startups convidadas ficam abaixo, com cards da mesma largura e {where}, em {grid_width}px', str(groups))
+        desktop.set_viewport_size({"width": 1280, "height": 900})
         desktop.close()
+
+        # Cabeçalho fixo com "Inscreva-se" ao rolar; "Dúvidas" no menu do desktop.
+        for vw, vh in ((1280, 800), (820, 1180), (390, 844)):
+            nav_page = open_page(viewport={"width": vw, "height": vh}, reduced_motion="reduce")
+            nav_page.goto(url, wait_until="load")
+            at_top = nav_page.evaluate("() => document.querySelector('[data-header-cta]').hidden")
+            faq_link = nav_page.locator('.site-nav a[href="#faq"]')
+            faq_visible = faq_link.is_visible() if vw >= 768 else faq_link.count() == 1
+            nav_page.evaluate("() => window.scrollTo(0, document.querySelector('#objetivos').offsetTop)")
+            nav_page.wait_for_timeout(300)
+            scrolled = nav_page.evaluate("""() => {
+              const header = document.querySelector('.site-header').getBoundingClientRect();
+              const cta = document.querySelector('[data-header-cta]');
+              return {ctaVisible: !cta.hidden && cta.getBoundingClientRect().width > 0, headerTop: Math.round(header.top),
+                      ctaInside: cta.getBoundingClientRect().right <= innerWidth + 1};
+            }""")
+            # Âncora do menu: o título da seção fica abaixo do cabeçalho fixo.
+            nav_page.evaluate("() => { document.documentElement.style.scrollBehavior = 'auto'; location.hash = '#palestrantes'; }")
+            nav_page.wait_for_timeout(300)
+            anchor_ok = nav_page.evaluate("() => document.querySelector('#palestrantes .eyebrow').getBoundingClientRect().top >= document.querySelector('.site-header').getBoundingClientRect().bottom - 1")
+            check(at_top and faq_visible and scrolled['ctaVisible'] and scrolled['headerTop'] == 0 and scrolled['ctaInside'] and anchor_ok,
+                  f'cabeçalho fixo mostra Inscreva-se só depois do hero, com Dúvidas no menu e âncoras visíveis, em {vw}px', str((at_top, faq_visible, scrolled, anchor_ok)))
+            nav_page.close()
+
+        # Depois de 19/11, a página entra no estado de curso encerrado.
+        for moment, ended_expected in (('2026-11-19T15:00:00-03:00', False), ('2026-11-20T09:00:00-03:00', True)):
+            for vw, vh in ((1280, 800), (390, 844)):
+                state_page = browser.new_page(viewport={"width": vw, "height": vh}, reduced_motion="reduce")
+                state_page.clock.set_fixed_time(datetime.fromisoformat(moment))
+                state_page.goto(url, wait_until="load")
+                state_page.evaluate("() => window.scrollTo(0, document.querySelector('#objetivos').offsetTop)")
+                state_page.wait_for_timeout(300)
+                st = state_page.evaluate("""() => {
+                  const shown = (el) => !!el && el.getClientRects().length > 0;
+                  return {ended: document.documentElement.classList.contains('course-ended'),
+                    heroCta: shown(document.querySelector('.hero__actions .pill')), endedText: shown(document.querySelector('.hero__ended')),
+                    tag: [...document.querySelectorAll('.hero__tag')].filter(shown).map((el) => el.textContent.trim()),
+                    headerCta: shown(document.querySelector('[data-header-cta]')),
+                    note: [...document.querySelectorAll('.schedule-note__text')].filter(shown).map((el) => el.textContent.trim().split('.')[0]),
+                    faqSignup: shown(document.querySelector('.faq__item[data-when="open"]'))};
+                }""")
+                if ended_expected:
+                    ok = st['ended'] and not st['heroCta'] and st['endedText'] and st['tag'] == ['Curso encerrado'] and not st['headerCta'] \
+                        and st['note'] == ['O curso foi encerrado em 19 de novembro'] and not st['faqSignup']
+                else:
+                    ok = not st['ended'] and st['heroCta'] and not st['endedText'] and st['tag'] == ['Curso gratuito · Online e ao vivo'] \
+                        and st['headerCta'] and st['note'] == ['As aulas são exclusivas para inscritos'] and st['faqSignup']
+                label = 'mostra o estado de curso encerrado' if ended_expected else 'continua com inscrição aberta'
+                check(ok, f'em {moment[:16]} a página {label} em {vw}px', str(st))
+                state_page.close()
 
         # Limites das faixas responsivas (um pixel antes e depois de cada corte).
         boundary = open_page(viewport={"width": 1024, "height": 900}, reduced_motion="reduce")
         boundary.goto(url, wait_until="load")
         boundary.locator('.day-nav__tabs [data-day="3"]').click()  # Encontro 4, com a aula da Inovafhytos
         boundary_issues = []
-        for width in (359, 360, 361, 430, 431, 480, 481, 599, 600, 767, 768, 1023, 1024, 1199, 1200, 2560):
+        for width in (359, 360, 361, 375, 430, 431, 480, 481, 599, 600, 767, 768, 799, 800, 1023, 1024, 1199, 1200, 2560):
             boundary.set_viewport_size({"width": width, "height": 900})
             boundary.wait_for_timeout(80)
             state = boundary.evaluate("""() => {
@@ -604,20 +738,40 @@ try:
               const right = Math.max(...[...range.getClientRects()].map((line) => line.right));
               const heading = document.querySelector('.hero__heading').getBoundingClientRect();
               const lines = (el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight));
-              const logo = document.querySelector('#encontro-4 .lesson--company .lesson__about .lesson__logo');
+              const logos = [...document.querySelectorAll('.lesson--company .lesson__about .lesson__logo')];
               return {
                 // O logo fica dentro da apresentação e não aparece com ela fechada.
-                logo: Boolean(logo) && !logo.checkVisibility(),
+                logo: logos.length === 2 && logos.every((logo) => !logo.checkVisibility()),
                 overflow: document.documentElement.scrollWidth - innerWidth,
                 titleFits: right <= heading.right + 1,
-                names: [...document.querySelectorAll('.speaker h3')].every((el) => lines(el) === 2),
-                topics: [...document.querySelectorAll('.speaker__topic')].every((el) => lines(el) === 2),
+                names: [...document.querySelectorAll('.speaker__name')].every((el) => lines(el) <= 2 && el.scrollWidth <= el.clientWidth + 1),
+                topics: [...document.querySelectorAll('.speaker__topic')].every((el) => el.scrollWidth <= el.clientWidth + 1),
+                // Painel lima: "Horário" e "Dias" lado a lado (como no celular),
+                // sem vazar; no desktop, base alinhada à dos botões do hero.
+                facts: (() => {
+                  if (innerWidth >= 600 && innerWidth < 1024) return true;  // tablet: coluna ao lado do calendário
+                  const f = document.querySelector('.dates__facts'), items = [...f.children];
+                  const side = Math.abs(items[0].getBoundingClientRect().top - items[1].getBoundingClientRect().top) < 2;
+                  const fits = [...f.querySelectorAll('dd')].every((dd) => dd.scrollWidth <= dd.clientWidth + 1);
+                  const buttons = Math.max(...[...document.querySelectorAll('.hero__actions a')].map((a) => a.getBoundingClientRect().bottom));
+                  return side && fits && (innerWidth < 1024 || Math.abs(f.getBoundingClientRect().bottom - buttons) <= 1);
+                })(),
+                // Selo e data cabem no card, sem corte, na mesma linha.
+                chips: [...document.querySelectorAll('.speaker__meta')].every((meta) => {
+                  const box = meta.getBoundingClientRect();
+                  const leaves = [...meta.querySelectorAll('span')].filter((el) => !el.children.length);
+                  const inside = leaves.every((el) => {
+                    const r = el.getBoundingClientRect();
+                    return r.left >= box.left - 1 && r.right <= box.right + 1 && el.scrollWidth <= el.clientWidth + 1;
+                  });
+                  return inside && Math.abs(meta.lastElementChild.getBoundingClientRect().top - leaves[0].getBoundingClientRect().top) <= 1;
+                }),
               };
             }""")
-            if state['overflow'] > 1 or not state['logo'] or not state['titleFits'] or not state['names'] or (width >= 360 and not state['topics']):
+            if state['overflow'] > 1 or not state['logo'] or not state['titleFits'] or not state['names'] or not state['topics'] or not state['chips'] or not state['facts']:
                 boundary_issues.append((width, state))
         boundary.close()
-        check(not boundary_issues, 'limites dos breakpoints sem overflow, com título do hero na coluna e cards em duas linhas', str(boundary_issues))
+        check(not boundary_issues, 'limites dos breakpoints sem overflow, com título do hero na coluna, nomes e temas dos cards inteiros, selo inteiro e Horário/Dias lado a lado', str(boundary_issues))
 
         # Encontros de dias anteriores viram "Aula encerrada" (datas simuladas).
         ended_cases = {
@@ -634,12 +788,13 @@ try:
             state = when.evaluate("""() => [...document.querySelectorAll('.day')].map((day) => {
               const btn = day.querySelector('.day__actions .btn');
               return {id: day.id, ended: btn.classList.contains('btn--ended'), disabled: btn.disabled === true,
-                      link: btn.tagName === 'A', label: btn.textContent.trim(), aria: btn.getAttribute('aria-label') || ''};
+                      link: btn.tagName === 'A', label: btn.querySelector('.btn__label')?.firstChild?.textContent.trim() || '',
+                      status: btn.querySelector('.btn__status')?.textContent.trim() || '', aria: btn.getAttribute('aria-label') || ''};
             })""")
             ended = [item['id'] for item in state if item['ended']]
             ok = (
                 ended == expected_ended and not when_errors and
-                all(item['disabled'] and not item['link'] and item['label'] == 'Aula encerrada' and 'encerrada' in item['aria']
+                all(item['disabled'] and not item['link'] and item['label'] == 'Aula encerrada' and item['status'] == 'Gravação por e-mail' and 'encerrada' in item['aria']
                     for item in state if item['ended']) and
                 not next(item for item in state if item['id'] == current_day)['ended']
             )

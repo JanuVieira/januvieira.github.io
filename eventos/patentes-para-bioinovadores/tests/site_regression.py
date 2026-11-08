@@ -119,6 +119,20 @@ try:
               })
             """)
             check(all(c['ok'] for c in corners), f"cantos do card e da foto do palestrante seguem o padrão de 8px sem conflito em {width}x{height}", str(corners[:2]))
+            alignment = page.evaluate("""() => {
+              const R = (el) => el.getBoundingClientRect();
+              const container = R(document.querySelector('#conteudo-programatico .container'));
+              const edges = ['.hero__brand > *', '.hero__icons > *', '.hero__actions .pill']
+                .map((s) => document.querySelector(s)).filter((el) => el && R(el).width > 0).map((el) => Math.round(R(el).left));
+              const eyebrows = [...document.querySelectorAll('main .section .eyebrow')].map((el) => Math.round(R(el).left - container.left));
+              return {hero: edges, eyebrows, titleIndent: parseFloat(getComputedStyle(document.querySelector('.hero__title-strong')).textIndent)};
+            }""")
+            # Logo, ícones e "Inscreva-se" na mesma borda (a tinta do "P" do título
+            # vem para ela pelo recuo óptico); etiquetas das seções na borda do
+            # container. (O fecho do "NOV/26" na régua é conferido pela tinta,
+            # porque o espaçamento negativo deixa a caixa do texto menor que ela.)
+            check(max(alignment['hero']) - min(alignment['hero']) <= 1 and alignment['titleIndent'] < 0 and all(abs(x) <= 1 for x in alignment['eyebrows']),
+                  f"alinhamentos do topo e das etiquetas de seção em {width}x{height}", str(alignment))
             facts = page.evaluate("""() => {
               const items = [...document.querySelectorAll('.facts__list > div')];
               const tops = new Set(items.map((el) => Math.round(el.getBoundingClientRect().top)));
@@ -744,7 +758,9 @@ try:
         # tamanho e diálogo de inscrição que só aceita destinos https.
         robust = open_page(viewport={"width": 1280, "height": 800}, reduced_motion="reduce")
         robust.goto(url + '?site-version=antiga&x=1#faq', wait_until="load")
-        robust.wait_for_timeout(200)
+        # A limpeza acontece depois de confirmar, no version.json, que a página está atualizada.
+        try: robust.wait_for_function("() => !location.search.includes('site-version')", timeout=3000)
+        except Exception: pass
         clean = robust.evaluate("() => ({search: location.search, hash: location.hash})")
         check(clean == {'search': '?x=1', 'hash': '#faq'}, 'endereço perde ?site-version= depois de carregar e mantém a seção e os outros parâmetros', str(clean))
         robust.evaluate("() => window.scrollTo(0, document.querySelector('#objetivos').offsetTop)")
@@ -848,6 +864,35 @@ try:
             csp_violations += csp_page.evaluate("() => window.__csp || []") + ([] if ready else ['head.js ou main.js não rodou'])
             csp_page.close()
         check(not csp_violations, 'nenhuma violação da política de segurança ao usar a página', str(csp_violations[:4]))
+
+        # HTML desatualizado (cache ou CDN atrasada) com version.json novo: no
+        # máximo uma recarga por versão, sem loop, e a trava fica no endereço.
+        stale_context = browser.new_context()
+        stale_docs = []
+        stale_context.on('request', lambda r: r.resource_type == 'document' and stale_docs.append(r.url))
+        stale_context.route('**/version.json**', lambda r: r.fulfill(status=200, content_type='application/json', body='{"version":"versao-nova-teste"}'))
+        stale = stale_context.new_page()
+        stale.goto(url + '?x=1#cronograma', wait_until='commit')
+        stale.wait_for_timeout(4000)
+        stale_url = stale.evaluate("() => location.search + location.hash")
+        check(len(stale_docs) <= 2 and 'site-version=versao-nova-teste' in stale_url and stale_url.endswith('#cronograma'),
+              'HTML antigo com version.json novo recarrega no máximo uma vez, sem loop', str((len(stale_docs), stale_url)))
+        stale_context.close()
+
+        # Fuso de quem acessa não muda o dia: 10/11 às 13h de Brasília (aula às 14h)
+        # e 19/11 às 23h (em Tóquio já é dia 20) valem como em Brasília.
+        tz_issues = []
+        for moment, e3_ended, course_ended in (('2026-11-10T13:00:00-03:00', False, False), ('2026-11-19T23:00:00-03:00', True, False), ('2026-11-20T00:30:00-03:00', True, True)):
+            for tz in ('America/Sao_Paulo', 'Asia/Tokyo', 'Pacific/Kiritimati', 'Pacific/Pago_Pago'):
+                tz_context = browser.new_context(timezone_id=tz)
+                use_precourse(tz_context)
+                tz_page = tz_context.new_page()
+                tz_page.clock.set_fixed_time(datetime.fromisoformat(moment))
+                tz_page.goto(url, wait_until="load")
+                got = tz_page.evaluate("() => [document.querySelector('#encontro-3 .day__actions .btn').classList.contains('btn--ended'), document.documentElement.classList.contains('course-ended')]")
+                if got != [e3_ended, course_ended]: tz_issues.append((moment, tz, got))
+                tz_context.close()
+        check(not tz_issues, 'encontros e estado do curso seguem o dia de Brasília em qualquer fuso', str(tz_issues))
 
         # Depois de 19/11, a página entra no estado de curso encerrado.
         for moment, ended_expected in (('2026-11-19T15:00:00-03:00', False), ('2026-11-20T09:00:00-03:00', True)):

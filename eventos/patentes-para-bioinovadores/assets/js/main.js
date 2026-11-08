@@ -236,7 +236,7 @@ function initDayCarousel() {
     });
   });
 
-  const today = new Date().toLocaleDateString('sv');
+  const today = todayInBrasilia();
   const upcoming = days.findIndex((day) => day.dataset.date >= today);
   if (upcoming !== -1) {
     const badge = document.createElement('span');
@@ -287,6 +287,17 @@ function initSiteMenu() {
   const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 4);
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+}
+
+/** Data de hoje (AAAA-MM-DD) em Brasília. Os encontros acontecem no horário de
+ *  Brasília, então "hoje", "próximo encontro" e "encerrado" não dependem do
+ *  fuso de quem acessa. */
+function todayInBrasilia() {
+  try {
+    return new Intl.DateTimeFormat('sv', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+  } catch {
+    return new Date().toLocaleDateString('sv');
+  }
 }
 
 /** "Inscreva-se" no cabeçalho fixo: aparece quando o botão do hero sai da
@@ -521,7 +532,7 @@ function initCursorFollower() {
  * Roda antes da confirmação de inscrição, que assim ignora esses links.
  */
 function initPastMeetings() {
-  const today = new Date().toLocaleDateString('sv');
+  const today = todayInBrasilia();
   document.querySelectorAll('.day[data-date]').forEach((day) => {
     if (day.dataset.date >= today) return;
     const action = day.querySelector('.day__actions .btn');

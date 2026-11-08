@@ -222,7 +222,7 @@
          da coluna, alinhada ao selo “Curso online”. */
       --fs-title: min(5.9cqi, 72px);
       --fs-day: clamp(20px, 6cqi, 30px);
-      --fs-month: 28.65cqi;
+      --fs-month: 29.6cqi;
     }
   }
 }
@@ -1039,6 +1039,12 @@
     letter-spacing: -0.035em;
     -webkit-font-smoothing: antialiased;
   }
+  /* Alinhamento óptico dos títulos que começam com "P" ("Por que…",
+     "Perguntas…"): a folga lateral da letra deixava a tinta ~5px à direita
+     da etiqueta. Os que começam com O, Q e N já alinham. */
+  .section__title--optical {
+    text-indent: -0.065em;
+  }
   .skip-link {
     position: absolute;
     top: 8px;
@@ -1754,10 +1760,6 @@
     margin-top: var(--space-8);
     padding: 0;
     list-style: none;
-    /* Same font size as the H1, so the indent below matches the
-       side bearing of its first letter ("P" ≈ 0.0586em). */
-    font-size: var(--fs-title);
-    padding-left: 0.0586em;
 
     li {
       display: grid;
@@ -1785,6 +1787,10 @@
     white-space: nowrap;
     font-weight: 700;
     color: var(--lime);
+    /* Alinhamento óptico: a 1ª linha recua a folga lateral do "P"
+       (≈ 0,0586em), e a tinta da letra fica na mesma linha do logo, dos
+       ícones e do "Inscreva-se". */
+    text-indent: -0.0586em;
   }
   .hero__actions {
     display: flex;
@@ -3674,6 +3680,12 @@
     line-height: 1.1;
     letter-spacing: -0.03em;
 
+    /* No desktop, o topo da maiúscula fica na linha do topo das fotos ao
+       lado (sem o espaço acima dela na caixa da linha). */
+    @media (min-width: 1024px) {
+      text-box: trim-start cap alphabetic;
+    }
+
     em {
       font-style: normal;
       color: var(--accent);
@@ -4661,12 +4673,6 @@
   }
 
   @media (min-width: 768px) and (max-width: 1023px) {
-    /* The portrait is the strongest visual edge inside each tablet card.
-       Align the section heading with that edge instead of the card shell. */
-    #palestrantes .section__head {
-      padding-inline: var(--space-4);
-    }
-
     .hero {
       padding-top: var(--space-8);
       padding-bottom: var(--space-6);

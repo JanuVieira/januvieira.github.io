@@ -14,28 +14,29 @@
       const response = await fetch(manifestUrl, { cache: 'no-store' });
       if (!response.ok) return;
       const { version } = await response.json();
-      if (!version || version === currentVersion) return;
+      if (!version) return;
 
-      const nextUrl = new URL(location.href);
-      if (nextUrl.searchParams.get('site-version') === version) return;
-      nextUrl.searchParams.set('site-version', version);
-      location.replace(nextUrl);
+      const pageUrl = new URL(location.href);
+      const tried = pageUrl.searchParams.get('site-version');
+      if (version === currentVersion) {
+        // Página atualizada: tira ?site-version= do endereço (mantém a seção
+        // e os outros parâmetros), para o link copiado sair limpo.
+        if (tried !== null) {
+          pageUrl.searchParams.delete('site-version');
+          history.replaceState(history.state, '', pageUrl);
+        }
+        return;
+      }
+      // HTML desatualizado. Se esta versão já foi tentada (o HTML veio antigo
+      // de novo, por cache ou CDN atrasada), não recarrega outra vez: o
+      // parâmetro fica no endereço como trava, uma tentativa por versão.
+      if (tried === version) return;
+      pageUrl.searchParams.set('site-version', version);
+      location.replace(pageUrl);
     } catch {
       /* O site continua funcionando normalmente quando estiver offline. */
     }
   };
-
-  // Depois da atualização, tira ?site-version= do endereço (mantém a
-  // seção e os outros parâmetros), para o link copiado sair limpo.
-  try {
-    const loadedUrl = new URL(location.href);
-    if (loadedUrl.searchParams.has('site-version')) {
-      loadedUrl.searchParams.delete('site-version');
-      history.replaceState(history.state, '', loadedUrl);
-    }
-  } catch {
-    /* Sem history ou URL, o parâmetro só fica visível no endereço. */
-  }
 
   checkForUpdate();
   addEventListener('pageshow', (event) => {
@@ -67,5 +68,12 @@ addEventListener('load', () => {
 (function () {
   var root = document.documentElement;
   var end = root.getAttribute('data-course-end');
-  if (end && new Date().toLocaleDateString('sv') > end) root.classList.add('course-ended');
+  var today;
+  // O dia é sempre o de Brasília, para quem acessa de outro fuso.
+  try {
+    today = new Intl.DateTimeFormat('sv', { timeZone: 'America/Sao_Paulo' }).format(new Date());
+  } catch (error) {
+    today = new Date().toLocaleDateString('sv');
+  }
+  if (end && today > end) root.classList.add('course-ended');
 })();

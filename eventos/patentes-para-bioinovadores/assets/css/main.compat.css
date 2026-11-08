@@ -8,6 +8,9 @@
      elementos data-when="open"; a partir do dia seguinte, os "ended". */
 /* Highlight section (cronograma), same blue as the hero panel */
 /* One title style for every section: system font, bold, tight */
+/* Alinhamento óptico dos títulos que começam com "P" ("Por que…",
+     "Perguntas…"): a folga lateral da letra deixava a tinta ~5px à direita
+     da etiqueta. Os que começam com O, Q e N já alinham. */
 /* Header */
 /* Brand, "Menu" button and the extra links exist only in the phone
      menu below; the desktop header shows the three section links. */
@@ -267,8 +270,6 @@
     /* A short viewport or browser zoom must not strand the final menu link. */
   }
 @media (min-width: 768px) and (max-width: 1023px) {
-    /* The portrait is the strongest visual edge inside each tablet card.
-       Align the section heading with that edge instead of the card shell. */
 
     /* Two compact rows of content per card avoid the 280px empty tablet
        tiles that caused the program section to jump at exactly 768px. */
@@ -551,7 +552,7 @@
          da coluna, alinhada ao selo “Curso online”. */
       --fs-title: min(5.9cqi, 72px);
       --fs-day: clamp(20px, 6cqi, 30px);
-      --fs-month: 28.65cqi;
+      --fs-month: 29.6cqi;
     }
   }
 
@@ -1384,6 +1385,12 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
     letter-spacing: -0.035em;
     -webkit-font-smoothing: antialiased;
   }
+/* Alinhamento óptico dos títulos que começam com "P" ("Por que…",
+     "Perguntas…"): a folga lateral da letra deixava a tinta ~5px à direita
+     da etiqueta. Os que começam com O, Q e N já alinham. */
+.section__title--optical:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+    text-indent: -0.065em;
+  }
 .skip-link:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
     position: absolute;
     top: 8px;
@@ -2103,10 +2110,6 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
     margin-top: var(--space-8);
     padding: 0;
     list-style: none;
-    /* Same font size as the H1, so the indent below matches the
-       side bearing of its first letter ("P" ≈ 0.0586em). */
-    font-size: var(--fs-title);
-    padding-left: 0.0586em;
   }
 .hero__icons:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) li {
       display: grid;
@@ -2133,6 +2136,10 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
     white-space: nowrap;
     font-weight: 700;
     color: var(--lime);
+    /* Alinhamento óptico: a 1ª linha recua a folga lateral do "P"
+       (≈ 0,0586em), e a tinta da letra fica na mesma linha do logo, dos
+       ícones e do "Inscreva-se". */
+    text-indent: -0.0586em;
   }
 .hero__actions:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
     display: flex;
@@ -4034,7 +4041,15 @@ summary:not(#\#):not(#\#):not(#\#):not(#\#) {
     font-weight: 600;
     line-height: 1.1;
     letter-spacing: -0.03em;
+
+    /* No desktop, o topo da maiúscula fica na linha do topo das fotos ao
+       lado (sem o espaço acima dela na caixa da linha). */
   }
+@media (min-width: 1024px) {
+  .speakers__group:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
+      text-box: trim-start cap alphabetic;
+  }
+    }
 .speakers__group:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) em {
       font-style: normal;
       color: var(--accent);
@@ -5026,13 +5041,6 @@ body:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not
     }
   }
 @media (min-width: 768px) and (max-width: 1023px) {
-    /* The portrait is the strongest visual edge inside each tablet card.
-       Align the section heading with that edge instead of the card shell. */
-    #palestrantes:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) .section__head {
-      padding-left: var(--space-4);
-      padding-right: var(--space-4);
-    }
-
     .hero:not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#):not(#\#) {
       padding-top: var(--space-8);
       padding-bottom: var(--space-6);

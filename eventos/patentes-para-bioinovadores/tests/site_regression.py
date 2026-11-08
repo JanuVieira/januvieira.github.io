@@ -72,18 +72,19 @@ try:
               })
             """)
             check(speaker_rhythm, f"cards de palestrantes mantêm 8px entre selo, nome e tema em {width}x{height}")
-            # Cantos concêntricos: quando o card é uma caixa branca, o canto dele é
-            # o canto da foto mais a distância entre os dois (R = r + d).
-            concentric = page.locator('.speaker').evaluate_all("""
-              cards => cards.every((card) => {
-                const cs = getComputedStyle(card);
-                if (cs.backgroundColor === 'rgba(0, 0, 0, 0)') return true;
-                const art = card.querySelector('.speaker__art');
+            # Cantos: padrão de 8px. Quando o card é uma caixa branca, a foto nunca
+            # é mais arredondada que ele, e, se estiver mais perto da borda que o
+            # raio do card, os cantos são concêntricos (r = R - d).
+            corners = page.locator('.speaker').evaluate_all("""
+              cards => cards.map((card) => {
+                const cs = getComputedStyle(card), art = card.querySelector('.speaker__art');
+                const R = parseFloat(cs.borderTopLeftRadius), r = parseFloat(getComputedStyle(art).borderTopLeftRadius);
                 const d = art.getBoundingClientRect().left - card.getBoundingClientRect().left;
-                return Math.abs(parseFloat(cs.borderTopLeftRadius) - (parseFloat(getComputedStyle(art).borderTopLeftRadius) + d)) <= 1;
+                const boxed = cs.backgroundColor !== 'rgba(0, 0, 0, 0)';
+                return {R, r, d: Math.round(d), ok: !boxed || (R === 8 && r <= R && (d >= R || Math.abs(r - (R - d)) <= 1))};
               })
             """)
-            check(concentric, f"cantos do card e da foto do palestrante são concêntricos em {width}x{height}")
+            check(all(c['ok'] for c in corners), f"cantos do card e da foto do palestrante seguem o padrão de 8px sem conflito em {width}x{height}", str(corners[:2]))
             facts = page.evaluate("""() => {
               const items = [...document.querySelectorAll('.facts__list > div')];
               const tops = new Set(items.map((el) => Math.round(el.getBoundingClientRect().top)));
@@ -216,7 +217,7 @@ try:
         check(layout_mobile['titleSize'] >= 38 and layout_mobile['subtitleSize'] >= 18 and layout_mobile['bodySize'] >= 17,
               'tipografia mobile ampliada com hierarquia', repr({key: layout_mobile[key] for key in ('titleSize','subtitleSize','bodySize')}))
         check(layout_mobile['actionsGap'] >= 16, 'botoes do hero mobile com separacao reforcada', str(round(layout_mobile['actionsGap'])))
-        check(layout_mobile['audienceBackground'] == 'rgb(255, 255, 255)' and layout_mobile['audienceRadius'] >= 12 and layout_mobile['audienceItemSize'] >= 18,
+        check(layout_mobile['audienceBackground'] == 'rgb(255, 255, 255)' and layout_mobile['audienceRadius'] == 8 and layout_mobile['audienceItemSize'] >= 18,
               'Para quem e possui composicao mobile independente')
         check(layout_mobile['pageBackground'] == layout_mobile['footerBackground'] and layout_mobile['footerPadding'] >= 24 and layout_mobile['viewportFit'],
               'fundo inferior acompanha rodape e contempla safe area')

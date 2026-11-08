@@ -176,12 +176,11 @@
        --radius-card / --radius-tile → things you touch or expand
        --pill / 50% → buttons, tags, badges, icon circles */
     --pill: 40px;
-    --radius-card: 16px;
+    /* Padrão único de 8px para todo canto arredondado (cards, painéis,
+       diálogos, abas, botões retangulares e fotos). Círculos e pílulas
+       mantêm a forma. */
+    --radius-card: 8px;
     --radius-tile: 8px;
-    /* Canto de um elemento encostado no canto de outro (foto dentro do card
-       branco do palestrante). O contêiner usa --radius-inner + o espaço entre
-       os dois, para os cantos serem concêntricos. */
-    --radius-inner: 4px;
 
     @media (max-width: 1023px) {
       --gutter: var(--space-8);
@@ -480,12 +479,11 @@
       /* Espaço vertical por margem, não por row-gap: assim um card sem tema
          não ganha o espaço de uma linha vazia. */
       gap: 0 var(--space-4);
-      /* Cantos concêntricos: card = canto da foto + espaço interno. */
       --speaker-pad: var(--space-4);
       padding: var(--speaker-pad);
       overflow: hidden;
       border: 0;
-      border-radius: calc(var(--radius-inner) + var(--speaker-pad));
+      border-radius: var(--radius-card);
       background: var(--white);
 
       &:last-child {
@@ -499,7 +497,7 @@
       min-height: 0;
       align-self: start;
       aspect-ratio: 1;
-      border-radius: var(--radius-inner);
+      border-radius: var(--radius-tile);
     }
     .speaker__art > span {
       inset: 0;
@@ -1126,17 +1124,20 @@
     }
   }
   /* "Inscreva-se" do cabeçalho: aparece quando o botão do hero sai da tela. */
+  /* Mesmas medidas do botão "Menu" (altura, espaço interno, borda, fonte),
+     para os dois terem exatamente o mesmo tamanho lado a lado. */
   .site-header__cta {
     display: inline-flex;
     flex: none;
     align-items: center;
     justify-content: center;
     min-height: 44px;
-    padding: var(--space-2) var(--space-5);
+    padding: 0 var(--space-4);
+    border: var(--rule-width) solid var(--blue);
     border-radius: var(--pill);
     background: var(--blue);
     color: var(--white);
-    font-size: var(--fs-small);
+    font-size: var(--fs-ui);
     font-weight: 600;
     line-height: 1;
     text-decoration: none;
@@ -1145,6 +1146,7 @@
 
     @media (hover: hover) {
       &:hover {
+        border-color: var(--navy);
         background: var(--navy);
       }
     }
@@ -2884,7 +2886,7 @@
     gap: var(--space-4) var(--space-2);
     /* Picker and arrows grouped on one translucent panel */
     padding: var(--space-3);
-    border-radius: calc(var(--radius-tile) + 12px); /* tile + padding: corners nest */
+    border-radius: var(--radius-card);
     background: color-mix(in srgb, var(--navy) 18%, var(--blue));
 
     [data-step='-1'] {
@@ -4677,11 +4679,10 @@
       align-items: start;
       gap: 0 var(--space-4);
       min-height: calc(var(--speaker-art) + 2 * var(--space-4));
-      /* Cantos concêntricos: card = canto da foto + espaço interno. */
       --speaker-pad: var(--space-4);
       padding: var(--speaker-pad);
       overflow: hidden;
-      border-radius: calc(var(--radius-inner) + var(--speaker-pad));
+      border-radius: var(--radius-card);
       background: var(--white);
     }
     .speaker__art {
@@ -4691,7 +4692,7 @@
       min-height: 0;
       align-self: start;
       aspect-ratio: 1;
-      border-radius: var(--radius-inner);
+      border-radius: var(--radius-tile);
     }
     .speaker__art > span {
       inset: 0;
@@ -5339,7 +5340,8 @@
     .site-header.has-menu .site-header__brand {
       display: none;
     }
-    .site-header.has-menu .site-header__toggle {
+    .site-header.has-menu .site-header__toggle,
+    .site-header.has-menu .site-header__cta {
       flex: 0 0 auto;
       min-width: 104px;
       min-height: 52px;
@@ -5361,7 +5363,7 @@
       min-height: 56px;
       padding-inline: var(--space-4);
       border-bottom: 0;
-      border-radius: 6px;
+      border-radius: var(--radius-tile);
       line-height: 1.35;
       font-weight: 600;
     }

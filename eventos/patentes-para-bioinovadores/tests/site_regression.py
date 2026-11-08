@@ -1066,6 +1066,49 @@ try:
         check(safe_tablet_schedule_controls, 'controles do cronograma têm pelo menos 48px no tablet')
         tablet_context.close()
         browser.close()
+
+        # Teste rápido no WebKit (motor do Safari, inclusive do iPhone): a página
+        # carrega sem erros nem violações da política de segurança, sem vazar na
+        # lateral, e as interações principais funcionam.
+        webkit = pw.webkit.launch(headless=True)
+        for vw, vh in ((390, 844), (1280, 800)):
+            wk_context = webkit.new_context(viewport={"width": vw, "height": vh}, timezone_id='America/Sao_Paulo')
+            use_precourse(wk_context)
+            wk_context.route('https://us02web.zoom.us/**', lambda route: route.abort())
+            wk = wk_context.new_page()
+            wk.clock.set_fixed_time(COURSE_DATE)
+            wk_errors = []
+            wk.on('pageerror', lambda exc: wk_errors.append(str(exc)))
+            wk.on('console', lambda msg: msg.type == 'error' and wk_errors.append(msg.text))
+            wk.add_init_script("document.addEventListener('securitypolicyviolation', (e) => (window.__csp = window.__csp || []).push(e.violatedDirective))")
+            wk.goto(url, wait_until='load')
+            wk.evaluate("() => document.fonts.ready")
+            base = wk.evaluate("""() => ({ready: ['js', 'schedule-ready', 'main-ready'].every((c) => document.documentElement.classList.contains(c)),
+              overflow: document.documentElement.scrollWidth - innerWidth, csp: window.__csp || [],
+              fonts: document.fonts.check('16px "Schibsted Grotesk"')})""")
+            wk.locator('.day-nav__tabs [data-day="3"]').click()
+            wk.wait_for_timeout(300)
+            tab_ok = wk.evaluate("() => !document.querySelector('#encontro-4').hidden")
+            wk.evaluate("() => { document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, document.querySelector('#objetivos').offsetTop); }")
+            wk.wait_for_timeout(400)
+            cta_ok = wk.evaluate("() => document.querySelector('.site-header').classList.contains('has-cta')")
+            wk.locator('.faq__item summary').first.click()
+            wk.wait_for_timeout(400)
+            faq_ok = wk.evaluate("() => document.querySelector('.faq__item').open")
+            wk.evaluate("() => window.scrollTo(0, 0)")
+            wk.locator('.day-nav__tabs [data-day="0"]').click()
+            wk.locator('a[data-requires-enrollment]').first.click()
+            wk.wait_for_timeout(400)
+            dialog_ok = wk.evaluate("() => document.querySelector('[data-enrollment-dialog]').open")
+            wk.keyboard.press('Escape')
+            ok = base['ready'] and base['overflow'] <= 1 and not base['csp'] and base['fonts'] and tab_ok and cta_ok and faq_ok and dialog_ok and not wk_errors
+            check(ok, f'WebKit (Safari) carrega e funciona em {vw}x{vh}', str({**base, 'aba': tab_ok, 'cta': cta_ok, 'faq': faq_ok, 'dialogo': dialog_ok, 'erros': wk_errors[:2]}))
+            wk_context.close()
+        wk_end = webkit.new_page(viewport={"width": 390, "height": 844})
+        wk_end.clock.set_fixed_time(datetime.fromisoformat('2026-11-20T09:00:00-03:00'))
+        wk_end.goto(url, wait_until='load')
+        check(wk_end.evaluate("() => document.documentElement.classList.contains('course-ended')"), 'WebKit (Safari) entra no estado de curso encerrado depois de 19/11')
+        webkit.close()
 finally:
     server.shutdown()
 

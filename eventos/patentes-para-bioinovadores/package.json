@@ -1,0 +1,22 @@
+{
+  "name": "patentes-para-bioinovadores",
+  "private": true,
+  "description": "Build e testes do site do curso Patentes para Bioinovadores (CGDI/INPI).",
+  "scripts": {
+    "build": "sh scripts/build-css.sh",
+    "check": "sh scripts/check-build.sh",
+    "test": "python3 tests/site_regression.py"
+  },
+  "browserslist": [
+    "Chrome >= 117",
+    "Edge >= 117",
+    "Firefox >= 113",
+    "Safari >= 16.2",
+    "iOS >= 16.2"
+  ],
+  "devDependencies": {
+    "postcss": "8.5.32",
+    "postcss-cli": "11.0.1",
+    "postcss-preset-env": "10.6.1"
+  }
+}

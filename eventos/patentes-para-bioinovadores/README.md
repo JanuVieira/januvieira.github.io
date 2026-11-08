@@ -19,6 +19,7 @@ index.html                    Página única, com as seções em ordem
 assets/
   css/main.css                Fonte editável dos estilos em camadas
   css/main.compat.css         CSS compilado e servido aos navegadores
+  js/head.js                  Carregado no <head>, antes da pintura: atualização automática, classe js e estado de curso encerrado
   js/main.js                  Menu do celular, carrossel do cronograma, confirmação de inscrição, cards de objetivos e cursor seguidor
   js/dna.js                   Animação 3D da hélice de DNA no hero (canvas)
   img/logo.svg                Favicon: logo do INPI em branco sobre quadrado azul (visível em abas claras e escuras)
@@ -28,6 +29,12 @@ assets/
   img/icons/                  Ícones do conteúdo programático (traço, 32×32)
   img/palestrantes/           Fotos dos palestrantes (quadradas)
   img/empresas/               Logos das empresas convidadas (fundo branco, recortados)
+scripts/build-css.sh          Build: CSS compilado, versões (?v=) no index.html e version.json
+scripts/check-build.sh        Confere se o build está em dia e é idempotente, e roda o check-css
+scripts/check-css.cjs         Aponta declarações mortas em main.css (anuladas por outra regra adiante)
+tests/site_regression.py      Testes de regressão (Chromium e WebKit, com Playwright)
+package.json                  Dependências do build com versões fixas e navegadores-alvo (browserslist)
+package-lock.json             Versões exatas de todas as dependências (npm ci)
 ```
 
 Seções do `index.html`: hero, 01 Conteúdo programático, 02 Objetivos (geral, público-alvo e específicos em cartões), 03 Cronograma, 04 Palestrantes e 05 Dúvidas.
@@ -65,18 +72,26 @@ Faixas responsivas:
 | até `1023px` e altura até `500px` | Celulares e tablets em paisagem |
 | até `599px`, altura até `500px` e paisagem | Paisagem muito estreita |
 
-Os breakpoints usam `min-width`/`max-width` para compatibilidade com WebViews e versões anteriores do Safari. O navegador carrega `main.compat.css`, que já contém toda a composição com seletores planos e sem dependência de CSS nesting ou cascade layers.
+Navegadores suportados: Chrome e Edge 117+, Firefox 113+, Safari e iOS 16.2+ (campo `browserslist` do `package.json`, usado pelo build). É o mínimo para o que o site usa: `subgrid`, `color-mix()`, unidades de container (`cqi`), propriedades individuais de transformação, `overflow: clip`, `inert` e camadas de cascata (`@layer`). `text-wrap` e `text-box` são melhorias progressivas: sem suporte, o texto só quebra ou alinha como antes. O navegador carrega `main.compat.css`: o build achata o CSS nesting e mantém as camadas nativas (sem simulação por especificidade).
 
-Depois de alterar `assets/css/main.css`, regenere o arquivo usado pelo site:
+Na primeira vez, instale as dependências do build com as versões travadas no `package-lock.json` (o build também faz isso sozinho se faltar `node_modules/`):
 
 ```sh
-sh scripts/build-css.sh
+npm ci
+```
+
+Depois de alterar `assets/css/main.css`, os scripts ou as imagens, regenere os arquivos usados pelo site e confira antes do commit:
+
+```sh
+npm run build    # CSS compilado, versões no index.html e version.json
+npm run check    # build em dia e idempotente + nenhuma declaração morta no CSS
+npm test         # regressão completa (Chromium e WebKit)
 ```
 
 Não edite `main.compat.css` diretamente: ele é um artefato gerado a partir de `main.css`, a única fonte dos estilos.
-O build também aplica permissão `644`, atualiza o hash curto dos recursos críticos em `index.html` e gera `version.json`. A página consulta esse manifesto sem cache e recarrega uma vez quando detecta uma publicação mais recente no GitHub Pages.
+O build gera tudo em arquivos temporários e só substitui `main.compat.css`, `index.html` e `version.json` no fim, depois que todas as etapas passam (e falha se o CSS compilado sair vazio). Ele aplica permissão `644`, atualiza o hash curto em `index.html` (CSS, scripts e todas as imagens referenciadas, inclusive fotos e logos em subpastas) e gera `version.json`; arquivos `.DS_Store` não entram no hash. A página consulta esse manifesto sem cache e recarrega uma vez quando detecta uma publicação mais recente no GitHub Pages.
 
-Não há build automático no GitHub: rode `sh scripts/build-css.sh` antes de cada commit. O GitHub Pages publica os arquivos do repositório como estão, inclusive `main.compat.css`, os hashes em `index.html` e `version.json`.
+Não há build automático no GitHub: rode `npm run build` e `npm run check` antes de cada commit. O GitHub Pages publica os arquivos do repositório como estão, inclusive `main.compat.css`, os hashes em `index.html` e `version.json`.
 
 Escala de espaço: `--space-half` (2px, só entre linhas de um mesmo bloco, como nome e cargo), `--space-1` (4px), `--space-2` (8px), `--space-3` (12px), `--space-4` (16px), `--space-5` (20px), `--space-6` (24px), `--space-8` (32px), `--space-10` (40px), `--space-12` (48px), `--space-14` (56px), `--space-16` (64px), `--space-20` (80px) e `--space-24` (96px). Todo margin, padding e gap usa um token da escala ou um token semântico (`--section-space`, `--head-gap`, `--eyebrow-gap`, `--subhead-gap`, `--block-gap`, `--column-gap`, `--card-pad`, `--gutter`), que muda por faixa de tela. Ajustes de 1–3px sobre um token (`calc(var(--space-3) - 2px)`) existem só para compensar borda de 1px ou a altura da linha em botões, selos e abas; não crie valores soltos em px.
 
@@ -116,8 +131,8 @@ Cantos: padrão único de 8px (`--radius-card` e `--radius-tile`) em todo canto 
 - **Alinhamento óptico:** títulos grandes alinham pela tinta da letra, não pela caixa do texto. A 1ª linha do título do hero recua a folga do “P” (`text-indent: -0.0586em`) e fica na mesma borda do logo, dos ícones e do “Inscreva-se”; os títulos de seção que começam com “P” usam `.section__title--optical` (`-0.065em`), porque O, Q e N já alinham com a etiqueta. No desktop, `--fs-month` (29,6cqi) faz a tinta do “6” de “NOV/26” fechar na régua dos dias e no círculo “30h”, e o título “Startups convidadas.” apara o espaço acima da maiúscula (`text-box`) para o topo da letra ficar no topo das fotos. Ao trocar um título grande, confira se a primeira letra pede o recuo.
 - **Textos (UX writing):** segunda pessoa (“você”), frases curtas e verbo de ação nos botões e links (“Inscreva-se”, “Ver cronograma”, “Abrir tópicos”). Informação de decisão primeiro: gratuito, online e ao vivo, datas e horário de Brasília. Estados dizem o que falta (“Link em breve”) e o que acontece depois (“Aula encerrada (Gravação por e-mail)”). Termos fixos: “encontro” para o dia, “aula” para o que acontece nele, “inscrição” para o formulário. Bios e conteúdo do cronograma seguem o texto oficial.
 - **Dúvidas:** nove perguntas, na ordem de quem vai se inscrever: inscrição, gratuidade, público, datas, acesso, gravações, carga horária, certificado e contato (curso.bioinovadores@inpi.gov.br). Só entram respostas confirmadas pela organização. A pergunta usa `--fs-h4` e a resposta, `--fs-body`.
-- **Testes:** `tests/site_regression.py` fixa a data em 02/11/2026, antes do curso, para dar o mesmo resultado em qualquer dia. Os encontros encerrados são testados com datas simuladas.
-- **Publicação:** rode o build, faça commit e push na `main`; o GitHub Pages publica em `januvieira.tech/eventos/patentes-para-bioinovadores/` em cerca de um minuto.
+- **Testes:** `tests/site_regression.py` fixa a data em 02/11/2026, antes do curso, para dar o mesmo resultado em qualquer dia. Os encontros encerrados são testados com datas simuladas, inclusive em fusos extremos (Tóquio, Kiritimati, Pago Pago), e há um teste de HTML desatualizado com `version.json` novo (sem loop de recarga). O fim da suíte roda um teste rápido no WebKit, o motor do Safari: carregamento, política de segurança, abas, cabeçalho, FAQ, diálogo de inscrição e estado de curso encerrado. Para instalar os navegadores dos testes: `python3 -m playwright install chromium webkit`.
+- **Publicação:** rode `npm run build` e `npm run check`, faça commit e push na `main`; o GitHub Pages publica em `januvieira.tech/eventos/patentes-para-bioinovadores/` em cerca de um minuto.
 
 ## Créditos
 

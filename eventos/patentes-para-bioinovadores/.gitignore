@@ -5,3 +5,6 @@ Thumbs.db
 
 # Relatórios locais de auditoria
 .site-audit/
+
+# Dependências do build (instaladas por npm ci)
+node_modules/

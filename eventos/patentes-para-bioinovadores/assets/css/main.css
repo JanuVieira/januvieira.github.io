@@ -269,8 +269,6 @@
     }
     .hero__grid {
       --hero-pad-x: var(--gutter);
-      --hero-pad-top: var(--gutter);
-      --hero-pad-bottom: var(--gutter);
       --hero-row-gap: var(--space-8);
       --hero-row: var(--space-14);
       --hero-gap: var(--space-8);
@@ -309,7 +307,6 @@
     .hero__copy {
       display: flex;
       flex-direction: column;
-      padding-top: var(--space-6);
     }
     .hero__heading,
     .hero__actions,
@@ -323,21 +320,13 @@
     }
     .hero__title-strong {
       white-space: normal;
-      font-size: clamp(30px, 9vw, 42px);
-      font-size: clamp(30px, 10.5cqi, 42px);
       font-weight: var(--fw-display);
-      line-height: 1.02;
-      letter-spacing: -0.03em;
       text-wrap: balance;
     }
     .hero__title-sub {
       display: block;
       max-width: 22em;
-      margin-top: var(--space-3);
-      font-size: clamp(17px, 4.8vw, 20px);
-      font-size: clamp(17px, 4.8cqi, 20px);
       font-weight: var(--fw-lead);
-      line-height: 1.4;
       letter-spacing: -0.005em;
       text-transform: none;
       color: var(--on-dark);
@@ -346,13 +335,8 @@
     .hero__icons {
       --tile: var(--space-12);
       gap: var(--space-3);
-      margin-top: var(--space-5);
       padding-left: 0;
       font-size: clamp(28px, 12.5cqi, 44px);
-    }
-    .hero__actions {
-      gap: var(--space-3);
-      margin-top: var(--space-6);
     }
     .pill {
       min-height: var(--space-12);
@@ -386,21 +370,13 @@
       font-size: var(--fs-small);
     }
     .dates__month {
-      margin-top: var(--space-5);
       margin-left: -0.04em;
-      font-size: clamp(72px, 24vw, 96px);
-      font-size: clamp(72px, 24cqi, 96px);
-      letter-spacing: -0.07em;
-    }
-    .dates__days {
-      margin-block: var(--space-4) var(--space-6);
     }
     .dates__facts {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
       justify-content: stretch;
       gap: var(--space-4);
       margin-top: 0;
-      padding-top: var(--space-5);
 
       > div:last-child {
         text-align: right;
@@ -424,9 +400,6 @@
         width: 24px;
         height: 24px;
       }
-    }
-    .audience {
-      border-radius: var(--radius-card);
     }
     .goal-card {
       overflow: clip;
@@ -456,9 +429,6 @@
     .lesson {
       padding-block: var(--space-5);
     }
-    .schedule-note {
-      padding: var(--space-4) var(--space-5) var(--space-5);
-    }
 
     /* Speakers: a true media card instead of disconnected horizontal rows. */
     .speakers {
@@ -470,11 +440,6 @@
       position: relative;
       display: grid;
       grid-template-columns: 88px minmax(0, 1fr);
-      grid-template-areas:
-        'art meta'
-        'art name'
-        'art topic'
-        'art bio';
       align-items: start;
       /* Espaço vertical por margem, não por row-gap: assim um card sem tema
          não ganha o espaço de uma linha vazia. */
@@ -632,10 +597,7 @@
     }
     .site-footer__bottom {
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
       justify-items: start;
-      gap: var(--space-4);
-      padding-top: var(--space-5);
 
       > a {
         justify-self: stretch;
@@ -1839,13 +1801,11 @@
   /* 3D DNA helix drawn by assets/js/dna.js */
   .hero__dna {
     /* Horizontal position of the helix centre, as a fraction of the panel. */
-    --dna-center: 0.74;
     position: absolute;
     inset: 0;
     z-index: 0;
     width: 100%;
     height: 100%;
-    opacity: 0.8;
     cursor: grab;
     touch-action: pan-y;
 
@@ -4387,9 +4347,6 @@
       width: 100%;
       max-width: none;
     }
-    .dates__facts {
-      margin-top: var(--space-8);
-    }
     .hero__dna {
       --dna-center: 0.82;
       --dna-scale: 0.9;
@@ -4664,9 +4621,6 @@
   @media (max-width: 767px) {
     /* A short viewport or browser zoom must not strand the final menu link. */
     .site-header.has-menu .site-nav {
-      max-height: calc(100vh - 56px);
-      max-height: calc(100dvh - 56px);
-      overflow-y: auto;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
     }
@@ -5128,40 +5082,12 @@
     }
 
     /* Audience: one editorial list, without a card around the three rows. */
-    .audience {
-      margin-top: 0;
-      padding: 0;
-      border-radius: 0;
-      background: transparent;
-    }
-    .audience .goals__label {
-      margin-bottom: var(--space-3);
-    }
-    .audience ul {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 0;
-      margin: 0;
-      border-top: var(--rule-width-strong) solid var(--ink);
-    }
     .audience li {
-      grid-template-columns: 36px minmax(0, 1fr);
-      justify-items: start;
-      gap: var(--space-4);
-      padding-block: var(--space-4);
-      border-bottom: var(--rule-width) solid var(--divider);
-      font-size: var(--fs-h4);
-      text-align: left;
-      overflow-wrap: normal;
 
       &:last-child {
         padding-bottom: var(--space-4);
         border-bottom: 0;
       }
-    }
-    .audience .icon {
-      width: 36px;
-      height: 36px;
     }
 
     /* Outcomes: more distance from every inner edge, open or closed. */
@@ -5248,7 +5174,6 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: center;
-      gap: var(--space-2);
       padding: var(--space-3) 0 0;
       background: transparent;
     }
@@ -5328,20 +5253,9 @@
     }
 
     /* Speakers: the desktop overlay becomes a full-width inline disclosure. */
-    .speaker {
-      grid-template-areas:
-        'art meta'
-        'art name'
-        'art topic'
-        'bio bio';
-    }
     .speaker__bio,
     .speaker__bio--pending {
       display: block;
-      grid-area: bio;
-      grid-column: 1 / -1;
-      width: 100%;
-      margin-top: var(--speaker-block);
     }
     .speaker__bio summary {
       font-family: var(--mono);

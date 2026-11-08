@@ -296,27 +296,62 @@ function initHeaderCta() {
   const header = document.querySelector('.site-header');
   const cta = document.querySelector('[data-header-cta]');
   const heroCta = document.querySelector('.hero__actions .pill');
-  if (!header || !cta || !heroCta || !('IntersectionObserver' in window)) return;
+  if (!header || !cta || !heroCta) return;
   if (document.documentElement.classList.contains('course-ended')) return;
 
-  // A margem do observador é a altura do cabeçalho, que muda entre faixas
-  // de tela (84px, 56px); ao mudar, o observador é recriado.
-  let observer = null;
-  let observedHeight = -1;
-  const observe = () => {
-    const height = header.offsetHeight;
-    if (height === observedHeight) return;
-    observedHeight = height;
-    observer?.disconnect();
-    observer = new IntersectionObserver(([entry]) => {
-      const passed = !entry.isIntersecting && entry.boundingClientRect.top < header.offsetHeight;
-      cta.hidden = !passed;
-      header.classList.toggle('has-cta', passed);
-    }, { rootMargin: `-${height}px 0px 0px 0px` });
-    observer.observe(heroCta);
+  // Uma pequena zona neutra impede que oscilações de 1px do scroll/resize
+  // façam o botão entrar e sair repetidamente na borda do cabeçalho.
+  const hysteresis = 8;
+  let visible = header.classList.contains('has-cta');
+  let frame = 0;
+
+  const setVisible = (next) => {
+    if (next === visible) return;
+    visible = next;
+    header.classList.toggle('has-cta', visible);
+    cta.inert = !visible;
+    if (visible) {
+      cta.removeAttribute('aria-hidden');
+      cta.removeAttribute('tabindex');
+    } else {
+      cta.setAttribute('aria-hidden', 'true');
+      cta.tabIndex = -1;
+    }
   };
-  observe();
-  if ('ResizeObserver' in window) new ResizeObserver(observe).observe(header);
+
+  // O botão participa do layout desde a inicialização. No desktop, o CSS
+  // expande o espaço de forma suave; no celular, o espaço já fica reservado.
+  // Assim nenhum item do cabeçalho muda de posição em um único quadro.
+  cta.inert = true;
+  cta.setAttribute('aria-hidden', 'true');
+  cta.tabIndex = -1;
+  header.classList.add('is-cta-ready');
+  cta.hidden = false;
+
+  const update = () => {
+    frame = 0;
+    const headerBottom = header.getBoundingClientRect().bottom;
+    const heroBottom = heroCta.getBoundingClientRect().bottom;
+    const distance = heroBottom - headerBottom;
+
+    if (!visible && distance <= -hysteresis) setVisible(true);
+    else if (visible && distance >= hysteresis) setVisible(false);
+  };
+
+  const schedule = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(update);
+  };
+
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule, { passive: true });
+  if ('ResizeObserver' in window) {
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(header);
+    resizeObserver.observe(heroCta);
+  }
+  document.fonts?.ready.then(schedule);
+  schedule();
 }
 
 /** Garante a volta ao início mesmo quando #topo já está na URL. */

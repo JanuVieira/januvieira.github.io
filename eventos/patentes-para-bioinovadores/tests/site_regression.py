@@ -571,7 +571,7 @@ try:
                   below: Math.round(next.top - facts.bottom), fits: hero.bottom <= innerHeight};
         }""")
         # Entre o hero e a seção 01 fica a faixa de resumo: nem colada, nem com vazio acumulado.
-        check(hero_space['above'] >= 32 and 24 <= hero_space['toFacts'] <= 48 and hero_space['below'] <= 160 and hero_space['fits'],
+        check(12 <= hero_space['above'] <= 24 and 24 <= hero_space['toFacts'] <= 48 and hero_space['below'] <= 160 and hero_space['fits'],
               'hero tem respiro abaixo do menu, a faixa de resumo vem logo depois e não acumula espaço antes da seção seguinte', str(hero_space))
         fold_issues = []
         for fold_w, fold_h in ((1024, 600), (1280, 720), (1366, 768), (1440, 900)):
@@ -581,6 +581,14 @@ try:
             if bottom > fold_h: fold_issues.append((fold_w, fold_h, round(bottom)))
         desktop.set_viewport_size({"width": 1280, "height": 900})
         check(not fold_issues, 'botão Inscreva-se fica visível sem rolar em telas de desktop baixas', str(fold_issues))
+        facts_fold_issues = []
+        for fold_w, fold_h in ((1280, 800), (1366, 768), (1440, 900)):
+            desktop.set_viewport_size({"width": fold_w, "height": fold_h})
+            desktop.wait_for_timeout(60)
+            bottom = desktop.evaluate("document.querySelector('.facts__list').getBoundingClientRect().bottom")
+            if bottom > fold_h: facts_fold_issues.append((fold_w, fold_h, round(bottom)))
+        desktop.set_viewport_size({"width": 1280, "height": 900})
+        check(not facts_fold_issues, 'faixa de resumo aparece inteira na primeira dobra do desktop', str(facts_fold_issues))
         credit = desktop.locator('.freefingers-credit a').evaluate("""el => {
           const s = getComputedStyle(el);
           return s.textDecorationLine.includes('underline') && s.textDecorationColor !== 'rgba(0, 0, 0, 0)';
@@ -713,7 +721,7 @@ try:
         for vw, vh in ((1280, 800), (820, 1180), (390, 844)):
             nav_page = open_page(viewport={"width": vw, "height": vh}, reduced_motion="reduce")
             nav_page.goto(url, wait_until="load")
-            at_top = nav_page.evaluate("() => document.querySelector('[data-header-cta]').hidden")
+            at_top = nav_page.evaluate("() => !document.querySelector('.site-header').classList.contains('has-cta')")
             faq_link = nav_page.locator('.site-nav a[href="#faq"]')
             faq_visible = faq_link.is_visible() if vw >= 768 else faq_link.count() == 1
             nav_page.evaluate("() => window.scrollTo(0, document.querySelector('#objetivos').offsetTop)")
@@ -721,7 +729,7 @@ try:
             scrolled = nav_page.evaluate("""() => {
               const header = document.querySelector('.site-header').getBoundingClientRect();
               const cta = document.querySelector('[data-header-cta]');
-              return {ctaVisible: !cta.hidden && cta.getBoundingClientRect().width > 0, headerTop: Math.round(header.top),
+              return {ctaVisible: getComputedStyle(cta).visibility === 'visible' && cta.getBoundingClientRect().width > 0, headerTop: Math.round(header.top),
                       ctaInside: cta.getBoundingClientRect().right <= innerWidth + 1};
             }""")
             # Âncora do menu: o título da seção fica abaixo do cabeçalho fixo.
@@ -745,12 +753,60 @@ try:
         robust.wait_for_timeout(400)
         robust.evaluate("() => window.scrollTo(0, document.querySelector('#objetivos').offsetTop)")
         robust.wait_for_timeout(400)
-        after_resize = robust.evaluate("() => !document.querySelector('[data-header-cta]').hidden")
+        after_resize = robust.evaluate("() => document.querySelector('.site-header').classList.contains('has-cta')")
         robust.evaluate("() => window.scrollTo(0, 0)")
         robust.wait_for_timeout(400)
-        at_top_after_resize = robust.evaluate("() => document.querySelector('[data-header-cta]').hidden")
+        at_top_after_resize = robust.evaluate("() => !document.querySelector('.site-header').classList.contains('has-cta')")
         check(after_resize and at_top_after_resize, 'Inscreva-se do cabeçalho continua certo depois de mudar o tamanho da tela', str((after_resize, at_top_after_resize)))
         robust.close()
+
+        # Na fronteira do hero, pequenas oscilações do trackpad não podem
+        # alternar o CTA a cada pixel e fazer o cabeçalho piscar.
+        stable_header = open_page(viewport={"width":820,"height":900}, reduced_motion="reduce")
+        stable_header.goto(url, wait_until="load")
+        threshold = stable_header.evaluate("""() => {
+          const header = document.querySelector('.site-header');
+          const heroCta = document.querySelector('.hero__actions .pill');
+          return scrollY + heroCta.getBoundingClientRect().bottom - header.getBoundingClientRect().bottom;
+        }""")
+        visible_states = []
+        for offset in (12, -4, -12, 4, 12):
+            stable_header.evaluate("top => scrollTo(0, top)", threshold + offset)
+            stable_header.wait_for_timeout(100)
+            visible_states.append(stable_header.locator('.site-header').evaluate("header => header.classList.contains('has-cta')"))
+        check(visible_states == [True, True, False, False, True],
+              'Inscreva-se do cabeçalho usa uma zona estável e não pisca na fronteira do hero', str(visible_states))
+        stable_header.close()
+
+        # A entrada do CTA não pode deslocar o menu inteiro em um único frame.
+        smooth_header = open_page(viewport={"width":820,"height":900}, reduced_motion="no-preference")
+        smooth_header.goto(url, wait_until="load")
+        transition_threshold = smooth_header.evaluate("""() => {
+          const header = document.querySelector('.site-header');
+          const heroCta = document.querySelector('.hero__actions .pill');
+          return scrollY + heroCta.getBoundingClientRect().bottom - header.getBoundingClientRect().bottom;
+        }""")
+        transition_start = smooth_header.evaluate("""() => ({
+          navLeft: document.querySelector('.site-nav').getBoundingClientRect().left,
+          headerHeight: document.querySelector('.site-header').getBoundingClientRect().height,
+          ctaHidden: document.querySelector('[data-header-cta]').hidden,
+          ctaWidth: document.querySelector('[data-header-cta]').getBoundingClientRect().width
+        })""")
+        smooth_header.evaluate("top => scrollTo(0, top)", transition_threshold + 12)
+        smooth_header.wait_for_timeout(80)
+        transition_middle = smooth_header.evaluate("() => document.querySelector('.site-nav').getBoundingClientRect().left")
+        smooth_header.wait_for_timeout(300)
+        transition_end = smooth_header.evaluate("""() => ({
+          navLeft: document.querySelector('.site-nav').getBoundingClientRect().left,
+          headerHeight: document.querySelector('.site-header').getBoundingClientRect().height
+        })""")
+        smooth_ok = (not transition_start['ctaHidden'] and transition_start['ctaWidth'] <= 1 and
+                     transition_start['navLeft'] > transition_middle > transition_end['navLeft'] and
+                     abs(transition_start['headerHeight'] - transition_end['headerHeight']) <= 1)
+        check(smooth_ok, 'Inscreva-se entra progressivamente sem salto do menu nem mudança de altura',
+              str((transition_start, transition_middle, transition_end)))
+        smooth_header.close()
+
         unsafe = open_page(viewport={"width": 1280, "height": 800}, reduced_motion="reduce")
         unsafe.goto(url, wait_until="load")
         unsafe.route('https://us02web.zoom.us/**', lambda route: route.abort())
@@ -853,6 +909,33 @@ try:
                   const buttons = Math.max(...[...document.querySelectorAll('.hero__actions a')].map((a) => a.getBoundingClientRect().bottom));
                   return side && fits && (innerWidth < 1024 || Math.abs(f.getBoundingClientRect().bottom - buttons) <= 1);
                 })(),
+                // O painel verde fica contido em todas as faixas: no celular
+                // largo há duas colunas; no tablet, calendário e fatos se
+                // empilham, com as seis datas e os dois fatos em linhas únicas.
+                dates: (() => {
+                  const panel = document.querySelector('.dates');
+                  const calendar = panel.querySelector('.dates__cal');
+                  const facts = panel.querySelector('.dates__facts');
+                  const month = panel.querySelector('.dates__month');
+                  const p = panel.getBoundingClientRect();
+                  const c = calendar.getBoundingClientRect();
+                  const f = facts.getBoundingClientRect();
+                  const m = month.getBoundingClientRect();
+                  const inside = [c, f, m].every((r) =>
+                    r.left >= p.left - 1 && r.right <= p.right + 1 &&
+                    r.top >= p.top - 1 && r.bottom <= p.bottom + 1
+                  );
+                  const cellsFit = [...panel.querySelectorAll('.dates__days li')]
+                    .every((cell) => cell.scrollWidth <= cell.clientWidth + 1);
+                  const factItems = [...facts.children].map((item) => item.getBoundingClientRect());
+                  const wideMobileColumns = innerWidth < 600 || innerWidth >= 768 || c.right <= f.left + 1;
+                  const tabletStack = innerWidth < 768 || innerWidth >= 1024 || f.top >= c.bottom - 1;
+                  const tabletFactsRow = innerWidth < 768 || innerWidth >= 1024 ||
+                    Math.abs(factItems[0].top - factItems[1].top) <= 1;
+                  const tabletMonth = innerWidth < 768 || innerWidth >= 1024 ||
+                    parseFloat(getComputedStyle(month).fontSize) <= 88.1;
+                  return inside && cellsFit && wideMobileColumns && tabletStack && tabletFactsRow && tabletMonth;
+                })(),
                 // Selo e data cabem no card, sem corte, na mesma linha.
                 chips: [...document.querySelectorAll('.speaker__meta')].every((meta) => {
                   const box = meta.getBoundingClientRect();
@@ -865,10 +948,10 @@ try:
                 }),
               };
             }""")
-            if state['overflow'] > 1 or not state['logo'] or not state['titleFits'] or not state['names'] or not state['topics'] or not state['chips'] or not state['facts']:
+            if state['overflow'] > 1 or not state['logo'] or not state['titleFits'] or not state['names'] or not state['topics'] or not state['chips'] or not state['facts'] or not state['dates']:
                 boundary_issues.append((width, state))
         boundary.close()
-        check(not boundary_issues, 'limites dos breakpoints sem overflow, com título do hero na coluna, nomes e temas dos cards inteiros, selo inteiro e Horário/Dias lado a lado', str(boundary_issues))
+        check(not boundary_issues, 'limites dos breakpoints sem overflow, com hero e painel verde contidos, título na coluna, selo inteiro e Horário/Dias lado a lado', str(boundary_issues))
 
         # Encontros de dias anteriores viram "Aula encerrada" (datas simuladas).
         ended_cases = {

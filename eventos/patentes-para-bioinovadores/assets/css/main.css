@@ -4127,6 +4127,13 @@
       line-height: var(--lh-small);
     }
   }
+  /* The passcode digits read at a glance, in the ink colour. */
+  .enrollment-option__passcode b {
+    color: var(--ink);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+  }
   @media (hover: hover) {
     .enrollment-option:hover .enrollment-option__card {
       border-color: color-mix(in srgb, var(--navy) 40%, transparent);

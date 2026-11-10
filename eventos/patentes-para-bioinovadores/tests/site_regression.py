@@ -29,7 +29,7 @@ results = []
 # os encontros passados como "Aula encerrada" e sem link do Zoom no código;
 # aqui o HTML volta ao estado de antes do curso, com um link de teste.
 PRECOURSE_ACTIONS = {
-    1: """<a class="btn btn--primary" href="https://us02web.zoom.us/j/00000000000?pwd=teste" target="_blank" rel="noopener noreferrer" data-requires-enrollment aria-label="Assistir aula do Encontro 1 no Zoom (abre em nova aba)" aria-describedby="schedule-access-note">
+    1: """<a class="btn btn--primary" href="https://us02web.zoom.us/j/00000000000?pwd=teste" target="_blank" rel="noopener noreferrer" data-requires-enrollment data-zoom-passcode="000000" aria-label="Assistir aula do Encontro 1 no Zoom (abre em nova aba)" aria-describedby="schedule-access-note">
                 <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
                 <span class="btn__label">Assistir aula<span class="btn__status">Via Zoom</span></span>
               </a>""",
@@ -423,6 +423,9 @@ try:
         check(sheet['bottom'] and sheet['fullWidth'] and sheet['stacked'], 'confirmação abre como painel inferior com opções empilhadas no mobile', str(sheet))
         check(sheet['targets'] and sheet['focused'], 'opções e Continuar têm 48px e o título recebe o foco')
         check(sheet['unselected'] and sheet['waiting'] and sheet['meta'] == 'Encontro 1 · 3 de novembro', 'Continuar só é liberado depois da escolha', sheet['meta'])
+        passcode = enrollment.locator('[data-enrollment-passcode]')
+        check(passcode.is_visible() and passcode.inner_text() == 'Senha: 000000' and 'Senha: 000000' in enrolled_option.inner_text(),
+              'confirmação mostra a senha do Zoom do encontro no cartão Sim, já me inscrevi', passcode.inner_text())
         signup_option.click()
         signup_state = proceed.evaluate("el => ({href: el.href, label: el.textContent.trim(), target: el.target})")
         with page.expect_popup() as signed:
@@ -438,12 +441,14 @@ try:
         check(proceed.get_attribute('href') == lesson.get_attribute('href') and proceed.inner_text().startswith('Entrar na aula'), 'Sim, já me inscrevi leva ao link da aula')
         page.keyboard.press('Escape')
         check(not enrollment.evaluate('el => el.open') and lesson.evaluate('el => document.activeElement === el'), 'Esc fecha a confirmação e devolve o foco ao botão da aula')
+        lesson.evaluate("el => el.removeAttribute('data-zoom-passcode')")
         lesson.click()
         reopened_clean = enrollment.evaluate("""el =>
           [...el.querySelectorAll('input[name="enrollment-status"]')].every((radio) => !radio.checked) &&
           !el.querySelector('[data-enrollment-hint]').textContent
         """)
         check(reopened_clean, 'confirmação reabre sem a escolha anterior')
+        check(not passcode.is_visible(), 'link sem data-zoom-passcode não mostra linha de senha na confirmação')
         enrolled_option.click()
         with page.expect_popup() as entered:
             proceed.click()
@@ -841,7 +846,7 @@ try:
         # sem link do Zoom no código e política de segurança sem violações.
         published = (ROOT / 'index.html').read_text(encoding='utf-8')
         past_actions = [re.search(r'<article class="day" id="encontro-%d".*?<div class="day__actions"[^>]*>(.*?)</div>' % n, published, re.S).group(1) for n in (1, 2)]
-        check('zoom.us' not in published and all('btn--ended' in a and 'href=' not in a for a in past_actions),
+        check(all('btn--ended' in a and 'href=' not in a and 'zoom.us' not in a for a in past_actions),
               'encontros que já passaram ficam encerrados no HTML, sem link do Zoom no código da página')
         check('<script>' not in published and 'style="' not in published and 'http-equiv="Content-Security-Policy"' in published,
               'HTML sem script nem estilo embutidos, com política de segurança (CSP)')

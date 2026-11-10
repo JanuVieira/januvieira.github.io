@@ -682,6 +682,8 @@ function initEnrollmentDialog() {
   const title = dialog?.querySelector('[data-enrollment-title]');
   const options = [...(dialog?.querySelectorAll('input[name="enrollment-status"]') || [])];
   const enrolled = dialog?.querySelector('[data-enrollment-enrolled]');
+  const passcode = dialog?.querySelector('[data-enrollment-passcode]');
+  const passcodeValue = passcode?.querySelector('[data-enrollment-passcode-value]');
   const proceed = dialog?.querySelector('[data-enrollment-continue]');
   const proceedLabel = proceed?.querySelector('[data-enrollment-continue-label]');
   const hint = dialog?.querySelector('[data-enrollment-hint]');
@@ -788,6 +790,12 @@ function initEnrollmentDialog() {
           .join(' · ');
       }
       enrolled.dataset.href = link.href;
+      // Senha do Zoom do encontro (data-zoom-passcode no link), quando houver.
+      if (passcode && passcodeValue) {
+        const code = link.dataset.zoomPasscode?.trim() || '';
+        passcodeValue.textContent = code;
+        passcode.hidden = !code;
+      }
       options.forEach((option) => (option.checked = false));
       if (hint) hint.textContent = '';
       updateProceed();

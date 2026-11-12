@@ -37,6 +37,10 @@ PRECOURSE_ACTIONS = {
                 <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
                 <span class="btn__label">Assistir aula<span class="btn__status">Link em breve</span></span>
               </button>""",
+    3: """<button class="btn btn--primary" type="button" disabled aria-label="Assistir aula do Encontro 3 (link em breve)" aria-describedby="schedule-access-note">
+                <span class="btn__icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.3-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5Z" fill="currentColor" /></svg></span>
+                <span class="btn__label">Assistir aula<span class="btn__status">Link em breve</span></span>
+              </button>""",
 }
 
 def precourse_html(html):
@@ -455,10 +459,12 @@ try:
         entered.value.close()
         page.wait_for_timeout(100)
         closed_after_enter = not enrollment.evaluate('el => el.open')
-        with page.expect_popup() as direct:
-            lesson.click()
-        direct.value.close()
-        check(closed_after_enter and not enrollment.evaluate('el => el.open'), 'depois de confirmar, as próximas aulas abrem direto')
+        lesson.evaluate("el => el.dataset.zoomPasscode = '000000'")
+        popup_count = len(popups)
+        lesson.click()
+        check(closed_after_enter and enrollment.evaluate('el => el.open') and len(popups) == popup_count and passcode.is_visible() and passcode.inner_text() == 'Senha: 000000',
+              'cada entrada na aula volta a mostrar a confirmação e a senha')
+        page.keyboard.press('Escape')
 
         bios = page.locator('.speaker__bio')
         speaker_count = page.locator('.speaker').count()
@@ -845,7 +851,7 @@ try:
         # Página publicada (sem a cópia de antes do curso): encontros passados
         # sem link do Zoom no código e política de segurança sem violações.
         published = (ROOT / 'index.html').read_text(encoding='utf-8')
-        past_actions = [re.search(r'<article class="day" id="encontro-%d".*?<div class="day__actions"[^>]*>(.*?)</div>' % n, published, re.S).group(1) for n in (1, 2)]
+        past_actions = [re.search(r'<article class="day" id="encontro-%d".*?<div class="day__actions"[^>]*>(.*?)</div>' % n, published, re.S).group(1) for n in (1, 2, 3)]
         check(all('btn--ended' in a and 'href=' not in a and 'zoom.us' not in a for a in past_actions),
               'encontros que já passaram ficam encerrados no HTML, sem link do Zoom no código da página')
         check('<script>' not in published and 'style="' not in published and 'http-equiv="Content-Security-Policy"' in published,

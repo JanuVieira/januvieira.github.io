@@ -674,7 +674,7 @@ function initSpeakerBios() {
   document.documentElement.classList.add('bios-ready');
 }
 
-/** Pergunta sobre a inscrição antes de abrir a aula e lembra a resposta no navegador. */
+/** Pergunta sobre a inscrição e mostra a senha antes de cada entrada na aula. */
 function initEnrollmentDialog() {
   const links = [...document.querySelectorAll('a[data-requires-enrollment]')];
   const dialog = document.querySelector('[data-enrollment-dialog]');
@@ -692,7 +692,6 @@ function initEnrollmentDialog() {
   if (links.length === 0 || !enrolled || !proceedLabel || typeof dialog.showModal !== 'function') return;
 
   const compact = matchMedia('(max-width: 767px)');
-  const storageKey = 'patentes-bioinovadores:inscricao-confirmada';
   const proceedLabels = { enrolled: 'Entrar na aula', signup: 'Ir para a inscrição' };
   // Só endereços https viram destino do "Continuar" (nunca javascript:, data: etc.).
   const safeHref = (value) => {
@@ -705,21 +704,6 @@ function initEnrollmentDialog() {
   };
   let opener = null;
 
-  // O armazenamento pode estar bloqueado (navegação privada ou política do navegador).
-  const isConfirmed = () => {
-    try {
-      return localStorage.getItem(storageKey) === 'sim';
-    } catch {
-      return false;
-    }
-  };
-  const rememberConfirmation = () => {
-    try {
-      localStorage.setItem(storageKey, 'sim');
-    } catch {
-      // Sem armazenamento, a pergunta volta a aparecer no próximo clique.
-    }
-  };
   const closeDialog = () => {
     if (dialog.open) dialog.close();
   };
@@ -762,7 +746,6 @@ function initEnrollmentDialog() {
       return;
     }
     if (selected === enrolled) {
-      rememberConfirmation();
       // Fecha só depois do clique, para que o navegador abra a aula normalmente.
       setTimeout(closeDialog);
       return;
@@ -778,7 +761,6 @@ function initEnrollmentDialog() {
     link.addEventListener('click', (event) => {
       // Ctrl/Cmd/Shift + clique mantêm o comportamento nativo do navegador.
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      if (isConfirmed()) return;
       event.preventDefault();
 
       const day = link.closest('.day');
